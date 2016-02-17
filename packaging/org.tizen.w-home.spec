@@ -51,8 +51,8 @@ BuildRequires: pkgconfig(rua)
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(dbus-glib-1)
-BuildRequires: pkgconfig(json)
-BuildRequires: pkgconfig(journal)
+#BuildRequires: pkgconfig(json)
+#BuildRequires: pkgconfig(journal)
 BuildRequires: pkgconfig(tapi)
 %else
 %define ARCH emulator

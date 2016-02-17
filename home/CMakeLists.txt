@@ -62,8 +62,8 @@ pkg_check_modules(PKGS_ARM REQUIRED
 	dbus-1
 	dbus-glib-1
 	glib-2.0
-	json
-	journal
+#	json
+#	journal
 	tapi
 )
 ENDIF()
