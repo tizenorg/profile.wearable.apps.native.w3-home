@@ -765,7 +765,7 @@ static Eina_Bool _visibility_timeout_cb(void *data)
 	_E("Visibility event is not reached in %lf seconds", VISIBILITY_TIMEOUT);
 
 	effect_init();
-	_clock_service_init_timer_cb(data);
+//	_clock_service_init_timer_cb(data);
 	_widget_load_init_timer_cb(NULL);
 
 	main_info.safety_init_timer = NULL;
@@ -811,7 +811,7 @@ static void _window_visibility_cb(void *data, Evas_Object *obj, void *event_info
 			main_info.safety_init_timer = NULL;
 		}
 
-		_clock_service_init_timer_cb(NULL);
+		//_clock_service_init_timer_cb(NULL);
 
 		if (!ecore_timer_add(LAZY_NOTI_TIMER, _noti_broker_init_timer_cb, NULL)) {
 			_E("Failed to create a new timer for noti-broker");
@@ -1022,7 +1022,7 @@ static bool _create_cb(void *data)
 
 	wms_register_setup_wizard_vconf();
 
-#if 1 //TBD
+#if 0 //TBD
 	home_gesture_init();
 	if (home_dbus_register_cb(DBUS_EVENT_LCD_ON, _lcd_on_cb, NULL) != W_HOME_ERROR_NONE) {
 		_E("Failed to register lcd status changed cb");
@@ -1030,15 +1030,16 @@ static bool _create_cb(void *data)
 	if (home_dbus_register_cb(DBUS_EVENT_LCD_OFF, _lcd_off_cb, NULL) != W_HOME_ERROR_NONE) {
 		_E("Failed to register lcd status changed cb");
 	}
-#else
+##else
 	if (device_add_callback(DEVICE_CALLBACK_DISPLAY_STATE, _display_state_cb, NULL) < 0) {
 		_E("Failed to add the display state callback");
 	}
 #endif
+#if 0
 	if (home_dbus_register_cb(DBUS_EVENT_ALPM_MANAGER_STATE_CHANGED, _alpm_manager_status_changed_cb, NULL) != W_HOME_ERROR_NONE) {
 		_E("Failed to register alpm manager status changed cb");
 	}
-
+#endif
 	/**
 	 * Register the X Event handlers before creating our Window.
 	 * If you don't want to be bothered by timing issue of these **cking events ;)
@@ -1097,7 +1098,7 @@ static bool _create_cb(void *data)
 	/* After creating a window */
 	_init_theme();
 
-	clock_service_event_register();
+	//clock_service_event_register();
 	/**
 	 * This function initialize the noti-broker.
 	 * But we already manage it from this file.
@@ -1409,13 +1410,13 @@ int main(int argc, char *argv[])
 	if (cooldown_mode_enabled_get() == 1) {
 		clock_service_mode_set(CLOCK_SERVICE_MODE_COOLDOWN);
 	}
-
+#if 0
 	/* Launch the clock */
 	if ((clock_pkgname = clock_service_clock_pkgname_get()) != NULL) {
 		clock_util_provider_launch(clock_pkgname, NULL, CLOCK_CONF_NONE);
 		free(clock_pkgname);
 	}
-
+#endif
 	ret = ui_app_main(argc, argv, &lifecycle_callback, &main_info);
 	CRITICAL_LOG_FINI();
 	return ret;

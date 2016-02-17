@@ -216,20 +216,24 @@ HAPI int clock_util_setting_conf_get(void)
 	int ret = 0;
 	int val = 0;
 
+	return 1;
+#if 0
 	if ((ret = vconf_get_int(VCONFKEY_CLOCK_SETTING_CONF_KEY, &val)) < 0) {
 		_E("Failed to get %s(%d)", VCONFKEY_CLOCK_SETTING_CONF_KEY, ret);
 	}
 
 	return val;
+#endif
 }
 
 HAPI void clock_util_setting_conf_set(int value)
 {
 	int ret = 0;
-
+#if 0
 	if ((ret = vconf_set_int(VCONFKEY_CLOCK_SETTING_CONF_KEY, value)) < 0) {
 		_E("Failed to set %s(%d)", VCONFKEY_CLOCK_SETTING_CONF_KEY, ret);
 	}
+#endif
 }
 
 HAPI void clock_util_setting_conf_bundle_add(bundle *b, int type)
