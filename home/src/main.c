@@ -843,8 +843,8 @@ static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
 
 	//Ecore_X_Window xWin = elm_win_xwindow_get(main_info.win);
 	//if (xWin == ev->win) {
-	//	_D("focus in");
-	//	_resume_cb(NULL);
+		_D("focus in");
+		_resume_cb(NULL);
 	//} else {
 	//	_E("win[%d], ev->win[%d]", xWin, ev->win);
 	//}
@@ -885,6 +885,8 @@ static Eina_Bool _window_focus_out_cb(void *data, int type, void *event)
 		_E("win[%d], ev->win[%d]", xWin, ev->win);
 	}
 #endif
+		_D("focus out");
+		_pause_cb(NULL);
 
 	return ECORE_CALLBACK_PASS_ON;
 }
@@ -1044,7 +1046,7 @@ static bool _create_cb(void *data)
 	 * Register the X Event handlers before creating our Window.
 	 * If you don't want to be bothered by timing issue of these **cking events ;)
 	 */
-	handler = ecore_event_handler_add(EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, NULL);
+	/*handler = ecore_event_handler_add(EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, NULL);
 	if (!handler) {
 		_E("Failed to add an ecore event handler (FOCUS_IN)");
 	}
@@ -1054,13 +1056,16 @@ static bool _create_cb(void *data)
 	if (!handler) {
 		_E("Failed to add an ecore event handler (FOCUS_OUT)");
 	}
-	evas_object_data_set(main_info.win, PRIVATE_DATA_KEY_FOCUS_OUT_EVENT_HANDLER, handler);
+	evas_object_data_set(main_info.win, PRIVATE_DATA_KEY_FOCUS_OUT_EVENT_HANDLER, handler);*/
 
 	evas_object_smart_callback_add(main_info.win, "visibility,changed", _window_visibility_cb, NULL);
 
 	main_info.win = win_create("W-Home");
 	retv_if(!main_info.win, false);
 	evas_object_smart_callback_add(main_info.win, "access,changed", _tts_cb, NULL);
+
+	evas_event_callback_add(main_info.e, EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, NULL);
+	evas_event_callback_add(main_info.e, EVAS_CALLBACK_CANVAS_FOCUS_OUT, _window_focus_out_cb, NULL);
 
 	/* DYNAMICBOX init */
 	widget_init(main_info.win);

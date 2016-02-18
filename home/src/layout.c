@@ -575,7 +575,7 @@ static Evas_Event_Flags _flick_move_cb(void *data, void *event_info)
 	int distance_x = abs( ei->momentum.x1 - ei->momentum.x2);
 	int distance_y = abs(vector_y);
 
-#if 0 //DEBUG
+#if 1 //DEBUG
 	_D("gesture_down_y:%d", gesture_down_y);
 	_D("ei->momentum.my:%d", ei->momentum.my);
 	_D("is_flickup_done:%d", is_flickup_done);

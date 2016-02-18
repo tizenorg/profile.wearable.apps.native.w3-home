@@ -26,6 +26,7 @@
 #include <system_settings.h>
 #include <unistd.h>
 #include <vconf.h>
+#include <Evas.h>
 
 #include "log.h"
 #include "util.h"
@@ -227,21 +228,21 @@ static void _apps_slide_down_effect_del(instance_info_s *info)
 #endif
 
 
-#if 0
+
 static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
 {
 	instance_info_s *info = data;
-	Ecore_X_Event_Window_Focus_In *ev = event;
+	//Ecore_X_Event_Window_Focus_In *ev = event;
 
-	Ecore_X_Window xWin = elm_win_xwindow_get(info->win);
-	if(xWin == ev->win) {
+//	Ecore_X_Window xWin = elm_win_xwindow_get(info->win);
+//	if(xWin == ev->win) {
 		_APPS_D("focus in");
 		noti_broker_event_fire_to_plugin(EVENT_SOURCE_VIEW, EVENT_TYPE_APPS_SHOW, NULL);
 		apps_main_resume();
-	}
-	else {
-		_APPS_E("win[%d], ev->win[%d]", xWin, ev->win);
-	}
+//	}
+//	else {
+//		_APPS_E("win[%d], ev->win[%d]", xWin, ev->win);
+//	}
 
 	return ECORE_CALLBACK_PASS_ON;
 }
@@ -251,21 +252,21 @@ static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
 static Eina_Bool _window_focus_out_cb(void *data, int type, void *event)
 {
 	instance_info_s *info = data;
-	Ecore_X_Event_Window_Focus_Out *ev = event;
+	//Ecore_X_Event_Window_Focus_Out *ev = event;
 
-	Ecore_X_Window xWin = elm_win_xwindow_get(info->win);
-	if(xWin == ev->win) {
+	//Ecore_X_Window xWin = elm_win_xwindow_get(info->win);
+	//if(xWin == ev->win) {
 		_APPS_D("focus out");
 		noti_broker_event_fire_to_plugin(EVENT_SOURCE_VIEW, EVENT_TYPE_APPS_HIDE, NULL);
 		apps_main_pause();
-	}
-	else {
-		_APPS_E("win[%d], ev->win[%d]", xWin, ev->win);
-	}
+	//}
+	//else {
+	//	_APPS_E("win[%d], ev->win[%d]", xWin, ev->win);
+	//}
 
 	return ECORE_CALLBACK_PASS_ON;
 }
-#endif
+
 
 
 #define ROTATION_TYPE_NUMBER 1
@@ -287,6 +288,7 @@ static apps_error_e _init_app_win(instance_info_s *info, const char *name, const
 #endif
 	info->win = elm_win_add(NULL, name, ELM_WIN_BASIC);
 	retv_if(!info->win, APPS_ERROR_FAIL);
+	elm_win_screen_size_get(info->win, NULL, NULL, &info->root_w, &info->root_h);
 	apps_main_info.instance_list = eina_list_append(apps_main_info.instance_list, info);
 
 	elm_win_alpha_set(info->win, EINA_FALSE); // This order is important
@@ -323,6 +325,19 @@ static apps_error_e _init_app_win(instance_info_s *info, const char *name, const
 	if (!info->ee) {
 		_APPS_E("[%s] Failed to get ecore_evas object", __func__);
 	}
+
+	evas_event_callback_add(info->e, EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, info);
+	evas_event_callback_add(info->e, EVAS_CALLBACK_CANVAS_FOCUS_OUT, _window_focus_out_cb, info);
+
+	/*
+
+	Evas_Object *rect = evas_object_rectangle_add(info->e);
+	evas_object_resize(rect, 200, 200);
+	evas_object_move(rect, 200, 200);
+	evas_object_color_set(rect, 100, 0, 0, 255);
+	evas_object_show(rect);
+	*/
+
 #if 0
 	Ecore_Event_Handler *handler = ecore_event_handler_add(EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, info);
 	evas_object_data_set(info->win, PRIVATE_DATA_KEY_FOCUS_IN_EVENT_HANDLER, handler);
