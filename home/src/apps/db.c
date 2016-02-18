@@ -488,6 +488,7 @@ HAPI apps_error_e apps_db_read_list(Eina_List *item_info_list)
 #define QUERY_SELECT_ORDERING_ITEM "SELECT id, ordering FROM "APPS_TABLE" ORDER BY ordering ASC"
 HAPI Eina_List *apps_db_write_list(void)
 {
+	_D(">>>>>>>>>>>>>>>>>>>>>> db: %s", APPS_DB_FILE);
 	stmt_h *st = NULL;
 	Eina_List *list = NULL;
 

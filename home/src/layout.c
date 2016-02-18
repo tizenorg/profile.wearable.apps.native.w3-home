@@ -543,6 +543,7 @@ static void _upper_end_cb(void *data, Evas_Object *obj, void *event_info)
 
 static Evas_Event_Flags _flick_start_cb(void *data, void *event_info)
 {
+	_D(">>>>>>>>>>>>>>>>>>. flick start");
 	int gesture_down_y = 0;
 	Evas_Object *layout = data;
 	Elm_Gesture_Line_Info *ei = (Elm_Gesture_Line_Info *)event_info;
@@ -575,7 +576,7 @@ static Evas_Event_Flags _flick_move_cb(void *data, void *event_info)
 	int distance_x = abs( ei->momentum.x1 - ei->momentum.x2);
 	int distance_y = abs(vector_y);
 
-#if 0 //DEBUG
+#if 1 //DEBUG
 	_D("gesture_down_y:%d", gesture_down_y);
 	_D("ei->momentum.my:%d", ei->momentum.my);
 	_D("is_flickup_done:%d", is_flickup_done);
@@ -663,6 +664,7 @@ static Evas_Event_Flags _flick_end_cb(void *data, void *event_info)
 
 static void _attach_gesture_layer(Evas_Object *layout)
 {
+	_D(">>>>>>>>>>>>>>>> attatch gesture layer");
 	Evas_Object *gesture_layer = NULL;
 	ret_if(!layout);
 
@@ -720,6 +722,7 @@ static void _destroy_checker(Evas_Object *checker)
 #define GROUP_LAYOUT "layout"
 HAPI Evas_Object *layout_create(Evas_Object *win)
 {
+	_D(">>>>>>>>>>>>>>>>>>>>>>>>>>>> layout create >>>");
 	Evas_Object *layout = NULL;
 	Evas_Object *checker = NULL;
 	Evas_Object *scroller = NULL;
@@ -769,9 +772,11 @@ HAPI Evas_Object *layout_create(Evas_Object *win)
 		_E("Cannot register the reset callback");
 	}
 
+	_D(">>>>>>>>>>>>>>>>>>>>>>>>>>>> layout create >>>");
 	if (W_HOME_ERROR_NONE != gesture_register_cb(BEZEL_UP, _bezel_up_cb, layout)) {
 		_E("Cannot register the gesture callback");
 	}
+	_D(">>>>>>>>>>>>>>>>>>>>>>>>>>>> success register bezel up>>>");
 
 	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BEZEL_UP, _bezel_up_key_cb, layout)) {
 		_E("Cannot register the key callback");
