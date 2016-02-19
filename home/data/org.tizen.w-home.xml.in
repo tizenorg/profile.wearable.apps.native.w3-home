@@ -18,5 +18,6 @@
 		<privilege>http://tizen.org/privilege/messaging.read</privilege>
 		<privilege>http://tizen.org/privilege/messaging.write</privilege>
 		<privilege>http://tizen.org/privilege/contact.read</privilege>
+		<privilege>http://tizen.org/privilege/appmanager.launch</privilege>
 	</privileges>
 </manifest>
