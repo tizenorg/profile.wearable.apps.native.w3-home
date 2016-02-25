@@ -858,7 +858,7 @@ group {
 				visible: 1;
 			}
 		}
-		part {
+	/*	part {
 			name: "add,bg";
 			type: RECT;
 			scale: 1;
@@ -877,7 +877,7 @@ group {
 				inherit: "default" 0.0;
 				color_class: "AO0481";
 			}
-		}
+		}*/
 		part {
 			name: "plus";
 			type: IMAGE;
@@ -885,8 +885,8 @@ group {
 			mouse_events: 0;
 			description {
 				state: "default" 0.0;
-				rel1 { relative: 0.5 0.5; to: "add,bg"; }
-				rel2 { relative: 0.5 0.5; to: "add,bg"; }
+				rel1 { relative: 0.5 0.5; to: "bg"; }
+				rel2 { relative: 0.5 0.5; to: "bg"; }
 				image {
 					normal: "b_home_screen_widget_plus.png";
 				}
@@ -1003,7 +1003,7 @@ group {
 			signal: "show,widget";
 			source: "plus_item";
 			action: STATE_SET "default" 0.0;
-			target: "add,bg";
+			//target: "add,bg";
 			target: "plus";
 		}
 		program {
@@ -1011,7 +1011,7 @@ group {
 			signal: "show,edit";
 			source: "plus_item";
 			action: STATE_SET "edit" 0.0;
-			target: "add,bg";
+			//target: "add,bg";
 			target: "plus";
 		}
 		program {
@@ -1019,14 +1019,14 @@ group {
 			signal: "show,widget,ani";
 			source: "plus_item";
 			action: STATE_SET "edit" 0.0;
-			target: "add,bg";
+			//target: "add,bg";
 			target: "plus";
 			after: "show,widget,ani,2";
 		}
 		program {
 			name: "show,widget,ani,2";
 			action: STATE_SET "default" 0.0;
-			target: "add,bg";
+			//target: "add,bg";
 			target: "plus";
 			transition: LINEAR 0.5;
 		}
