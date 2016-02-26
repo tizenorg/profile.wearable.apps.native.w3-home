@@ -137,18 +137,7 @@ EXEC_PROGRAM("${UNAME}" ARGS "-m" OUTPUT_VARIABLE "ARCH")
 
 ADD_EXECUTABLE(${PROJECT_NAME}
 	src/bg.c
-	src/clock_shortcut.c
-	src/clock_service.c
-	src/clock_event.c
-	src/clock_manager.c
-	src/clock_inf_widget.c
-	src/clock_inf_minictrl.c
-	src/clock_manager.c
-	src/clock_util.c
-	src/clock_view.c
-	src/clock_view_cue.c
-	src/clock_view_hidden.c
-	src/clock_view_indicator.c
+	src/clock.c
 	src/db.c
 	src/dbus.c
 	src/dbus_util.c
@@ -165,9 +154,6 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	src/main.c
 	src/mapbuf.c
 	src/noti_broker.c
-	src/minictrl.c
-	src/minictrl_util.c
-	src/minictrl_manager.c
 	src/page.c
 	src/page_info.c
 	src/popup.c

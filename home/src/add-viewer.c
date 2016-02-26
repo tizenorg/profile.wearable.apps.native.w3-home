@@ -161,6 +161,7 @@ out:
 cancel:
 	(void)evas_object_data_del(container, "list");
 	(void)evas_object_data_del(container, "loader");
+	DbgPrint("There is no content");
 
 	l = elm_box_children_get(container);
 	if (!l) {

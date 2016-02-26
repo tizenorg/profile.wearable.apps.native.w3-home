@@ -30,7 +30,6 @@
 #include "scroller_info.h"
 #include "scroller.h"
 #include "layout.h"
-#include "clock_service.h"
 #include "db.h"
 #include "dbus.h"
 //#include "tutorial.h"
@@ -190,8 +189,6 @@ static void _psmode_apply(int mode)
 
 		_execute_cbs(POWER_MODE_ENHANCED_OFF, NULL);
 
-		clock_service_request(CLOCK_SERVICE_MODE_NORMAL);
-
 		page_info_list = db_write_list();
 		if (page_info_list) {
 			scroller_push_pages(scroller, page_info_list, _del_list, page_info_list);
@@ -211,7 +208,6 @@ static void _psmode_apply(int mode)
 		}
 		layout_set_idle(_layout_get());
 
-		clock_service_request(CLOCK_SERVICE_MODE_EMERGENCY);
 		scroller_region_show_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_INSTANT);
 
 		scroller_pop_pages(scroller, PAGE_DIRECTION_RIGHT);
@@ -268,7 +264,6 @@ static void _cooldown_mode_apply(int mode)
 	if (mode == COOLDOWN_MODE_RELEASE) {
 		_execute_cbs(POWER_MODE_COOLDOWN_OFF, NULL);
 
-		clock_service_request(CLOCK_SERVICE_MODE_NORMAL);
 		scroller_unfreeze(scroller);
 
 		//if(tutorial_is_first_boot()) tutorial_create(_layout_get());
@@ -283,7 +278,6 @@ static void _cooldown_mode_apply(int mode)
 		}
 		layout_set_idle(_layout_get());
 
-		clock_service_request(CLOCK_SERVICE_MODE_COOLDOWN);
 		scroller_region_show_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_INSTANT);
 		elm_win_activate(main_get_info()->win);
 		scroller_freeze(scroller);

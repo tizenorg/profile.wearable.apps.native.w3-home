@@ -40,7 +40,6 @@
 #include "index.h"
 #include "util.h"
 #include "xml.h"
-#include "clock_service.h"
 #include "power_mode.h"
 #include "apps/apps_main.h"
 #include "gesture.h"
@@ -191,11 +190,13 @@ static Eina_Bool _longpress_timer_cb(void *data)
 		break;
 	case PAGE_DIRECTION_CENTER:
 		if (util_feature_enabled_get(FEATURE_CLOCK_SELECTOR) == 1) {
+#if 0
 			if (clock_service_clock_selector_launch() > 0) {
 				evas_object_data_set(layout_info->pressed_page, DATA_KEY_PAGE_ONHOLD_COUNT, (void*)1);
 				evas_object_data_set(layout, PRIVATE_DATA_KEY_CENTER_LONG_PRESSED, (void*)1);
 				scroller_freeze(layout_info->scroller);
 			}
+#endif
 		} else {
 			no_effect = 1;
 		}
