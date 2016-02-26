@@ -25,15 +25,12 @@
 #include <dbus/dbus-glib-lowlevel.h>
 #include <efl_assist.h>
 #include <dlog.h>
-#include <minicontrol-viewer.h>
-#include <minicontrol-monitor.h>
 
 #include "util.h"
 #include "main.h"
 #include "log.h"
 #include "dbus.h"
 #include "gesture.h"
-#include "minictrl.h"
 #include "page_info.h"
 #include "scroller_info.h"
 #include "scroller.h"

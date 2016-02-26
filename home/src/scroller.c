@@ -19,8 +19,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <dlog.h>
-#include <minicontrol-viewer.h>
-#include <minicontrol-monitor.h>
 #include <bundle.h>
 #include <efl_assist.h>
 #include <vconf.h>
@@ -39,7 +37,6 @@
 #include "widget.h"
 #include "log.h"
 #include "main.h"
-#include "minictrl.h"
 #include "page_info.h"
 #include "page.h"
 #include "pkgmgr.h"

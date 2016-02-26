@@ -89,9 +89,6 @@ HAPI int util_feature_enabled_get(int feature)
 		if (cooldown_mode_enabled_get() == 1) {
 			return 0;
 		}
-		if (clock_service_scroller_freezed_get() == 1) {
-			return 0;
-		}
 #if 0
 		if (tutorial_is_exist() == 1) {
 			return 0;
@@ -113,9 +110,6 @@ HAPI int util_feature_enabled_get(int feature)
 		if (apps_main_show_count_get() > 3) {
 			return 0;
 		}
-		if (clock_service_scroller_freezed_get() == 1) {
-			return 0;
-		}
 	} else if (feature & FEATURE_CLOCK_SELECTOR) {
 #if 0 //TBD, it can be disabled
 		return 0;
@@ -134,9 +128,6 @@ HAPI int util_feature_enabled_get(int feature)
 		if (cooldown_mode_enabled_get() == 1) {
 			return 0;
 		}
-		if (clock_service_scroller_freezed_get() == 1) {
-			return 0;
-		}
 	} else if (feature & FEATURE_APPS_BY_BEZEL_UP) {
 		if (main_get_info()->is_tts) {
 			return 0;
@@ -150,9 +141,6 @@ HAPI int util_feature_enabled_get(int feature)
 			return 0;
 		}
 		if (cooldown_mode_enabled_get() == 1) {
-			return 0;
-		}
-		if (clock_service_scroller_freezed_get() == 1) {
 			return 0;
 		}
 	} else if (feature & FEATURE_APPS) {
