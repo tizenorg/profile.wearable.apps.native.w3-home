@@ -412,7 +412,8 @@ HAPI Evas_Object *page_create(Evas_Object *scroller
 	focus = elm_button_add(page_inner);
 	retv_if(NULL == focus, NULL);
 
-	elm_object_style_set(focus, "focus");
+	elm_object_theme_set(focus, main_get_info()->theme);
+	elm_object_style_set(focus, "transparent");
 	elm_object_part_content_set(page_inner, "focus", focus);
 
 	elm_access_info_cb_set(focus, ELM_ACCESS_TYPE, NULL, NULL);

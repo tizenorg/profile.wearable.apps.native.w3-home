@@ -167,7 +167,7 @@ static void widget_pended_event_consumer(Evas_Object *obj, int ret, void *data)
 	info = pop_pended_event_list();
 	if (info) {
 		int ret;
-		ret = widget_viewer_evas_feed_access_event(info->widget, info->info.action_type, &info->info, info->cb, info->data);
+		//ret = widget_viewer_evas_feed_access_event(info->widget, info->info.action_type, &info->info, info->cb, info->data);
 		if (ret == WIDGET_ERROR_RESOURCE_BUSY) {
 			_E("Failed to send pended event (%s), %X", action_type_string(info->info.action_type), ret);
 			try_again_send_event(info);
@@ -183,7 +183,7 @@ static void send_access_event(Evas_Object *widget, Elm_Access_Action_Info *info,
 {
 	int ret;
 
-	ret = widget_viewer_evas_feed_access_event(widget, info->action_type, info, cb, data);
+	//ret = widget_viewer_evas_feed_access_event(widget, info->action_type, info, cb, data);
 	if (ret == WIDGET_ERROR_RESOURCE_BUSY && must_be_sent) {
 		_D("Pending event (%s)", action_type_string(info->action_type));
 		push_pended_event_list(widget, info, cb, data);

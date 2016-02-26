@@ -419,14 +419,16 @@ static void _init_theme(void)
 {
 	main_info.theme = elm_theme_new();
 	elm_theme_ref_set(main_info.theme, NULL);
-	elm_theme_extension_add(main_info.theme, EDJEDIR"/index.edj");
+	//elm_theme_extension_add(main_info.theme, EDJEDIR"/index.edj");
+	elm_theme_extension_add(main_info.theme, EDJEDIR"/style.edj");
 }
 
 
 
 static void _destroy_theme(void)
 {
-	elm_theme_extension_del(main_info.theme, EDJEDIR"/index.edj");
+	//elm_theme_extension_del(main_info.theme, EDJEDIR"/index.edj");
+	elm_theme_extension_del(main_info.theme, EDJEDIR"/style.edj");
 	elm_theme_free(main_info.theme);
 	main_info.theme = NULL;
 }

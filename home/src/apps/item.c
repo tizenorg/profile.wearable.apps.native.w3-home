@@ -54,6 +54,7 @@
 
 #define MOVE_THRESHOLD 5
 #define CALL_THRESHOLD 50
+#define THEME_EDJE EDJEDIR"/style.edj"
 
 
 
@@ -822,10 +823,16 @@ HAPI Evas_Object *item_create(Evas_Object *scroller, item_info_s *item_info)
 	elm_object_part_content_set(item_inner, "icon", icon);
 	elm_object_part_text_set(item_inner, "name", item_info->name);
 
+	/*Elm_Theme *th;
+	th = elm_theme_new();
+	elm_theme_ref_set(th, NULL);
+	elm_theme_extension_add(th, THEME_EDJE);*/
+
 	focus = elm_button_add(item);
 	retv_if(NULL == focus, NULL);
 
-	elm_object_style_set(focus, "focus");
+	elm_object_theme_set(focus, apps_main_get_info()->theme);
+	elm_object_style_set(focus, "transparent");
 	elm_object_part_content_set(item, "focus", focus);
 	elm_access_info_cb_set(focus, ELM_ACCESS_INFO, _access_info_cb, item);
 	elm_access_info_cb_set(focus, ELM_ACCESS_TYPE, NULL, NULL);

@@ -334,7 +334,8 @@ HAPI Evas_Object *apps_layout_create(Evas_Object *win, const char *file, const c
 	Evas_Object *focus = elm_button_add(layout);
 	retv_if(!focus, NULL);
 
-	elm_object_style_set(focus, "focus");
+	elm_object_theme_set(focus, apps_main_get_info()->theme);
+	elm_object_style_set(focus, "transparent");
 	elm_object_part_content_set(layout, "focus", focus);
 	elm_access_info_cb_set(focus, ELM_ACCESS_INFO, _access_info_cb, _("IDS_IDLE_BODY_APPS"));
 	elm_access_info_cb_set(focus, ELM_ACCESS_TYPE, NULL, NULL);
