@@ -48,6 +48,7 @@
 
 
 #define LAYOUT_EDJE EDJEDIR"/apps_layout.edj"
+#define THEME_EDJE EDJEDIR"/style.edj"
 #define LAYOUT_GROUP_NAME "layout"
 #define VCONFKEY_APPS_IS_FIRST_BOOT "db/private/org.tizen.w-home/apps_first_boot"
 
@@ -438,6 +439,10 @@ static void _execute_cbs(instance_info_s *info, int state)
 HAPI void apps_main_init()
 {
 	_APPS_D("APPS INIT");
+	apps_main_info.theme = elm_theme_new();
+	elm_theme_ref_set(apps_main_info.theme, NULL);
+	elm_theme_extension_add(apps_main_info.theme, THEME_EDJE);
+
 
 	/* Data set */
 	instance_info_s *info = NULL;
@@ -481,6 +486,9 @@ HAPI void apps_main_fini()
 {
 	instance_info_s *info = eina_list_nth(apps_main_get_info()->instance_list, 0);
 	ret_if(NULL == info);
+
+	elm_theme_extension_del(apps_main_info.theme, THEME_EDJE);
+	elm_theme_free(apps_main_info.theme);
 
 	info->state = APPS_APP_STATE_TERMINATE;
 	_execute_cbs(info, APPS_APP_STATE_TERMINATE);
@@ -551,6 +559,7 @@ HAPI void apps_main_launch(int launch_type)
 	if(eina_list_count(apps_main_info.instance_list) == 0) {
 		apps_main_init();
 	}
+
 	instance_info_s *info = eina_list_nth(apps_main_get_info()->instance_list, 0);
 	ret_if(!info);
 
