@@ -50,7 +50,6 @@
 #include "page.h"
 #include "scroller_info.h"
 #include "scroller.h"
-#include "minictrl.h"
 #include "clock_service.h"
 #include "dbus.h"
 #include "gesture.h"
@@ -540,7 +539,6 @@ static int _dead_cb(int pid, void *data)
 {
 	_D("PID(%d) is dead", pid);
 	/* Who manages the idle clock? home_item_idle_clock_app_dead_cb */
-	clock_service_event_app_dead_cb(pid);
 
 	return 1;
 }
@@ -587,7 +585,6 @@ static void _resume_cb(void *data)
 		if (_is_lcd_turned_on() == 1) {
 			_W("clock/widget resumed");
 			widget_viewer_evas_notify_resumed_status_of_viewer();
-			clock_service_resume();
 		}
 	}
 }
@@ -611,7 +608,6 @@ static void _pause_cb(void *data)
 	/* DYNAMICBOX pause */
 	_W("clock/widget paused");
 	widget_viewer_evas_notify_paused_status_of_viewer();
-	clock_service_pause();
 }
 
 
@@ -754,7 +750,6 @@ static Eina_Bool _clock_service_init_timer_cb(void *data)
 {
 	_W("clock service init");
 	clock_service_init();
-	minicontrol_init();
 	power_mode_ui_init();
 
 	return ECORE_CALLBACK_CANCEL;
@@ -767,7 +762,7 @@ static Eina_Bool _visibility_timeout_cb(void *data)
 	_E("Visibility event is not reached in %lf seconds", VISIBILITY_TIMEOUT);
 
 	effect_init();
-//	_clock_service_init_timer_cb(data);
+	_clock_service_init_timer_cb(data);
 	_widget_load_init_timer_cb(NULL);
 
 	main_info.safety_init_timer = NULL;
@@ -813,7 +808,7 @@ static void _window_visibility_cb(void *data, Evas_Object *obj, void *event_info
 			main_info.safety_init_timer = NULL;
 		}
 
-		//_clock_service_init_timer_cb(NULL);
+		_clock_service_init_timer_cb(NULL);
 
 		if (!ecore_timer_add(LAZY_NOTI_TIMER, _noti_broker_init_timer_cb, NULL)) {
 			_E("Failed to create a new timer for noti-broker");
@@ -937,13 +932,11 @@ static void _alpm_manager_status_changed_cb(void *user_data, void *event_info)
 			if (_is_lcd_turned_on() == 1) {
 				_W("clock/widget resumed");
 				widget_viewer_evas_notify_resumed_status_of_viewer();
-				clock_service_resume();
 			}
 		}
 	} else if (strcmp(status, ALPM_MANAGER_STATUS_SIMPLE_HIDE) == 0)  {
 		main_info->is_alpm_clock_enabled = 0;
 		widget_viewer_evas_notify_resumed_status_of_viewer();
-		clock_service_resume();
 	}
 }
 
@@ -959,7 +952,6 @@ static void _lcd_on_cb(void *user_data, void *event_info)
 		if (main_info->is_alpm_clock_enabled == 0) {
 			_W("clock/widget resumed");
 			widget_viewer_evas_notify_resumed_status_of_viewer();
-			clock_service_resume();
 		}
 	}
 }
@@ -974,7 +966,6 @@ static void _lcd_off_cb(void *user_data, void *event_info)
 	if (main_info->state == APP_STATE_RESUME) {
 		_W("clock/widget paused");
 		widget_viewer_evas_notify_paused_status_of_viewer();
-		clock_service_pause();
 	}
 }
 
@@ -1188,13 +1179,9 @@ static void _terminate_cb(void *data)
 #endif
 	effect_fini();
 
-	clock_service_event_deregister();
 
 	/* Clock Service fini */
 	clock_service_fini();
-
-	/* Minicontrol fini */
-	minicontrol_fini();
 
 	noti_broker_fini();
 
@@ -1410,20 +1397,8 @@ int main(int argc, char *argv[])
 		_E("setenv(BUFMGR_MAP_CACHE) is failed: %s", strerror(errno));
 	}
 
-	/* initial mode set */
-	if (emergency_mode_enabled_get() == 1) {
-		clock_service_mode_set(CLOCK_SERVICE_MODE_EMERGENCY);
-	}
-	if (cooldown_mode_enabled_get() == 1) {
-		clock_service_mode_set(CLOCK_SERVICE_MODE_COOLDOWN);
-	}
-#if 0
 	/* Launch the clock */
-	if ((clock_pkgname = clock_service_clock_pkgname_get()) != NULL) {
-		clock_util_provider_launch(clock_pkgname, NULL, CLOCK_CONF_NONE);
-		free(clock_pkgname);
-	}
-#endif
+	//aul_launch_app(clock):
 	ret = ui_app_main(argc, argv, &lifecycle_callback, &main_info);
 	CRITICAL_LOG_FINI();
 	return ret;

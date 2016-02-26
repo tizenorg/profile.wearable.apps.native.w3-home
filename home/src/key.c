@@ -30,7 +30,6 @@
 #include "util.h"
 #include "main.h"
 #include "key.h"
-#include "minictrl.h"
 #include "page_info.h"
 #include "scroller_info.h"
 #include "scroller.h"
