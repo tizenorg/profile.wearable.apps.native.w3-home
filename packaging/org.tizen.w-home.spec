@@ -63,7 +63,7 @@ BuildRequires: edje-bin
 BuildRequires: embryo-bin
 BuildRequires: gettext-devel
 BuildRequires: hash-signer
-#BuildRequires: model-build-features
+BuildRequires: model-build-features
 
 %description
 Home for wearable devices

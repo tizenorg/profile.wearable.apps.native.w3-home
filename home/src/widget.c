@@ -160,38 +160,6 @@ static struct pended_access_event *pop_pended_event_list(void)
 
 
 
-static void widget_pended_event_consumer(Evas_Object *obj, int ret, void *data)
-{
-	struct pended_access_event *info;
-
-	info = pop_pended_event_list();
-	if (info) {
-		int ret;
-		ret = widget_viewer_evas_feed_access_event(info->widget, info->info.action_type, &info->info, info->cb, info->data);
-		if (ret == WIDGET_ERROR_RESOURCE_BUSY) {
-			_E("Failed to send pended event (%s), %X", action_type_string(info->info.action_type), ret);
-			try_again_send_event(info);
-		} else {
-			free(info);
-		}
-	}
-}
-
-
-
-static void send_access_event(Evas_Object *widget, Elm_Access_Action_Info *info, int must_be_sent, void (*cb)(Evas_Object *obj, int ret, void *data), void *data)
-{
-	int ret;
-
-	ret = widget_viewer_evas_feed_access_event(widget, info->action_type, info, cb, data);
-	if (ret == WIDGET_ERROR_RESOURCE_BUSY && must_be_sent) {
-		_D("Pending event (%s)", action_type_string(info->action_type));
-		push_pended_event_list(widget, info, cb, data);
-	}
-}
-
-
-
 static void del_cb(void *data, Evas *e, Evas_Object *widget, void *event_info)
 {
 	const char *widget_id;
@@ -511,7 +479,6 @@ static void _widget_access_action_ret_cb(Evas_Object *obj, int ret, void *data)
 		Elm_Access_Action_Info action_info;
 		memset(&action_info, 0, sizeof(action_info));
 		action_info.action_type = ELM_ACCESS_ACTION_UNHIGHLIGHT;
-		push_pended_event_list(page_info->item, &action_info, widget_pended_event_consumer, NULL);
 	}
 	case WIDGET_ACCESS_STATUS_ERROR: /* In case of error, we have to set focus on our page */
 		page_info->need_to_unhighlight = EINA_FALSE;
@@ -538,8 +505,6 @@ static void _widget_access_action_ret_cb(Evas_Object *obj, int ret, void *data)
 			_D("page_info->highlight EINA_FALSE");
 		}
 	}
-
-	widget_pended_event_consumer(obj, ret, data);
 }
 
 
@@ -605,17 +570,14 @@ static Eina_Bool _unhighlight_action_cb(void *data, Evas_Object *focus, Elm_Acce
 				// We have to cancelate the scroll event.
 				_action_info.mouse_type = 2; // MOUSE_UP
 				_action_info.action_type = ELM_ACCESS_ACTION_SCROLL;
-				send_access_event(page_info->item, &_action_info, 1, widget_pended_event_consumer, NULL);
 
 				_action_info.mouse_type = 0;
 				_action_info.action_type = ELM_ACCESS_ACTION_UNHIGHLIGHT;
-				send_access_event(page_info->item, &_action_info, 1, widget_pended_event_consumer, NULL);
 				_D("Reset scroll event");
 			}
 		} else {
 			// Need to turn of highlight
 			_action_info.action_type = ELM_ACCESS_ACTION_UNHIGHLIGHT;
-			send_access_event(page_info->item, &_action_info, 1, widget_pended_event_consumer, NULL);
 		}
 		return EINA_FALSE;
 	}
@@ -648,7 +610,6 @@ static Eina_Bool _access_action_activate_cb(void *data, Evas_Object *focus, Elm_
 		widget_viewer_evas_activate_faulted_widget(page_info->item);
 	} else {
 		_D("Access action(%s) for focus(%p <> %p) is called", action_type_string(action_info->action_type), focus, page_info->focus);
-		send_access_event(page_info->item, action_info, 1, _widget_access_action_ret_cb, page);
 		/* Highligh off and then reset highlight from return callback _widget_access_action_ret_cb() */
 	}
 
@@ -697,7 +658,6 @@ static Eina_Bool _access_action_scroll_cb(void *data, Evas_Object *focus, Elm_Ac
 		return EINA_FALSE;
 	}
 
-	send_access_event(page_info->item, action_info, must, widget_pended_event_consumer, NULL);
 
 	/* Highligh off and then reset highlight from return callback _widget_access_action_ret_cb() */
 	return EINA_FALSE;
@@ -802,7 +762,6 @@ static Eina_Bool _access_action_forward_cb(void *data, Evas_Object *focus, Elm_A
 	}
 
 	_D("Access action(%s) for focus(%p <> %p) is called, by(%d)", action_type_string(action_info->action_type), focus, page_info->focus, action_info->action_by);
-	send_access_event(page_info->item, action_info, 1, _widget_access_action_ret_cb, page);
 
 	/* Highligh off and then reset highlight from return callback _widget_access_action_ret_cb() */
 	return EINA_TRUE;
@@ -841,7 +800,6 @@ static Eina_Bool _access_action_mouse_cb(void *data, Evas_Object *focus, Elm_Acc
 	must = action_info->mouse_type != 1;
 
 	_D("Access action(%s) for focus(%p <> %p) is called", action_type_string(action_info->action_type), focus, page_info->focus);
-	send_access_event(page_info->item, action_info, must, widget_pended_event_consumer, NULL);
 
 	/* Highligh off and then reset highlight from return callback _widget_access_action_ret_cb() */
 	return EINA_TRUE;

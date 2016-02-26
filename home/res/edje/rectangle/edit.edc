@@ -27,15 +27,6 @@ styles {
 	}
 }
 
-images {
-	image: "b_home_screen_widget_line.#.png" COMP;
-	image: "b_home_screen_widget_line_ef.png" COMP;
-	image: "b_home_screen_widget_plus.png" COMP;
-	image: "b_home_screen_widget_plus_ef.png" COMP;
-	image: "b_home_screen_edit_cover.png" COMP;
-	image: "b_home_screen_edit_cover_ef.png" COMP;
-}
-
 collections {
 group {
 	name: "edit";
