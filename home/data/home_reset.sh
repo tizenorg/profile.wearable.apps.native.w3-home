@@ -16,4 +16,4 @@
 /usr/bin/vconftool set -t int "memory/private/org.tizen.w-home/sensitive_move" 1 -i -g 5000 -f -s org.tizen.w-home
 
 #badge DB reset
-/usr/bin/sqlite3 /opt/dbspace/.badge.db "delete from badge_data; delete from badge_option; VACUUM;"
+#/usr/bin/sqlite3 /opt/dbspace/.badge.db "delete from badge_data; delete from badge_option; VACUUM;"

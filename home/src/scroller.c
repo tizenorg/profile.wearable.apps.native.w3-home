@@ -75,6 +75,7 @@ static void _mouse_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_in
 	scroller_info_s *scroller_info = NULL;
 
 	ret_if(!layout);
+	_D("scroller mouse down");
 
 	home_dbus_scroll_booster_signal_send(200);
 
@@ -97,6 +98,7 @@ static void _mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info
 {
 	Evas_Object *scroller = obj;
 	scroller_info_s *scroller_info = NULL;
+	_D("scroller mouse up");
 
 #if 0 //TBD
 	home_dbus_scroll_booster_signal_send(0);
@@ -285,7 +287,10 @@ static void _elm_box_pack_before(Evas_Object *scroller, Evas_Object *page, Evas_
 static void _elm_box_pack_after(Evas_Object *scroller, Evas_Object *page, Evas_Object *after)
 {
 	scroller_info_s *scroller_info = NULL;
+	Eina_List *list = NULL;
+	Evas_Object *item = NULL;
 	int reverse_factor;
+	int is_exist = 0;
 
 	ret_if(!scroller);
 	ret_if(!page);
@@ -314,7 +319,19 @@ static void _elm_box_pack_after(Evas_Object *scroller, Evas_Object *page, Evas_O
 		break;
 	}
 
-	elm_box_pack_after(scroller_info->box, page, after);
+	list = elm_box_children_get(scroller_info->box);
+
+	EINA_LIST_FREE(list, item) {
+		if (item == after) {
+			is_exist = 1;
+		}
+	}
+
+	if (is_exist) {
+		elm_box_pack_after(scroller_info->box, page, after);
+	} else {
+		elm_box_pack_start(scroller_info->box, page);
+	}
 	/* recalculate : child box with pages -> parent box */
 	elm_box_recalculate(scroller_info->box);
 	elm_box_recalculate(scroller_info->box_layout);
@@ -987,7 +1004,7 @@ static Eina_Bool _index_update_cb(void *data)
 	}
 
 	_D("Index is updated");
-
+	scroller_info->index_update_timer = NULL;
 	return ECORE_CALLBACK_CANCEL;
 }
 
@@ -1004,11 +1021,6 @@ HAPI w_home_error_e scroller_push_page(Evas_Object *scroller, Evas_Object *page,
 
 	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
 	retv_if(!scroller_info, W_HOME_ERROR_FAIL);
-
-	if (scroller_info->index_update_timer) {
-		ecore_timer_del(scroller_info->index_update_timer);
-		scroller_info->index_update_timer = NULL;
-	}
 
 	page_info = evas_object_data_get(page, DATA_KEY_PAGE_INFO);
 	retv_if(!page_info, W_HOME_ERROR_FAIL);
@@ -1095,7 +1107,11 @@ HAPI w_home_error_e scroller_push_page(Evas_Object *scroller, Evas_Object *page,
 		break;
 	}
 
-	scroller_info->index_update_timer = ecore_timer_add(INDEX_UPDATE_TIME, _index_update_cb, scroller);
+	if (scroller_info->index_update_timer) {
+		ecore_timer_reset(scroller_info->index_update_timer);
+	} else {
+		scroller_info->index_update_timer = ecore_timer_add(INDEX_UPDATE_TIME, _index_update_cb, scroller);
+	}
 	if (!scroller_info->index_update_timer) {
 		_E("Cannot add an index update timer");
 	}
@@ -1438,6 +1454,7 @@ HAPI void scroller_pop_pages(Evas_Object *scroller, page_direction_e direction)
 		}
 
 		if (PAGE_DIRECTION_RIGHT == page_info->direction) {
+			elm_object_part_content_unset(page_info->page_inner, "item");
 			evas_object_del(page_info->item);
 		}
 
