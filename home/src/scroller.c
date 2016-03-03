@@ -75,6 +75,7 @@ static void _mouse_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_in
 	scroller_info_s *scroller_info = NULL;
 
 	ret_if(!layout);
+	_D("scroller mouse down");
 
 	home_dbus_scroll_booster_signal_send(200);
 
@@ -97,6 +98,7 @@ static void _mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info
 {
 	Evas_Object *scroller = obj;
 	scroller_info_s *scroller_info = NULL;
+	_D("scroller mouse up");
 
 #if 0 //TBD
 	home_dbus_scroll_booster_signal_send(0);
@@ -285,7 +287,10 @@ static void _elm_box_pack_before(Evas_Object *scroller, Evas_Object *page, Evas_
 static void _elm_box_pack_after(Evas_Object *scroller, Evas_Object *page, Evas_Object *after)
 {
 	scroller_info_s *scroller_info = NULL;
+	Eina_List *list = NULL;
+	Evas_Object *item = NULL;
 	int reverse_factor;
+	int is_exist = 0;
 
 	ret_if(!scroller);
 	ret_if(!page);
@@ -314,7 +319,19 @@ static void _elm_box_pack_after(Evas_Object *scroller, Evas_Object *page, Evas_O
 		break;
 	}
 
-	elm_box_pack_after(scroller_info->box, page, after);
+	list = elm_box_children_get(scroller_info->box);
+
+	EINA_LIST_FREE(list, item) {
+		if (item == after) {
+			is_exist = 1;
+		}
+	}
+
+	if (is_exist) {
+		elm_box_pack_after(scroller_info->box, page, after);
+	} else {
+		elm_box_pack_start(scroller_info->box, page);
+	}
 	/* recalculate : child box with pages -> parent box */
 	elm_box_recalculate(scroller_info->box);
 	elm_box_recalculate(scroller_info->box_layout);
@@ -350,7 +367,7 @@ static void _elm_box_unpack(Evas_Object *scroller, Evas_Object *page)
 		return;
 	}
 
-	reverse_factor = _set_scroller_reverse_by_page(scroller, page);
+//	reverse_factor = _set_scroller_reverse_by_page(scroller, page);
 	switch (reverse_factor) {
 	case -1:
 #if 0 /* EFL Private feature */
@@ -370,11 +387,11 @@ static void _elm_box_unpack(Evas_Object *scroller, Evas_Object *page)
 		break;
 	}
 
-	elm_object_focus_set(page, EINA_FALSE);
+	//elm_object_focus_set(page, EINA_FALSE);
 	elm_box_unpack(scroller_info->box, page);
 	/* recalculate : child box with pages -> parent box */
-	elm_box_recalculate(scroller_info->box);
-	elm_box_recalculate(scroller_info->box_layout);
+	//elm_box_recalculate(scroller_info->box);
+	//elm_box_recalculate(scroller_info->box_layout);
 }
 
 
@@ -1095,6 +1112,7 @@ HAPI w_home_error_e scroller_push_page(Evas_Object *scroller, Evas_Object *page,
 		break;
 	}
 
+//TODO: ecore_timer_reset 
 	scroller_info->index_update_timer = ecore_timer_add(INDEX_UPDATE_TIME, _index_update_cb, scroller);
 	if (!scroller_info->index_update_timer) {
 		_E("Cannot add an index update timer");
@@ -1438,6 +1456,7 @@ HAPI void scroller_pop_pages(Evas_Object *scroller, page_direction_e direction)
 		}
 
 		if (PAGE_DIRECTION_RIGHT == page_info->direction) {
+			elm_object_part_content_unset(page_info->page_inner, "item");
 			evas_object_del(page_info->item);
 		}
 

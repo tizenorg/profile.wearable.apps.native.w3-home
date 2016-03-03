@@ -153,14 +153,7 @@ sqlite3 %{DATADIR}/.apps.db 'PRAGMA journal_mode = PERSIST;
 '
 chmod 666 %{DATADIR}/.apps.db*
 
-if [ -f /usr/lib/rpm-plugins/msm.so ]
-then
-chsmack -a '%{name}' /opt%{PREFIX}
-chsmack -a '%{name}' %{DATADIR}
-chsmack -a '%{name}' %{DATADIR}/.home.db*
-chsmack -a '%{name}' %{DATADIR}/.home_tts.db*
-chsmack -a '%{name}' %{DATADIR}/.apps.db*
-fi
+
 
 vconftool set -t int "memory/private/org.tizen.w-home/tutorial" 0 -i -g $INHOUSE_ID -f -s %{name}
 vconftool set -t int "db/private/org.tizen.w-home/enabled_tutorial" 0 -g $INHOUSE_ID -f -s %{name}
@@ -180,7 +173,6 @@ vconftool set -t string "db/wms/clocks_set_idle" "org.tizen.idle-clock-digital" 
 /usr/share/license/%{name}
 /usr/share/packages/%{name}.xml
 /usr/share/icons/default/small/%{name}*.png
-/etc/smack/accesses.d/%{name}.efl
 /etc/opt/upgrade/*.sh
 %{PREFIX}/*.xml
 %{PREFIX}/bin/*
