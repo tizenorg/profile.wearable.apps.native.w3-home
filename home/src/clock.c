@@ -107,7 +107,6 @@ static Evas_Object *_clock_view_add(Evas_Object *parent, Evas_Object *item)
 	goto_if(evb == NULL, ERR);
 	evas_object_size_hint_min_set(evb, main_get_info()->root_w, main_get_info()->root_h);
 	evas_object_size_hint_weight_set(evb, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_repeat_events_set(evb, 1);
 	evas_object_color_set(evb, 0, 0, 0, 0);
 	evas_object_show(evb);
 	elm_object_part_content_set(layout, "event_blocker", evb);
@@ -116,25 +115,11 @@ static Evas_Object *_clock_view_add(Evas_Object *parent, Evas_Object *item)
 		elm_access_object_unregister(item);
 	}
 
-	Evas_Object *focus_apps = elm_button_add(layout);
-	if (focus_apps != NULL) {
-		elm_object_theme_set(focus_apps, main_get_info()->theme);
-		elm_object_style_set(focus_apps, "transparent");
-		evas_object_smart_callback_add(focus_apps, "clicked", _apps_clicked_cb, NULL);
-		elm_object_part_content_set(layout, "focus.bottom.cue", focus_apps);
-	}
-
 	if (item != NULL) {
+		evas_object_size_hint_min_set(item, 360, 360);
+		evas_object_size_hint_weight_set(item, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+		evas_object_show(item);
 		elm_object_part_content_set(layout, "item", item);
-	} else {
-	/* it is just for test */
-		evb = evas_object_rectangle_add(main_get_info()->e);
-		goto_if(evb == NULL, ERR);
-		evas_object_size_hint_min_set(evb, 100, 100);
-		evas_object_size_hint_weight_set(evb, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-		evas_object_color_set(evb, 0, 255, 0, 255);
-		evas_object_show(evb);
-		elm_object_part_content_set(layout, "item", evb);
 	}
 
 	page = page_create(parent
@@ -188,6 +173,9 @@ static int __watch_handler(watch_control_h watch, void *data)
 	if (!page) {
 		_E("Fail to create the page");
 		evas_object_del(clock);
+	}
+	if (scroller_push_page(scroller, page, SCROLLER_PUSH_TYPE_CENTER) != W_HOME_ERROR_NONE) {
+		_E("Fail to push the page into scroller");
 	}
 }
 

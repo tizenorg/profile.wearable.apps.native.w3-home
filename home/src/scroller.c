@@ -75,6 +75,7 @@ static void _mouse_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_in
 	scroller_info_s *scroller_info = NULL;
 
 	ret_if(!layout);
+	_D("scroller mouse down");
 
 	home_dbus_scroll_booster_signal_send(200);
 
@@ -97,6 +98,7 @@ static void _mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info
 {
 	Evas_Object *scroller = obj;
 	scroller_info_s *scroller_info = NULL;
+	_D("scroller mouse up");
 
 #if 0 //TBD
 	home_dbus_scroll_booster_signal_send(0);
