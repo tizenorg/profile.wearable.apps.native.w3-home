@@ -42,6 +42,7 @@ pkg_check_modules(PKGS REQUIRED
 	libxml-2.0
 	widget_viewer_evas
 	widget_service
+	watch-control
 	minicontrol-viewer
 	minicontrol-monitor
 	pkgmgr

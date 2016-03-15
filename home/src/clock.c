@@ -205,7 +205,7 @@ void clock_service_init(Evas_Object *win)
 		return;
 	}
 
-	watch_manager_init(win, NULL);
+	watch_manager_init(win);
 	watch_manager_add_handler(WATCH_OBJ_ADD, __watch_handler, scroller);
 	watch_manager_get_app_control(pkg_name, &watch_control);
 	app_control_send_launch_request(watch_control, NULL, NULL);
