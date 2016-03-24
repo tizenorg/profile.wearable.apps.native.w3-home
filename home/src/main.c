@@ -29,8 +29,6 @@
 #include <widget_errno.h>
 #include <unistd.h>
 #include <vconf.h>
-#include <minicontrol-viewer.h>
-#include <minicontrol-monitor.h>
 #include <dlog.h>
 #include <app_preference.h>
 #include <widget_viewer_evas.h>

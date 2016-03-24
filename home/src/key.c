@@ -22,8 +22,6 @@
 #include <dlog.h>
 #include <bundle.h>
 #include <efl_assist.h>
-#include <minicontrol-viewer.h>
-#include <minicontrol-monitor.h>
 
 #include "layout_info.h"
 #include "log.h"
