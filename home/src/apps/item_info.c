@@ -50,6 +50,7 @@ HAPI item_info_s *apps_item_info_create(const char *appid)
 	pkgmgrinfo_appinfo_h appinfo_h = NULL;
 	pkgmgrinfo_pkginfo_h pkghandle = NULL;
 	char *pkgid = NULL;
+	char *component_type = NULL;
 	char *name = NULL;
 	char *icon = NULL;
 	char *type = NULL;
@@ -75,6 +76,9 @@ HAPI item_info_s *apps_item_info_create(const char *appid)
 		break_if(0 > pkgmgrinfo_pkginfo_get_pkginfo(pkgid, &pkghandle));
 		break_if(NULL == pkghandle);
 	} while (0);
+
+	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_component_type(appinfo_h, &component_type), ERROR);
+	if (strncmp(component_type, "uiapp", strlen("uiapp")) != 0) goto ERROR;
 
 	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_is_nodisplay(appinfo_h, &nodisplay), ERROR);
 	if (nodisplay) goto ERROR;
