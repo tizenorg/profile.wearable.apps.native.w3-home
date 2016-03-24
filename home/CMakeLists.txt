@@ -43,8 +43,6 @@ pkg_check_modules(PKGS REQUIRED
 	widget_viewer_evas
 	widget_service
 	watch-control
-	minicontrol-viewer
-	minicontrol-monitor
 	pkgmgr
 	pkgmgr-info
 	syspopup-caller
