@@ -64,7 +64,7 @@ HAPI item_info_s *apps_item_info_create(const char *appid)
 		return NULL;
 	}
 
-	goto_if(0 > pkgmgrinfo_appinfo_get_appinfo(appid, &appinfo_h), ERROR);
+	goto_if(0 > pkgmgrinfo_appinfo_get_usr_appinfo(appid, getuid(), &appinfo_h), ERROR);
 
 	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_label(appinfo_h, &name), ERROR);
 	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_icon(appinfo_h, &icon), ERROR);
@@ -73,7 +73,7 @@ HAPI item_info_s *apps_item_info_create(const char *appid)
 		break_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_pkgid(appinfo_h, &pkgid));
 		break_if(NULL == pkgid);
 
-		break_if(0 > pkgmgrinfo_pkginfo_get_pkginfo(pkgid, &pkghandle));
+		break_if(0 > pkgmgrinfo_pkginfo_get_usr_pkginfo(pkgid, getuid(), &pkghandle));
 		break_if(NULL == pkghandle);
 	} while (0);
 
@@ -231,7 +231,7 @@ static Eina_List *_read_all_except_top4(Eina_List **list)
 
 	retv_if(PMINFO_R_OK != pkgmgrinfo_appinfo_filter_create(&handle), NULL);
 	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_filter_add_bool(handle, PMINFO_APPINFO_PROP_APP_NODISPLAY, 0), ERROR);
-	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_filter_foreach_appinfo(handle, _apps_cb, list), ERROR);
+	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_usr_filter_foreach_appinfo(handle, _apps_cb, list, getuid()), ERROR);
 
 	*list = eina_list_sort(*list, eina_list_count(*list), _apps_sort_cb);
 
@@ -274,7 +274,7 @@ static Eina_List *_read_all_apps(Eina_List **list)
 
 	retv_if(PMINFO_R_OK != pkgmgrinfo_appinfo_filter_create(&handle), NULL);
 	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_filter_add_bool(handle, PMINFO_APPINFO_PROP_APP_NODISPLAY, 0), ERROR);
-	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_filter_foreach_appinfo(handle, _apps_all_cb, list), ERROR);
+	goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_usr_filter_foreach_appinfo(handle, _apps_all_cb, list, getuid()), ERROR);
 
 	*list = eina_list_sort(*list, eina_list_count(*list), _apps_sort_cb);
 

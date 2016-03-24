@@ -643,7 +643,6 @@ static apps_error_e _end(const char *package, const char *val, void *data)
 	pkgmgrinfo_pkginfo_h handle = NULL;
 
 	retv_if(!_exist_request_in_list(package), APPS_ERROR_FAIL);
-
 	rt = _get_request_in_list(package);
 	retv_if(NULL == rt, APPS_ERROR_FAIL);
 	retv_if(strcasecmp(val, "ok"), APPS_ERROR_FAIL);
@@ -656,10 +655,10 @@ static apps_error_e _end(const char *package, const char *val, void *data)
 		goto OUT;
 	}
 
-	retv_if(PMINFO_R_OK != pkgmgrinfo_pkginfo_get_pkginfo(package, &handle), APPS_ERROR_FAIL);
+	retv_if(PMINFO_R_OK != pkgmgrinfo_pkginfo_get_usr_pkginfo(package, getuid(), &handle), APPS_ERROR_FAIL);
 
 	/* Criteria : appid */
-	if (PMINFO_R_OK != pkgmgrinfo_appinfo_get_list(handle, PMINFO_UI_APP, _end_cb, rt)) {
+	if (PMINFO_R_OK != pkgmgrinfo_appinfo_get_usr_list(handle, PMINFO_UI_APP, _end_cb, rt, getuid())) {
 		if (APPS_ERROR_NONE != _remove_request_in_list(package))
 			_APPS_E("cannot remove a request(%s:%s)", rt->package, rt->status);
 		pkgmgrinfo_pkginfo_destroy_pkginfo(handle);
@@ -697,7 +696,7 @@ static struct pkgmgr_handler pkgmgr_cbs[] = {
 
 
 
-static apps_error_e _pkgmgr_cb(int req_id, const char *pkg_type, const char *package, const char *key, const char *val, const void *pmsg, void *data)
+static apps_error_e _pkgmgr_cb(uid_t target_uid, int req_id, const char *pkg_type, const char *package, const char *key, const char *val, const void *pmsg, void *data)
 {
 	register unsigned int i;
 
