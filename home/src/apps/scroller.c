@@ -56,7 +56,6 @@
 #define PRIVATE_DATA_KEY_ITEM_INFO_LIST_TIMER "p_iil_tm"
 
 
-#if 0
 static Eina_Bool _rotary_cb(void *data, Evas_Object *obj, Eext_Rotary_Event_Info *rotary_info)
 {
 	_APPS_D("Rotary callback is called");
@@ -89,7 +88,6 @@ static void _destroy_rotary(Evas_Object *scroller)
 	_APPS_D("Finish the rotary event");
 	eext_rotary_object_event_callback_del(scroller, _rotary_cb);
 }
-#endif
 
 
 static void _mouse_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
@@ -178,7 +176,6 @@ static void _scroll_cb(void *data, Evas_Object *scroller, void *event_info)
 }
 
 
-#if 0
 static apps_error_e _resume_result_cb(void *data)
 {
 	Evas_Object *scroller = data;
@@ -190,7 +187,6 @@ static apps_error_e _resume_result_cb(void *data)
 
 	return APPS_ERROR_NONE;
 }
-#endif
 
 
 HAPI void apps_scroller_destroy(Evas_Object *layout)
@@ -207,11 +203,9 @@ HAPI void apps_scroller_destroy(Evas_Object *layout)
 
 	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
 	ret_if(!scroller_info);
-#if 0
 	_destroy_rotary(scroller);
 
 	apps_main_unregister_cb(scroller_info->instance_info, APPS_APP_STATE_RESUME, _resume_result_cb);
-#endif
 	box_list = elm_box_children_get(scroller_info->box);
 	ret_if(!box_list);
 
@@ -474,12 +468,10 @@ HAPI Evas_Object *apps_scroller_create(Evas_Object *layout)
 	scroller_info->list_index = 0;
 
 	evas_object_data_set(scroller, DATA_KEY_SCROLLER_INFO, scroller_info);
-#if 0
 	_init_rotary(scroller);
 	if (APPS_ERROR_NONE != apps_main_register_cb(instance_info, APPS_APP_STATE_RESUME, _resume_result_cb, scroller)) {
 		_APPS_E("Cannot register the pause callback");
 	}
-#endif
 	return scroller;
 
 ERROR:

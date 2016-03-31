@@ -646,7 +646,6 @@ static w_home_error_e _resume_result_cb(void *data)
 }
 
 
-#if 0
 static Eina_Bool _rotary_cb(void *data, Evas_Object *obj, Eext_Rotary_Event_Info *rotary_info)
 {
 	Evas_Object *scroller = obj;
@@ -670,9 +669,7 @@ static Eina_Bool _rotary_cb(void *data, Evas_Object *obj, Eext_Rotary_Event_Info
 
 	return ECORE_CALLBACK_PASS_ON;
 }
-#endif
 
-#if 0
 static void _init_rotary(Evas_Object *scroller)
 {
 	ret_if(!scroller);
@@ -698,7 +695,6 @@ static void _destroy_rotary(Evas_Object *scroller)
 	main_unregister_cb(APP_STATE_RESUME, _resume_result_cb);
 	scroller_unfreeze(scroller);
 }
-#endif
 
 
 HAPI void scroller_destroy(Evas_Object *parent)
@@ -711,7 +707,7 @@ HAPI void scroller_destroy(Evas_Object *parent)
 	scroller = elm_object_part_content_unset(parent, "scroller");
 	ret_if(!scroller);
 
-//	_destroy_rotary(scroller);
+	_destroy_rotary(scroller);
 
 	evas_object_data_del(parent, DATA_KEY_SCROLLER);
 	scroller_info = evas_object_data_del(scroller, DATA_KEY_SCROLLER_INFO);
@@ -878,7 +874,7 @@ HAPI Evas_Object *scroller_create(Evas_Object *layout, Evas_Object *parent, int 
 	scroller_info->scroll_focus = 1;
 	scroller_info->scroll_index = 1;
 
-//	_init_rotary(scroller);
+	_init_rotary(scroller);
 
 	return scroller;
 }
