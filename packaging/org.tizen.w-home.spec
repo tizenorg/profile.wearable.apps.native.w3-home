@@ -1,8 +1,8 @@
-Name:	org.tizen.w-home
+Name:	        org.tizen.w-home
 Summary:	Home for the wearable devices
 Version:	0.1.0
 Release:	1
-Group:	Applications/System
+Group:	        Applications/System
 License:	Flora-1.1
 Source0:	%{name}-%{version}.tar.gz
 

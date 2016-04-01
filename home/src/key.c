@@ -134,7 +134,7 @@ static Eina_Bool _key_release_cb(void *data, int type, void *event)
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	if (!strcmp(ev->keyname, "XF86Stop")) {
+	if (!strcmp(ev->keyname, "XF86Back")) {
 		_execute_cbs(KEY_TYPE_BACK);
 	} else if (!strcmp(ev->keyname, "XF86Menu")) {
 		_execute_cbs(KEY_TYPE_BEZEL_UP);

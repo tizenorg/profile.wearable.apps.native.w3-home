@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns="http://tizen.org/ns/packages" package="@PACKAGE_NAME@" version="0.1.0" install-location="internal-only" support-mode="screen-reader" support-reset="true|res/home_reset.sh" api-version="2.3.1">
+<manifest xmlns="http://tizen.org/ns/packages" package="@PACKAGE_NAME@" version="0.1.0" install-location="internal-only" support-mode="screen-reader" support-reset="true|res/home_reset.sh" api-version="3.0">
 	<label>W-Home</label>
 	<author email="ys4610.ko@samsung.com" href="www.samsung.com">Youngsub Ko</author>
 	<author email="jinny.yoon@samsung.com" href="www.samsung.com">Jin Yoon</author>
