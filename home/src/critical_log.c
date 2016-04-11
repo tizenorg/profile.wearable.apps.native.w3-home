@@ -68,7 +68,11 @@ do { \
 	int ret; \
 	ret = pthread_mutex_lock(handle); \
 	if (ret != 0) \
-		ErrPrint("Failed to lock: %s\n", strerror(ret)); \
+	{ \
+		char err_buf[256] = { 0, }; \
+		strerror_r(errno, err_buf, sizeof(err_buf)); \
+		ErrPrint("Failed to lock: %s\n", err_buf); \
+	} \
 } while (0)
 
 #define CRITICAL_SECTION_END(handle) \
@@ -76,7 +80,11 @@ do { \
 	int ret; \
 	ret = pthread_mutex_unlock(handle); \
 	if (ret != 0) \
-		ErrPrint("Failed to unlock: %s\n", strerror(ret)); \
+	{ \
+		char err_buf[256] = { 0, }; \
+		strerror_r(errno, err_buf, sizeof(err_buf)); \
+		ErrPrint("Failed to unlock: %s\n", err_buf); \
+	} \
 } while (0)
 
 static struct {
@@ -117,7 +125,9 @@ static inline void rotate_log(void)
 
 		if (s_info.fp) {
 			if (fclose(s_info.fp) != 0) {
-				ErrPrint("fclose: %s\n", strerror(errno));
+				char err_buf[256] = { 0, };
+				strerror_r(errno, err_buf, sizeof(err_buf));
+				ErrPrint("fclose: %s\n", err_buf);
 			}
 		}
 
@@ -200,7 +210,9 @@ HAPI int critical_log_init(const char *name)
 
 	s_info.fp = fopen(filename, "w+");
 	if (!s_info.fp) {
-		ErrPrint("Failed to open log: %s\n", strerror(errno));
+		char err_buf[256] = { 0, };
+		strerror_r(errno, err_buf, sizeof(err_buf));
+		ErrPrint("Failed to open log: %s\n", err_buf);
 		DbgFree(s_info.filename);
 		s_info.filename = NULL;
 		DbgFree(filename);

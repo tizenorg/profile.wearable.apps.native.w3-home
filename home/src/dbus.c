@@ -240,7 +240,7 @@ static w_home_error_e _dbus_sig_attach(char *path, char *interface, char *member
 
 	/* Set the DBus rule for the wakeup gesture signal */
 	char rules[512] = {0,};
-	sprintf(rules, "path='%s',type='signal',interface='%s',member='%s'", path, interface, member);
+	snprintf(rules, sizeof(rules), "path='%s',type='signal',interface='%s',member='%s'", path, interface, member);
 	dbus_bus_add_match(connection, rules, &derror);
 	if (dbus_error_is_set(&derror)) {
 		_E("D-BUS rule adding error: %s", derror.message);

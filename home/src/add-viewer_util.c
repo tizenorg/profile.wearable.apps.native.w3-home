@@ -324,7 +324,9 @@ HAPI char *add_viewer_util_highlight_keyword(const char *name, const char *filte
 			ret_len += tag_len;
 			tmp = realloc(highlighted_name, ret_len);
 			if (!tmp) {
-				ErrPrint("Heap: %s\n", strerror(errno));
+				char err_buf[256] = { 0, };
+				strerror_r(errno, err_buf, sizeof(err_buf));
+				ErrPrint("Heap: %s\n", err_buf);
 				free(highlighted_name);
 				return NULL;
 			}

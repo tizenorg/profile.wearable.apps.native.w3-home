@@ -164,7 +164,7 @@ static int __watch_handler(watch_control_h watch, void *data)
 	clock = watch_control_get_evas_object(watch);
 	if (!clock) {
 		_E("Fail to create the clock");
-		return;
+		return 0;
 	}
 
 	page = _clock_view_add(scroller, clock);
@@ -175,6 +175,7 @@ static int __watch_handler(watch_control_h watch, void *data)
 	if (scroller_push_page(scroller, page, SCROLLER_PUSH_TYPE_CENTER) != W_HOME_ERROR_NONE) {
 		_E("Fail to push the page into scroller");
 	}
+	return 1;
 }
 
 

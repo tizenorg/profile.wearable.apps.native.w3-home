@@ -781,7 +781,7 @@ HAPI apps_error_e apps_db_sync(void)
 			serial = 1;
 		} else if (!pkg_item && !db_item) {
 			break;
-		} else {
+		} else if(pkg_item && db_item) {
 			goto_if(!pkg_item->appid, ERROR);
 			goto_if(!db_item->appid, ERROR);
 			serial = strcmp(pkg_item->appid, db_item->appid);

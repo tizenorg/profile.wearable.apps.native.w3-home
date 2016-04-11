@@ -102,7 +102,9 @@ static inline UChar *to_UTF16(const char *src, int *out_len)
 
 	res = malloc((len + 1) * sizeof(*res));
 	if (!res) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char err_buf[256] = { 0, };
+		strerror_r(errno, err_buf, sizeof(err_buf));
+		ErrPrint("Heap: %s\n", err_buf);
 		return NULL;
 	}
 
@@ -131,7 +133,9 @@ static inline char *to_UTF8(UChar *src, int *out_len)
 
 	res = malloc((len + 1) * sizeof(*res));
 	if (!res) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char err_buf[256] = { 0, };
+		strerror_r(errno, err_buf, sizeof(err_buf));
+		ErrPrint("Heap: %s\n", err_buf);
 		return NULL;
 	}
 
@@ -336,7 +340,9 @@ static char *ucol_toupper(const char *haystack)
 
 	_haystack = malloc(sizeof(*_haystack) * (haystack_len + 1));
 	if (!_haystack) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char err_buf[256] = { 0, };
+		strerror_r(errno, err_buf, sizeof(err_buf));
+		ErrPrint("Heap: %s\n", err_buf);
 		free(u_haystack);
 		return NULL;
 	}
