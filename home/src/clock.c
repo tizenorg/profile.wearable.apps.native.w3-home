@@ -154,14 +154,13 @@ static Evas_Object *_clock_view_empty_add(void)
 
 
 
-static int __watch_handler(watch_control_h watch, void *data)
+static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 {
-	_D("watch handler");
-	Evas_Object *clock = NULL;
+	_D("watch added");
+	Evas_Object *clock = (Evas_Object *)event_info;;
 	Evas_Object *page = NULL;
 	Evas_Object *scroller = (Evas_Object *)data;
 
-	clock = watch_control_get_evas_object(watch);
 	if (!clock) {
 		_E("Fail to create the clock");
 		return 0;
@@ -178,7 +177,10 @@ static int __watch_handler(watch_control_h watch, void *data)
 	return 1;
 }
 
-
+static void __watch_removed(void *data, Evas_Object *obj, void *event_info)
+{
+	_D("watch removed");
+}
 
 void clock_service_init(Evas_Object *win)
 {
@@ -207,7 +209,8 @@ void clock_service_init(Evas_Object *win)
 	}
 
 	watch_manager_init(win);
-	watch_manager_add_handler(WATCH_OBJ_ADD, __watch_handler, scroller);
+	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_ADDED, __watch_added, scroller);
+	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_REMOVED, __watch_removed, scroller);
 	watch_manager_get_app_control(pkg_name, &watch_control);
 	app_control_send_launch_request(watch_control, NULL, NULL);
 
