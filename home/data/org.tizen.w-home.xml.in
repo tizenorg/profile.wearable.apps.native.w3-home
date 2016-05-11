@@ -14,10 +14,10 @@
 		<privilege>http://tizen.org/privilege/setting</privilege>
 		<privilege>http://tizen.org/privilege/power</privilege>
 		<privilege>http://tizen.org/privilege/notification</privilege>
-		<privilege>http://tizen.org/privilege/application.launch</privilege>
 		<privilege>http://tizen.org/privilege/messaging.read</privilege>
 		<privilege>http://tizen.org/privilege/messaging.write</privilege>
 		<privilege>http://tizen.org/privilege/contact.read</privilege>
 		<privilege>http://tizen.org/privilege/appmanager.launch</privilege>
+		<privilege>http://tizen.org/privilege/widget.viewer</privilege>
 	</privileges>
 </manifest>
