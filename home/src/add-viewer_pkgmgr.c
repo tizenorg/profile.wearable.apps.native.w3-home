@@ -481,7 +481,7 @@ HAPI int add_viewer_pkgmgr_init(void)
 		return WIDGET_ERROR_FAULT;
 	}
 
-	if (pkgmgr_client_listen_status(s_info.listen_pc, pkgmgr_cb, NULL) != PKGMGR_R_OK) {
+	if (pkgmgr_client_listen_status(s_info.listen_pc, pkgmgr_cb, NULL) < 0) {
 		ErrPrint("Failed to add listener\n");
 		return WIDGET_ERROR_FAULT;
 	}
