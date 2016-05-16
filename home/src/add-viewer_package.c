@@ -121,11 +121,14 @@ static int is_preloaded(const char *pkgid)
 
 static int load_name_and_icon(struct add_viewer_package *item)
 {
+	
 	item->name = widget_service_get_name(item->pkgname, NULL);
 	item->icon = widget_service_get_icon(item->pkgname, NULL);
 	if (item->icon && access(item->icon, R_OK) != 0) {
 		char *new_icon;
-		ErrPrint("%s - %s\n", item->icon, strerror(errno));
+		char strerrbuf[256];
+		strerror_r(errno,strerrbuf,256);
+		ErrPrint("%s - %s\n", item->icon, strerrbuf);
 		new_icon = strdup(RESDIR"/image/unknown.png");
 		if (new_icon) {
 			free(item->icon);
@@ -266,7 +269,9 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 #endif
 			preview = calloc(1, sizeof(*preview));
 			if (!preview) {
-				ErrPrint("Heap: %s\n", strerror(errno));
+				char strerrbuf[256];
+				strerror_r(errno,strerrbuf,256);
+				ErrPrint("Heap: %s\n", strerrbuf);
 				EINA_LIST_FREE(preview_list, preview) {
 					free(preview);
 				}

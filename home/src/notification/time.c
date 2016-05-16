@@ -169,8 +169,8 @@ static i18n_udate_format_h _get_time_formatter(void)
 	/* remove am/pm of best pattern */
 	retv_if(!i18n_ustring_copy_au(a_best_pattern, u_best_pattern), NULL);
 	_D("best pattern [%s]", a_best_pattern);
-
-	a_best_pattern_fixed = strtok(a_best_pattern, "a");
+	char *saveptr;
+	a_best_pattern_fixed = strtok_r(a_best_pattern, "a",&saveptr);
 	a_best_pattern_fixed = strtok(a_best_pattern_fixed, " ");
 	_D("best pattern fixed [%s]", a_best_pattern_fixed);
 
@@ -243,8 +243,8 @@ static i18n_udate_format_h _get_time_formatter_24(void)
 	/* remove am/pm of best pattern */
 	retv_if(!i18n_ustring_copy_au(a_best_pattern, u_best_pattern), NULL);
 	_D("best pattern [%s]", a_best_pattern);
-
-	a_best_pattern_fixed = strtok(a_best_pattern, "a");
+	char *saveptr2;
+	a_best_pattern_fixed = strtok_r(a_best_pattern, "a",&saveptr2);
 	a_best_pattern_fixed = strtok(a_best_pattern_fixed, " ");
 	_D("best pattern fixed [%s]", a_best_pattern_fixed);
 

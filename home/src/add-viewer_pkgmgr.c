@@ -218,7 +218,9 @@ static int start_cb(const char *pkgname, const char *val, void *data)
 
 	item->pkgname = strdup(pkgname);
 	if (!item->pkgname) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char strerrbuf[256];
+		strerror_r(errno,strerrbuf,256);
+		ErrPrint("Heap: %s\n",strerrbuf );
 		DbgFree(item);
 		return WIDGET_ERROR_OUT_OF_MEMORY;
 	}
@@ -265,7 +267,9 @@ static int icon_path_cb(const char *pkgname, const char *val, void *data)
 
 	item->icon = strdup(val);
 	if (!item->icon) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char strerrbuf[256];
+		strerror_r(errno,strerrbuf,256);
+		ErrPrint("Heap: %s\n",strerrbuf );
 		return WIDGET_ERROR_OUT_OF_MEMORY;
 	}
 
@@ -324,7 +328,9 @@ static int change_pkgname_cb(const char *pkgname, const char *val, void *data)
 
 	new_pkgname = strdup(val);
 	if (!new_pkgname) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char strerrbuf[256];
+		strerror_r(errno,strerrbuf,256);
+		ErrPrint("Heap: %s\n",strerrbuf );
 		return WIDGET_ERROR_OUT_OF_MEMORY;
 	}
 

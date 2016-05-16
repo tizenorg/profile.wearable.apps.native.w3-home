@@ -511,7 +511,7 @@ HAPI void winset_access_object_add(Evas_Object *parent, Evas_Object *layout, con
 		return;
 	}
 
-	strcpy(text, name);
+	strncpy(text, name,sizeof(name));
 
 	ao = evas_object_data_get(layout, "access,object");
 	if (ao) {

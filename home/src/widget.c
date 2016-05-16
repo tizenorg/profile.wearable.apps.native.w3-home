@@ -117,7 +117,9 @@ static void push_pended_event_list(Evas_Object *obj, Elm_Access_Action_Info *inf
 
 	_info = malloc(sizeof(*_info));
 	if (!_info) {
-		_E("malloc:%s\n", strerror(errno));
+		char strerrbuf[256];
+		strerror_r(errno,strerrbuf,256);
+		_E("malloc:%s\n", strerrbuf);
 		return;
 	}
 
@@ -479,6 +481,7 @@ static void _widget_access_action_ret_cb(Evas_Object *obj, int ret, void *data)
 		Elm_Access_Action_Info action_info;
 		memset(&action_info, 0, sizeof(action_info));
 		action_info.action_type = ELM_ACCESS_ACTION_UNHIGHLIGHT;
+		break;
 	}
 	case WIDGET_ACCESS_STATUS_ERROR: /* In case of error, we have to set focus on our page */
 		page_info->need_to_unhighlight = EINA_FALSE;
