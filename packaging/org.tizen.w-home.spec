@@ -164,7 +164,6 @@ vconftool set -t int "memory/homescreen/clock_visibility" 0 -i -g $INHOUSE_ID -f
 vconftool set -t string "memory/homescreen/music_status" ";" -i -g $INHOUSE_ID -f -s system::vconf_system
 vconftool set -t int "memory/private/org.tizen.w-home/auto_feed" 1 -i -g $INHOUSE_ID -f -s %{name}
 vconftool set -t int "memory/private/org.tizen.w-home/sensitive_move" 1 -i -g $INHOUSE_ID -f -s %{name}
-vconftool set -t string "db/wms/clocks_set_idle" "org.tizen.idle-clock-digital" -u $INHOUSE_ID -s system::vconf
 
 %files
 %manifest home/%{name}.manifest

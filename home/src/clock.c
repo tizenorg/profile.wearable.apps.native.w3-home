@@ -17,6 +17,7 @@
 
 #include <Elementary.h>
 #include <watch_control.h>
+#include <vconf.h>
 
 #include "conf.h"
 #include "clock_service.h"
@@ -182,16 +183,33 @@ static void __watch_removed(void *data, Evas_Object *obj, void *event_info)
 	_D("watch removed");
 }
 
+static void _wms_clock_vconf_cb(keynode_t *node, void *data)
+{
+	char *clock_pkgname = NULL;
+	app_control_h watch_control;
+
+	clock_pkgname = vconf_get_str(VCONFKEY_WMS_CLOCKS_SET_IDLE);
+	_D("clock = %s, is set", clock_pkgname);
+
+	watch_manager_get_app_control(clock_pkgname, &watch_control);
+	app_control_send_launch_request(watch_control, NULL, NULL);
+}
+
 void clock_service_init(Evas_Object *win)
 {
 	Evas_Object *clock = NULL;
 	Evas_Object *page = NULL;
 	Evas_Object *scroller = _scroller_get();
 	app_control_h watch_control;
-
 	char *pkg_name = NULL;
+	int ret = 0;
 
 	ret_if(!scroller);
+
+	ret = vconf_notify_key_changed(VCONFKEY_WMS_CLOCKS_SET_IDLE, _wms_clock_vconf_cb, NULL);
+	if (ret < 0)
+		_E("Failed to ignore the vconf callback(WMS_CLOCKS_SET_IDLE) : %d", ret);
+
 	pkg_name = "org.tizen.idle-clock-digital";
 
 	if (!pkg_name) {
