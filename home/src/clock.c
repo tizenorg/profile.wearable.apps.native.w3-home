@@ -189,6 +189,9 @@ static void _wms_clock_vconf_cb(keynode_t *node, void *data)
 	app_control_h watch_control;
 
 	clock_pkgname = vconf_get_str(VCONFKEY_WMS_CLOCKS_SET_IDLE);
+	if(!clock_pkgname)
+		clock_pkgname = "org.tizen.idle-clock-digital";
+
 	_D("clock = %s, is set", clock_pkgname);
 
 	watch_manager_get_app_control(clock_pkgname, &watch_control);
@@ -210,8 +213,15 @@ void clock_service_init(Evas_Object *win)
 	if (ret < 0)
 		_E("Failed to ignore the vconf callback(WMS_CLOCKS_SET_IDLE) : %d", ret);
 
-	pkg_name = "org.tizen.idle-clock-digital";
+	pkg_name = vconf_get_str(VCONFKEY_WMS_CLOCKS_SET_IDLE);
 
+	if(!pkg_name)
+	{
+		_D("Failed to get vconf string, launching default clock");
+		pkg_name = "org.tizen.idle-clock-digital";
+	}
+
+#if 0
 	if (!pkg_name) {
 		Evas_Object *empty_page = NULL;
 
@@ -225,13 +235,26 @@ void clock_service_init(Evas_Object *win)
 
 		return;
 	}
+#endif
 
 	watch_manager_init(win);
 	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_ADDED, __watch_added, scroller);
 	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_REMOVED, __watch_removed, scroller);
 	watch_manager_get_app_control(pkg_name, &watch_control);
-	app_control_send_launch_request(watch_control, NULL, NULL);
 
+	ret = app_control_send_launch_request(watch_control, NULL, NULL);
+	if (ret != APP_CONTROL_ERROR_NONE) {
+		_E("Failed to launch:%d", ret);
+		goto done;
+	}
+
+	return;
+
+done:
+	_D("Launching default clock");
+	pkg_name = "org.tizen.idle-clock-digital";
+	watch_manager_get_app_control(pkg_name, &watch_control);
+	app_control_send_launch_request(watch_control, NULL, NULL);
 }
 
 
