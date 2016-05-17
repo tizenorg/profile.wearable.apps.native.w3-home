@@ -11,7 +11,6 @@ ExcludeArch: %{arm} %ix86 x86_64
 %endif
 
 BuildRequires: cmake, gettext-tools, smack, coreutils
-BuildRequires: pkgconfig(ail)
 BuildRequires: pkgconfig(appcore-efl)
 BuildRequires: pkgconfig(badge)
 BuildRequires: pkgconfig(bundle)
@@ -21,6 +20,7 @@ BuildRequires: pkgconfig(capi-media-sound-manager)
 BuildRequires: pkgconfig(capi-appfw-preference)
 BuildRequires: pkgconfig(capi-system-runtime-info)
 BuildRequires: pkgconfig(capi-system-device)
+BuildRequires: pkgconfig(db-util)
 BuildRequires: pkgconfig(deviced)
 BuildRequires: pkgconfig(dlog)
 #BuildRequires: pkgconfig(ecore-x)

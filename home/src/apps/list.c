@@ -16,7 +16,6 @@
  */
 
 #include <Elementary.h>
-#include <ail.h>
 #include <package-manager.h>
 #include <pkgmgr-info.h>
 

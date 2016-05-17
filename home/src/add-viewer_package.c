@@ -27,10 +27,7 @@
 #include <widget_service_internal.h>
 #include <widget_service.h>
 #include <widget_errno.h>
-#include <ail.h>
-#if defined(CHECK_PRELOAD)
 #include <pkgmgr-info.h>
-#endif
 
 #if defined(LOG_TAG)
 #undef LOG_TAG
@@ -137,7 +134,7 @@ static int load_name_and_icon(struct add_viewer_package *item)
 
 	if (!item->name || !item->icon) {
 		char *pkgname;
-		ail_appinfo_h ai;
+		pkgmgrinfo_appinfo_h ai;
 		int ret;
 
 		pkgname = widget_service_get_main_app_id(item->pkgname);
@@ -146,10 +143,10 @@ static int load_name_and_icon(struct add_viewer_package *item)
 			return -EINVAL;
 		}
 
-		ret = ail_get_appinfo(pkgname, &ai);
+		ret = pkgmgrinfo_appinfo_get_appinfo(pkgname, &ai);
 		free((char *)pkgname);
 
-		if (ret != AIL_ERROR_OK) {
+		if (ret != PMINFO_R_OK) {
 			ErrPrint("Failed to get appinfo: %s\n", add_viewer_package_list_pkgname(item));
 			if (!item->name) {
 				ret = add_viewer_package_list_set_name(item, add_viewer_package_list_pkgname(item));
@@ -171,34 +168,34 @@ static int load_name_and_icon(struct add_viewer_package *item)
 
 		if (!item->icon) {
 			char *icon;
-			ret = ail_appinfo_get_str(ai, AIL_PROP_ICON_STR, &icon);
-			if (ret != AIL_ERROR_OK || !icon || access(icon, R_OK) != 0) {
+			ret = pkgmgrinfo_appinfo_get_icon(ai, &icon);
+			if (ret != PMINFO_R_OK || !icon || access(icon, R_OK) != 0) {
 				ErrPrint("Fail to get the icon path %s - %d\n", icon, errno);
 				icon = RESDIR"/image/unknown.png";
 			}
 
 			ret = add_viewer_package_list_set_icon(item, icon); 
 			if (ret != 0) {
-				ail_destroy_appinfo(ai);
+				pkgmgrinfo_appinfo_destroy_appinfo(ai);
 				return ret;
 			}
 		}
 
 		if (!item->name) {
 			char *name;
-			ret = ail_appinfo_get_str(ai, AIL_PROP_NAME_STR, &name);
-			if (ret != AIL_ERROR_OK || !name) {
+			ret = pkgmgrinfo_appinfo_get_label(ai, &name);
+			if (ret != PMINFO_R_OK || !name) {
 				name = item->pkgname;
 			}
 
 			ret = add_viewer_package_list_set_name(item, name);
 			if (ret != 0) {
-				ail_destroy_appinfo(ai);
+				pkgmgrinfo_appinfo_destroy_appinfo(ai);
 				return ret;
 			}
 		}
 
-		ail_destroy_appinfo(ai);
+		pkgmgrinfo_appinfo_destroy_appinfo(ai);
 	}
 
 	return 0;
