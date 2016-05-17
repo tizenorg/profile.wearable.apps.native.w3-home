@@ -11,7 +11,6 @@ MESSAGE("ARCH: ${ARCH}")
 
 INCLUDE(FindPkgConfig)
 pkg_check_modules(PKGS REQUIRED
-	ail
 	appcore-efl
 	aul
 	badge
@@ -23,6 +22,7 @@ pkg_check_modules(PKGS REQUIRED
 	capi-appfw-preference
 	capi-system-runtime-info
 	capi-system-device
+	db-util
 	deviced
 	dlog
 	ecore

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include <ail.h>
 #include <app.h>
 #include <appcore-efl.h>
 #include <aul.h>
