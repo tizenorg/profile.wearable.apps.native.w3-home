@@ -44,6 +44,7 @@ BuildRequires: pkgconfig(capi-message-port)
 BuildRequires: pkgconfig(capi-media-image-util)
 BuildRequires: pkgconfig(notification)
 BuildRequires: pkgconfig(rua)
+BuildRequires: pkgconfig(aul)
 
 %ifarch %{arm}
 %define ARCH arm
