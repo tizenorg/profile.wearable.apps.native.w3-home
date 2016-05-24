@@ -18,6 +18,8 @@
 #include <Elementary.h>
 #include <watch_control.h>
 #include <vconf.h>
+#include <pkgmgr-info.h>
+#include <pkgmgrinfo_type.h>
 
 #include "conf.h"
 #include "clock_service.h"
@@ -30,6 +32,14 @@
 #include "scroller.h"
 #include "page.h"
 #include "apps/apps_main.h"
+
+static struct {
+	Evas_Object *cur_watch;
+	Evas_Object *clock_page;
+} clock_info_s = {
+	.cur_watch = NULL,
+	.clock_page = NULL,
+};
 
 
 
@@ -143,6 +153,27 @@ ERR:
 
 
 
+static void _clock_view_exchange(Evas_Object *item)
+{
+	Eina_Bool ret = EINA_TRUE;
+	Evas_Object *priv_clock = NULL;
+	page_info_s *page_info = NULL;
+
+	page_info = evas_object_data_get(clock_info_s.clock_page, DATA_KEY_PAGE_INFO);
+	ret_if(!page_info);
+
+	if (item != NULL) {
+		elm_access_object_unregister(item);
+		evas_object_size_hint_min_set(item, 360, 360);
+		evas_object_size_hint_weight_set(item, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+		evas_object_show(item);
+		elm_object_part_content_set(page_info->item, "item", item);
+		evas_object_repeat_events_set(item, EINA_TRUE);
+	}
+}
+
+
+
 static Evas_Object *_clock_view_empty_add(void)
 {
 	Evas_Object *scroller = _scroller_get();
@@ -158,7 +189,7 @@ static Evas_Object *_clock_view_empty_add(void)
 static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 {
 	_D("watch added");
-	Evas_Object *clock = (Evas_Object *)event_info;;
+	Evas_Object *clock = (Evas_Object *)event_info;
 	Evas_Object *page = NULL;
 	Evas_Object *scroller = (Evas_Object *)data;
 
@@ -167,20 +198,32 @@ static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 		return;
 	}
 
-	page = _clock_view_add(scroller, clock);
-	if (!page) {
-		_E("Fail to create the page");
-		evas_object_del(clock);
-		return;
+	if (clock_info_s.cur_watch) {
+			watch_manager_send_terminate(clock_info_s.cur_watch);
+
+		_clock_view_exchange(clock);
+	} else {
+		page = _clock_view_add(scroller, clock);
+		if (!page) {
+			_E("Fail to create the page");
+			evas_object_del(clock);
+			return;
+		}
+		if (scroller_push_page(scroller, page, SCROLLER_PUSH_TYPE_CENTER) != W_HOME_ERROR_NONE) {
+			_E("Fail to push the page into scroller");
+		}
+		clock_info_s.clock_page = page;
 	}
-	if (scroller_push_page(scroller, page, SCROLLER_PUSH_TYPE_CENTER) != W_HOME_ERROR_NONE) {
-		_E("Fail to push the page into scroller");
-	}
+
+	clock_info_s.cur_watch = clock;
 }
 
 static void __watch_removed(void *data, Evas_Object *obj, void *event_info)
 {
 	_D("watch removed");
+	Evas_Object *clock = (Evas_Object *)event_info;
+	if (clock)
+		evas_object_del(clock);
 }
 
 static void _wms_clock_vconf_cb(keynode_t *node, void *data)
@@ -192,10 +235,11 @@ static void _wms_clock_vconf_cb(keynode_t *node, void *data)
 	if(!clock_pkgname)
 		clock_pkgname = "org.tizen.idle-clock-digital";
 
-	_D("clock = %s, is set", clock_pkgname);
+	_D("clock = (%s), is set", clock_pkgname);
 
 	watch_manager_get_app_control(clock_pkgname, &watch_control);
 	app_control_send_launch_request(watch_control, NULL, NULL);
+	app_control_destroy(watch_control);
 }
 
 void clock_service_init(Evas_Object *win)
@@ -237,6 +281,8 @@ void clock_service_init(Evas_Object *win)
 	}
 #endif
 
+	_D("clock = (%s), is set", pkg_name);
+
 	watch_manager_init(win);
 	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_ADDED, __watch_added, scroller);
 	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_REMOVED, __watch_removed, scroller);
@@ -247,6 +293,7 @@ void clock_service_init(Evas_Object *win)
 		_E("Failed to launch:%d", ret);
 		goto done;
 	}
+	app_control_destroy(watch_control);
 
 	return;
 
@@ -255,6 +302,7 @@ done:
 	pkg_name = "org.tizen.idle-clock-digital";
 	watch_manager_get_app_control(pkg_name, &watch_control);
 	app_control_send_launch_request(watch_control, NULL, NULL);
+	app_control_destroy(watch_control);
 }
 
 
@@ -262,4 +310,5 @@ done:
 void clock_service_fini(void)
 {
 	_D("clock service is finished");
+	watch_manager_fini();
 }
