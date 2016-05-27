@@ -609,7 +609,7 @@ static struct pkgmgr_handler pkgmgr_cbs[] = {
 
 
 
-static w_home_error_e _pkgmgr_cb(int req_id, const char *pkg_type, const char *package, const char *key, const char *val, const void *pmsg, void *data)
+static w_home_error_e _pkgmgr_cb(uid_t target_uid, int req_id, const char *pkg_type, const char *package, const char *key, const char *val, const void *pmsg, void *data)
 {
 	register unsigned int i;
 
