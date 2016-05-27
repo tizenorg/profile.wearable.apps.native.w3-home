@@ -383,7 +383,28 @@ static void _bezel_up_cb(void *data)
 	apps_main_launch(APPS_LAUNCH_SHOW);
 }
 
+static void _bezel_down_cb(void *data)
+{
+	Evas_Object *layout = data;
+	int pid = 0;
+	bundle *b = NULL;
 
+	_D("Bezel down cb");
+
+	ret_if(!layout);
+
+#if 0
+	b = bundle_create();
+	if (b != NULL)
+	{
+		bundle_add(b, "__WINDICATOR_OP__", "__SHOW_MOMENT_VIEW__");
+		bundle_add(b, "__EFFECT__", "ON");
+        }
+#endif
+	pid = aul_launch_app("org.tizen.windicator", b);
+
+	_D("aul_launch_app: %s(%d)", "org.tizen.windicator", pid);
+}
 
 static key_cb_ret_e _bezel_up_key_cb(void *data)
 {
@@ -771,6 +792,10 @@ HAPI Evas_Object *layout_create(Evas_Object *win)
 	}
 
 	if (W_HOME_ERROR_NONE != gesture_register_cb(BEZEL_UP, _bezel_up_cb, layout)) {
+		_E("Cannot register the gesture callback");
+	}
+
+	if (W_HOME_ERROR_NONE != gesture_register_cb(BEZEL_DOWN, _bezel_down_cb, layout)) {
 		_E("Cannot register the gesture callback");
 	}
 
