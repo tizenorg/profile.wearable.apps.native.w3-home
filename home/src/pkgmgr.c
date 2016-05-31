@@ -692,7 +692,7 @@ HAPI w_home_error_e pkgmgr_reserve_list_pop_request(void)
 	if (!pr) return W_HOME_ERROR_NO_DATA;
 	pkg_mgr_info.reserve_list = eina_list_remove(pkg_mgr_info.reserve_list, pr);
 
-	goto_if(W_HOME_ERROR_NONE != _pkgmgr_cb(0, NULL, pr->package, pr->key, pr->val, NULL, NULL), ERROR);
+	goto_if(W_HOME_ERROR_NONE != _pkgmgr_cb(getuid(), 0, NULL, pr->package, pr->key, pr->val, NULL, NULL), ERROR);
 
 	free(pr->package);
 	free(pr->key);
