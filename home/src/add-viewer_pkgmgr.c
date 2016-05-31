@@ -449,7 +449,7 @@ static struct pkgmgr_handler {
 	{ NULL, NULL },
 };
 
-static int pkgmgr_cb(int req_id, const char *type, const char *pkgname, const char *key, const char *val, const void *pmsg, void *data)
+static int pkgmgr_cb(uid_t target_uid, int req_id, const char *type, const char *pkgname, const char *key, const char *val, const void *pmsg, void *data)
 {
 	register int i;
 	int ret;
