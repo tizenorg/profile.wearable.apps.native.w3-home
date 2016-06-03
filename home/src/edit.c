@@ -77,6 +77,8 @@
 #define PRIVATE_DATA_KEY_ANIM_FOR_MINIFY "p_a_mi"
 #define PRIVATE_DATA_KEY_ANIM_FOR_ENLARGE "p_a_en"
 #define PRIVATE_DATA_KEY_EDIT_DO_NOT_SUPPORT_ENLARGE_EFFECT "pdk_dnsee"
+#define SHORTCUT_WIDGET_ID "org.tizen.apptray-widget"
+#define SHORTCUT_APP_ID "org.tizen.apptray-widget-app"
 
 #define MOVE_THRESHOLD 5
 #define SLIPPED_LENGTH 40
@@ -812,6 +814,12 @@ static char *_access_remove_button_name_cb(void *data, Evas_Object *obj)
     return tmp;
 }
 
+static void _edit_button_click_cb(void *data, Evas_Object *obj, void *event_info)
+{
+	// Launch the app-shortcut launcher app
+	_D("_edit_button_click_cb" );
+	util_launch_app(SHORTCUT_APP_ID, NULL, NULL);
+}
 
 
 #define PROXY_ITEM_EDJ EDJEDIR"/edit.edj"
@@ -894,6 +902,7 @@ HAPI void edit_change_focus(Evas_Object *edit_scroller, Evas_Object *page_curren
 	Evas_Object *page_focused = NULL;
 	page_info_s *page_info = NULL;
 	page_info_s *focused_page_info = NULL;
+	layout_info_s *layout_info = NULL;
 	int unfocusable = 0;
 
 	ret_if(!edit_scroller);
@@ -909,6 +918,20 @@ HAPI void edit_change_focus(Evas_Object *edit_scroller, Evas_Object *page_curren
 	ret_if(!page_info);
 	ret_if(!page_info->page_inner);
 	ret_if(!page_info->item);
+	ret_if(!page_info->id);
+	ret_if(!page_info->layout);
+
+	layout_info = evas_object_data_get(page_info->layout, DATA_KEY_LAYOUT_INFO);
+	ret_if(!layout_info);
+
+	if (strcmp(page_info->id, SHORTCUT_WIDGET_ID) == 0)	{
+		_D( " Showing edit button for page %s", page_info->id);
+		elm_object_signal_emit(layout_info->edit, "edit,show", "edit");
+    }
+    else {
+        _D( " Hiding edit button for page %s", page_info->id);
+        elm_object_signal_emit(layout_info->edit, "edit,hide", "edit");
+    }
 
 	/* Blocker has to be disabled even if this is unfocusable */
 	elm_object_signal_emit(page_info->page_inner, "disable", "blocker");
@@ -2683,6 +2706,7 @@ HAPI Evas_Object *_create_right_layout(Evas_Object *layout)
 
 	elm_object_part_content_set(layout, "edit", edit);
 	elm_object_part_content_set(edit, "scroller", edit_scroller);
+	elm_object_signal_callback_add(edit, "edit_click", "", _edit_button_click_cb, NULL);
 
 	edit_info->layout = layout;
 	edit_info->scroller = edit_scroller;
