@@ -812,7 +812,7 @@ HAPI Evas_Object *scroller_create(Evas_Object *layout, Evas_Object *parent, int 
 
 	elm_scroller_bounce_set(scroller, EINA_FALSE, EINA_FALSE);
 	elm_scroller_policy_set(scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-	elm_scroller_page_scroll_limit_set(scroller, 1, 1);
+	elm_scroller_page_scroll_limit_set(scroller, 3, 1);
 	elm_scroller_content_min_limit(scroller, EINA_FALSE, EINA_TRUE);
 	elm_scroller_single_direction_set(scroller, ELM_SCROLLER_SINGLE_DIRECTION_HARD);
 	elm_scroller_page_size_set(scroller, page_width, page_height);

@@ -27,6 +27,8 @@
 #include <system_settings.h>
 
 #include <Elementary.h>
+ #include <efl_assist.h>
+#include <efl_extension.h>
 
 #include "add-viewer.h"
 #include "add-viewer_pkgmgr.h"
@@ -34,9 +36,13 @@
 #include "add-viewer_package.h"
 #include "add-viewer_debug.h"
 #include "add-viewer_util.h"
+#include "add-viewer_index.h"
 #include "conf.h"
+// #include "dbox.h"
 
 #include "bg.h"
+ #include "util.h"
+ #include "rotary.h"
 
 #if defined(LOG_TAG)
 #undef LOG_TAG
@@ -66,6 +72,8 @@ struct widget_data {
 	Evas_Object *parent;
 
 	Evas_Object *scroller;
+	Evas_Object *index;
+	Evas_Object *progress;
 
 	Evas_Object *bg;
 };
@@ -101,8 +109,8 @@ static inline void append_padding(Evas_Object *box, int padding)
 		return;
 	}
 
-	evas_object_resize(pad, ADD_VIEWER_PREVIEW_WIDTH, padding);
-	evas_object_size_hint_min_set(pad, ADD_VIEWER_PREVIEW_WIDTH, padding);
+	evas_object_resize(pad, 0.001, padding);
+	evas_object_size_hint_min_set(pad, 0.001, padding);
 	evas_object_show(pad);
 	elm_box_pack_end(box, pad);
 }
@@ -569,6 +577,7 @@ static void _widget_scroll_cb(void *data, Evas_Object *obj, void *event_info)
 	Eina_List *list = NULL;
 	int h_page = 0;
 	Evas_Coord y;
+	Evas_Coord x;
 
 	DbgPrint("========== Widget Scroll CB is called (%p)\n", obj);
 
@@ -586,9 +595,9 @@ static void _widget_scroll_cb(void *data, Evas_Object *obj, void *event_info)
 		return;
 	}
 
-	evas_object_geometry_get(box, NULL, &y, NULL, NULL);
-	y -= (ADD_VIEWER_PAGE_HEIGHT >> 1);
-	h_page = -(y / ADD_VIEWER_PAGE_HEIGHT);
+	evas_object_geometry_get(box, &x, &y, NULL, NULL);
+	x -= (ADD_VIEWER_PAGE_WIDTH >> 1);
+	h_page = -(x / ADD_VIEWER_PAGE_WIDTH);
 
 	focus_widget = eina_list_nth(list, h_page + 1);
 	eina_list_free(list);
@@ -635,24 +644,25 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 		return WIDGET_ERROR_FAULT;
 	}
 
-	elm_box_horizontal_set(box, EINA_FALSE);
+	elm_box_horizontal_set(box, EINA_TRUE);
 	elm_box_homogeneous_set(box, EINA_FALSE);
 	evas_object_size_hint_fill_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	elm_box_padding_set(box, ADD_VIEWER_PREVIEW_PAD_LEFT, ADD_VIEWER_PREVIEW_PAD_TOP);
+	elm_box_padding_set(box, 80, ADD_VIEWER_PREVIEW_PAD_ITEM_V);
 	elm_box_align_set(box, 0.0, 0.0);
 	evas_object_show(box);
 
-	elm_scroller_policy_set(widget_data->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_AUTO);
+	elm_scroller_page_scroll_limit_set(widget_data->scroller, 1, 1);
+	elm_scroller_policy_set(widget_data->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+	elm_scroller_content_min_limit(widget_data->scroller, EINA_FALSE, EINA_TRUE);
 	elm_scroller_propagate_events_set(widget_data->scroller, EINA_TRUE);
-	elm_scroller_bounce_set(widget_data->scroller, EINA_FALSE, EINA_TRUE);
+	elm_scroller_bounce_set(widget_data->scroller, EINA_TRUE, EINA_TRUE);
 	elm_object_style_set(widget_data->scroller, "effect");
-
-	elm_scroller_page_size_set(widget_data->scroller, ADD_VIEWER_PAGE_WIDTH, ADD_VIEWER_PAGE_HEIGHT);
+	elm_scroller_page_size_set(widget_data->scroller, 324, ADD_VIEWER_PAGE_HEIGHT);
 
 	elm_object_content_set(widget_data->scroller, box);
 
-	evas_object_smart_callback_add(widget_data->scroller, "scroll", _widget_scroll_cb, box);
+	evas_object_smart_callback_add(widget_data->scroller, "scroll", _widget_scroll_cb, widget_data);
 
 	evas_object_show(widget_data->scroller);
 	evas_object_show(widget_data->bg);
@@ -662,7 +672,16 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 
 	evas_object_smart_member_add(widget_data->scroller, widget_data->add_viewer);
 	evas_object_clip_set(widget_data->scroller, widget_data->stage);
+
+ /*	util_uxt_scroller_set_rotary_event_enabled(widget_data->scroller, EINA_TRUE);
+    widget_data->index = add_viewer_index_create(widget_data->bg);
+	evas_object_show(widget_data->index);
+	evas_object_smart_member_add(widget_data->index, widget_data->add_viewer);
+	evas_object_clip_set(widget_data->index, widget_data->stage);
+	elm_object_part_content_set(widget_data->bg, "index", widget_data->index);
+*/
 	return WIDGET_ERROR_NONE;
+
 }
 
 static void del_cb(void *data, Evas *e, Evas_Object *container, void *event_info)

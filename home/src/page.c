@@ -532,6 +532,9 @@ HAPI Evas_Object *page_create_plus_page(Evas_Object *scroller)
 	evas_object_repeat_events_set(plus_item, EINA_TRUE);
 	evas_object_show(plus_item);
 	evas_object_data_set(plus_item, DATA_KEY_IS_LONGPRESS, (void *)0);
+	
+
+   //elm_object_part_content_set(plus_item, "mask");
 #if !CIRCLE_TYPE
 	elm_object_signal_emit(plus_item, "emul,normal", "plus");
 #endif
@@ -558,6 +561,8 @@ HAPI Evas_Object *page_create_plus_page(Evas_Object *scroller)
 	elm_object_signal_callback_add(plus_item, "down", "plus_item", _plus_item_down_cb, page);
 	elm_object_signal_callback_add(plus_item, "up", "plus_item", _plus_item_up_cb, page);
 	elm_object_signal_callback_add(plus_item, "click", "plus_item", _plus_item_clicked_cb, page_info->layout);
+
+
 
 	return page;
 
