@@ -22,6 +22,7 @@
 #include <dlog.h>
 #include <bundle.h>
 #include <efl_assist.h>
+#include <efl_extension.h>
 
 #include "layout_info.h"
 #include "log.h"
@@ -34,7 +35,7 @@
 
 
 
-#define CB_LIST_MAX 1
+#define CB_LIST_MAX 4
 static struct {
 	Eina_Bool pressed;
 	Ecore_Event_Handler *press_handler;
@@ -138,6 +139,8 @@ static Eina_Bool _key_release_cb(void *data, int type, void *event)
 		_execute_cbs(KEY_TYPE_BACK);
 	} else if (!strcmp(ev->keyname, "XF86Menu")) {
 		_execute_cbs(KEY_TYPE_BEZEL_UP);
+	} else if (!strcmp(ev->keyname, "XF86PowerOff")) {
+		_execute_cbs(KEY_TYPE_ROTARY);
 	}
 
 	key_info.pressed = EINA_FALSE;

@@ -32,6 +32,7 @@
 #include <dlog.h>
 #include <app_preference.h>
 #include <widget_viewer_evas.h>
+#include <efl_extension.h>
 
 #include "bg.h"
 #include "conf.h"
@@ -63,6 +64,8 @@
 #include "widget.h"
 #include "edit.h"
 #include "popup.h"
+#include "clock_service.h"
+//#include "rotary.h"
 
 #define HOME_SERVICE_KEY "home_op"
 #define HOME_SERVICE_VALUE_POWERKEY "powerkey"
@@ -87,7 +90,7 @@
 static main_s main_info = {
 	.theme = NULL,
 	.layout = NULL,
-
+	.clock_focus = NULL,
 	.state = APP_STATE_CREATE,
 	.is_mapbuf = 0,
 	.apps_pid = 0,
@@ -557,7 +560,9 @@ static Eina_Bool _window_effect_setting_cb(void *data)
 static void _resume_cb(void *data)
 {
 	_D("Resumed");
-
+	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb,main_get_info()->clock_focus)) {
+											_E("Cannot register the key callback");
+										}
 	if (main_info.state == APP_STATE_RESUME) {
 		_E("resumed already");
 		return;
@@ -592,7 +597,8 @@ static void _resume_cb(void *data)
 static void _pause_cb(void *data)
 {
 	_D("Paused");
-
+	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
+	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
 	if (main_info.state == APP_STATE_PAUSE) {
 		_E("paused already");
 		return;
@@ -1272,13 +1278,13 @@ static void _app_control(app_control_h service, void *data)
 	_D("Service value : %s", service_val);
 
 	if (service_val) {
-		int is_clock_displayed = 0;
+	//	int is_clock_displayed = 0;
 		//int is_window_on_top = _is_window_on_top();
 		//is_window_on_top = (apps_main_is_visible() == EINA_TRUE) ? 0 : is_window_on_top;
 		Evas_Object *layout = _layout_get();
 		Evas_Object *scroller = _scroller_get();
 		if (scroller_get_current_page_direction(scroller) == PAGE_DIRECTION_CENTER) {
-			is_clock_displayed = 1;
+		//	is_clock_displayed = 1;
 		}
 
 		if (!strncmp(service_val, HOME_SERVICE_VALUE_POWERKEY, strlen(HOME_SERVICE_VALUE_POWERKEY))) {

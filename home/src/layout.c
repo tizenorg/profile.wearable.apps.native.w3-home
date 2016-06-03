@@ -22,6 +22,7 @@
 #include <bundle.h>
 #include <dlog.h>
 #include <widget_viewer_evas.h>
+#include <efl_extension.h>
 
 #include "util.h"
 #include "conf.h"
@@ -44,6 +45,8 @@
 #include "apps/apps_main.h"
 #include "gesture.h"
 #include "notification/notification.h"
+#include "rotary.h"
+#include "clock_service.h"
 
 #define PRIVATE_DATA_KEY_LAYOUT_DOWN_X "p_l_x"
 #define PRIVATE_DATA_KEY_LAYOUT_DOWN_Y "p_l_y"
@@ -802,7 +805,6 @@ HAPI Evas_Object *layout_create(Evas_Object *win)
 	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BEZEL_UP, _bezel_up_key_cb, layout)) {
 		_E("Cannot register the key callback");
 	}
-
 	layout_add_mouse_cb(layout);
 
 	checker = _create_checker(layout, MOVE_LEFT);

@@ -17,7 +17,7 @@
 
 #ifndef __W_HOME_KEY_H__
 #define __W_HOME_KEY_H__
-
+#include "util.h"
 typedef enum {
 	KEY_CB_RET_CONTINUE = 0,
 	KEY_CB_RET_STOP,
@@ -28,6 +28,7 @@ typedef enum {
 	KEY_TYPE_HOME,
 	KEY_TYPE_BEZEL_UP,
 	KEY_TYPE_MAX,
+	KEY_TYPE_ROTARY,
 } key_type_e;
 
 /* Key callbacks are managed as a stack[LIFO] */

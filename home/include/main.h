@@ -22,6 +22,7 @@ typedef struct {
 	Evas_Object *win;
 	Evas *e;
 	Evas_Object *layout;
+	Evas_Object *clock_focus;
 	Ecore_Event_Handler *handler;
 	Eina_List *font_theme;
 	Elm_Theme *theme;

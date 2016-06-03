@@ -35,7 +35,7 @@
 #include "apps/scroller.h"
 #include "apps/scroller_info.h"
 #include "apps/item.h"
-
+#include "clock_service.h"
 
 #define PRIVATE_DATA_KEY_CHECKER_TYPE "ck_tp"
 #define PRIVATE_DATA_KEY_DOWN_X "dw_x"
