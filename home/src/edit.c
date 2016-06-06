@@ -725,69 +725,6 @@ static key_cb_ret_e _add_viewer_back_key_cb(void *data)
 
 
 
-#if 0 /* We use this when back key isn't used anymore*/
-static Eina_Bool _delay_destroy_add_viewer_cb(void *data)
-{
-	Evas_Object *layout = data;
-
-	edit_destroy_add_viewer(layout);
-	return ECORE_CALLBACK_CANCEL;
-}
-
-
-
-static Eina_Bool _delay_destroy_edit_cb(void *data)
-{
-	Evas_Object *layout = data;
-
-	edit_destroy_layout(layout);
-	return ECORE_CALLBACK_CANCEL;
-}
-
-
-
-static void _add_viewer_bezel_down_cb(void *data)
-{
-	Evas_Object *layout = data;
-	Ecore_Timer *timer = NULL;
-
-	ret_if(!layout);
-
-	timer = evas_object_data_del(layout, PRIVATE_DATA_KEY_TIMER);
-	if (timer) {
-		ecore_timer_del(timer);
-	}
-	timer = ecore_timer_add(0.1f, _delay_destroy_add_viewer_cb, layout);
-	evas_object_data_set(layout, PRIVATE_DATA_KEY_TIMER, timer);
-}
-
-
-
-static void _edit_bezel_down_cb(void *data)
-{
-	Evas_Object *layout = data;
-	Ecore_Timer *timer = NULL;
-
-	ret_if(!layout);
-
-	layout_info = evas_object_data_get(layout, DATA_KEY_LAYOUT_INFO);
-	ret_if(!layout_info);
-
-	if (!layout_info->edit) {
-		_D("Layout is not edited");
-		return;
-	}
-	timer = evas_object_data_del(layout, PRIVATE_DATA_KEY_TIMER);
-	if (timer) {
-		ecore_timer_del(timer);
-	}
-	timer = ecore_timer_add(0.1f, _delay_destroy_layout_cb, layout);
-	evas_object_data_set(layout, PRIVATE_DATA_KEY_TIMER, timer);
-}
-#endif
-
-
-
 static key_cb_ret_e _add_viewer_home_key_cb(void *data)
 {
 	Evas_Object *layout = data;
@@ -1915,11 +1852,7 @@ HAPI Evas_Object *edit_create_add_viewer(Evas_Object *layout)
 	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_HOME, _add_viewer_home_key_cb, layout)) {
 		_E("Cannot register the key callback");
 	}
-#if 0
-	if (W_HOME_ERROR_NONE != gesture_register_cb(BEZEL_DOWN, _add_viewer_bezel_down_cb, layout)) {
-		_E("Cannot register the gesture callback");
-	}
-#endif
+
 
 	return add_viewer;
 }
@@ -3134,11 +3067,6 @@ HAPI Evas_Object *edit_create_layout(Evas_Object *layout, edit_mode_e edit_mode)
 	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_HOME, _edit_home_key_cb, layout)) {
 		_E("Cannot register the key callback");
 	}
-#if 0
-	if (W_HOME_ERROR_NONE != gesture_register_cb(BEZEL_DOWN, _edit_bezel_down_cb, layout)) {
-		_E("Cannot register the gesture callback");
-	}
-#endif
 
 	switch (edit_mode) {
 	case EDIT_MODE_LEFT:

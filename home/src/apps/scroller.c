@@ -37,11 +37,6 @@
 
 #define BOX_EDJE EDJEDIR"/apps_box.edj"
 #define BOX_GROUP_NAME "box"
-#if 0 /* Do not need buttons */
-#define BOX_TOP_BTN_GROUP_NAME "top_button"
-#define BOX_BOTTOM_BTN_GROUP_NAME "bottom_button"
-#endif
-
 #define PRIVATE_DATA_KEY_SCROLLER_MOUSE_DOWN "p_sc_m_dn"
 #define PRIVATE_DATA_KEY_SCROLLER_DRAG "p_sc_dr"
 #define PRIVATE_DATA_KEY_IS_SCROLLING "p_is_scr"
@@ -281,91 +276,6 @@ OUT:
 }
 
 
-
-#if 0 /* Do not need buttons */
-static void _top_btn_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Evas_Object *top_btn_layout = data;
-	ret_if(!top_btn_layout);
-
-	Evas_Event_Mouse_Down *ei = event_info;
-	ret_if(!ei);
-
-	_APPS_D("Mouse is down [%d,%d]", ei->output.x, ei->output.y);
-
-	Evas_Object *btn_text_layout = elm_object_part_content_get(top_btn_layout, "button,txt");
-	ret_if(!btn_text_layout);
-
-	elm_object_signal_emit(btn_text_layout, "press,button", "button");
-}
-
-
-
-static void _top_btn_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Evas_Object *top_btn_layout = data;
-	ret_if(!top_btn_layout);
-
-	Evas_Event_Mouse_Up *ei = event_info;
-	ret_if(!ei);
-
-	_APPS_D("Mouse is up [%d,%d]", ei->output.x, ei->output.y);
-
-	Evas_Object *btn_text_layout = elm_object_part_content_get(top_btn_layout, "button,txt");
-	ret_if(!btn_text_layout);
-
-	elm_object_signal_emit(btn_text_layout, "release,button", "button");
-}
-
-#define APPS_W_TASKMGR_PKGNAME "org.tizen.w-taskmanager"
-static void _top_btn_clicked_cb(void *data, Evas_Object *obj, void *event_info)
-{
-	_APPS_D("Clicked");
-
-	Evas_Object *layout = (Evas_Object*)data;
-	ret_if(!layout);
-
-	if(apps_layout_is_edited(layout)) {
-		_APPS_D("Edit mode");
-		return;
-	}
-
-	apps_effect_play_sound();
-
-	int isttsmode = apps_item_info_is_support_tts(APPS_W_TASKMGR_PKGNAME);
-	if(apps_main_get_info()->tts && !isttsmode) {
-		char tmp[NAME_LEN] = {0,};
-		snprintf(tmp, sizeof(tmp), _("IDS_SCR_POP_PS_IS_NOT_AVAILABLE_WHILE_SCREEN_READER_IS_ENABLED"), _("IDS_ST_OPT_RECENT_APPS_ABB"));
-		char *text = strdup(tmp);
-		util_create_toast_popup(layout, text);
-	}
-	else {
-		util_launch_app(APPS_W_TASKMGR_PKGNAME, NULL, NULL);
-	}
-}
-
-
-
-#define APPS_SAMSUNGAPPS_MAIN_CATEGORY_LIST "samsungapps://MainCategoryList/"
-static void _bottom_btn_clicked_cb(void *data, Evas_Object *obj, void *event_info)
-{
-	_APPS_D("Clicked");
-
-	Evas_Object *layout = (Evas_Object*)data;
-	ret_if(!layout);
-
-	if(apps_layout_is_edited(layout)) {
-		_APPS_D("Edit mode");
-		return;
-	}
-
-	apps_effect_play_sound();
-	wms_launch_gear_manager(data, APPS_SAMSUNGAPPS_MAIN_CATEGORY_LIST);
-}
-#endif
-
-
-
 static char *_access_info_cb(void *data, Evas_Object *obj)
 {
 	retv_if(!data, NULL);
@@ -477,10 +387,6 @@ HAPI Evas_Object *apps_scroller_create(Evas_Object *layout)
 ERROR:
 	if(box_layout) evas_object_del(box_layout);
 	if(scroller) evas_object_del(scroller);
-#if 0 /* Do not need buttons */
-	if(top_btn_layout) evas_object_del(top_btn_layout);
-	if(bottom_btn_layout) evas_object_del(bottom_btn_layout);
-#endif
 
 	return NULL;
 }
@@ -960,10 +866,6 @@ HAPI void apps_scroller_change_language(Evas_Object *scroller)
 	ret_if(!scroller_info);
 
 	elm_access_info_cb_set(scroller_info->layout_focus, ELM_ACCESS_INFO, _access_info_cb, _("IDS_IDLE_BODY_APPS"));
-#if 0 /* Do not need buttons */
-	elm_access_info_cb_set(scroller_info->top_focus, ELM_ACCESS_INFO, _access_info_cb, _("IDS_ST_OPT_RECENT_APPS_ABB"));
-	elm_access_info_cb_set(scroller_info->bottom_focus, ELM_ACCESS_INFO, _access_info_cb, _("IDS_HS_BUTTON_GET_MORE_APPLICATIONS_ABB2"));
-#endif
 
 	list = elm_box_children_get(scroller_info->box);
 	ret_if(!list);

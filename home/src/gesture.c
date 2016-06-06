@@ -118,15 +118,6 @@ static void _clock_show(void)
 	evas_obscured_clear(e);
 	evas_damage_rectangle_add(e, 0, 0, w, h);
 	ecore_evas_manual_render(ee);
-#if 0
-	gc = ecore_x_gc_new(0, ECORE_X_GC_VALUE_MASK_FOREGROUND, NULL);
-	ecore_x_pixmap_paste(elm_win_xwindow_get(main_get_info()->win)
-		, ecore_x_window_root_first_get(), gc, 0, 0, main_get_info()->root_w, main_get_info()->root_h, 0, 0);
-	ecore_x_sync();
-#endif
-#if 0 /* EFL private features */
-	gesture_home_window_effect_set(0);
-#endif
 	elm_win_raise(main_get_info()->win);
 
 	/* hiding apps */

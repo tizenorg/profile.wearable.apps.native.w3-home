@@ -138,22 +138,6 @@ static Evas_Object *_scroller_get(void) {
 }
 
 
-#if 0
-static Evas_Object *_tutorial_get(void) {
-	Evas_Object *layout = _layout_get();
-	layout_info_s *layout_info = NULL;
-	Evas_Object *tutorial = NULL;
-
-	if (layout != NULL) {
-		layout_info = evas_object_data_get(layout, DATA_KEY_LAYOUT_INFO);
-		if(layout_info != NULL) {
-			tutorial = layout_info->tutorial;
-		}
-	}
-
-	return tutorial;
-}
-#endif
 
 
 static int _psmode_get(void)

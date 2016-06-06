@@ -180,55 +180,6 @@ static void _destroy_layout(instance_info_s *info)
 }
 
 
-
-#if 0 /* EFL private features */
-static void _apps_slide_down_effect_add(instance_info_s *info)
-{
-	Evas_Object *win = NULL;
-	int xwin;
-	int angle = 0;
-	int size = 0;
-	char *buf = NULL;
-	int id = 0;
-
-	win = info->win;
-	ret_if(!win);
-
-	xwin = elm_win_xwindow_get(win);
-
-	id = elm_win_aux_hint_add(win, "wm.comp.win.effect.enable", "1");
-	if (-1 == id) _APPS_E("Failed to get effect enable id");
-	else evas_object_data_set(win, PRIVATE_DATA_KEY_EFFECT_ENABLE_ID, (void *)id);
-
-	id = 0;
-	angle = elm_win_rotation_get(win);
-	size = snprintf(NULL, 0, "%x.%d.%d.%d.%d.%d", xwin, angle, 0, info->root_h, info->root_w, info->root_h) + 1;
-	buf = (char *)malloc(sizeof(char) * size);
-	if (buf) {
-		snprintf(buf, size, "%x.%d.%d.%d.%d.%d", xwin, angle, 0, info->root_h, info->root_w, info->root_h);
-		id = elm_win_aux_hint_add(win, "wm.comp.win.effect.launch.pos", buf);
-		if (-1 == id) _APPS_E("Failed to get effect id");
-		else evas_object_data_set(win, PRIVATE_DATA_KEY_EFFECT_POS_ID, (void *)id);
-
-		free(buf);
-	}
-}
-
-
-
-static void _apps_slide_down_effect_del(instance_info_s *info)
-{
-	int id;
-
-	id = (int) evas_object_data_get(info->win, PRIVATE_DATA_KEY_EFFECT_ENABLE_ID);
-	elm_win_aux_hint_del(info->win, id);
-	id = (int) evas_object_data_get(info->win, PRIVATE_DATA_KEY_EFFECT_POS_ID);
-	elm_win_aux_hint_del(info->win, id);
-}
-#endif
-
-
-
 static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
 {
 	instance_info_s *info = data;
@@ -282,10 +233,6 @@ static apps_error_e _init_app_win(instance_info_s *info, const char *name, const
 
 	/* Open GL backend */
 	elm_config_accel_preference_set("opengl");
-#if 0
-	root_win = ecore_x_window_root_first_get();
-	ecore_x_window_size_get(root_win, &info->root_w, &info->root_h);
-#endif
 	info->win = elm_win_add(NULL, name, ELM_WIN_BASIC);
 	retv_if(!info->win, APPS_ERROR_FAIL);
 	elm_win_screen_size_get(info->win, NULL, NULL, &info->root_w, &info->root_h);
@@ -294,15 +241,6 @@ static apps_error_e _init_app_win(instance_info_s *info, const char *name, const
 	elm_win_alpha_set(info->win, EINA_FALSE); // This order is important
 	elm_win_role_set(info->win, "no-effect");
 
-#if 0 /* EFL private features */
-	_apps_slide_down_effect_add(info);
-#endif
-#if 0
-	opaque_atom = ecore_x_atom_get("_E_ILLUME_WINDOW_REGION_OPAQUE");
-	xwin = elm_win_xwindow_get(info->win);
-	ecore_x_window_prop_card32_set(xwin, opaque_atom, &opaque_val, 1);
-	ecore_x_vsync_animator_tick_source_set(xwin);
-#endif
 	if (elm_win_wm_rotation_supported_get(info->win)) {
 		const int rots[ROTATION_TYPE_NUMBER] = {0};
 		elm_win_wm_rotation_available_rotations_set(info->win, rots, ROTATION_TYPE_NUMBER);
@@ -338,13 +276,6 @@ static apps_error_e _init_app_win(instance_info_s *info, const char *name, const
 	evas_object_show(rect);
 	*/
 
-#if 0
-	Ecore_Event_Handler *handler = ecore_event_handler_add(EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, info);
-	evas_object_data_set(info->win, PRIVATE_DATA_KEY_FOCUS_IN_EVENT_HANDLER, handler);
-
-	handler = ecore_event_handler_add(EVAS_CALLBACK_CANVAS_FOCUS_OUT, _window_focus_out_cb, info);
-	evas_object_data_set(info->win, PRIVATE_DATA_KEY_FOCUS_OUT_EVENT_HANDLER, handler);
-#endif
 	return APPS_ERROR_NONE;
 }
 
@@ -362,9 +293,6 @@ static void _destroy_app_win(instance_info_s *info)
 	handler = evas_object_data_del(info->win, PRIVATE_DATA_KEY_FOCUS_OUT_EVENT_HANDLER);
 	if (handler) ecore_event_handler_del(handler);
 
-#if 0 /* EFL private features */
-	_apps_slide_down_effect_del(info);
-#endif
 
 	evas_object_del(info->win);
 	info->win = NULL;
@@ -593,11 +521,6 @@ HAPI void apps_main_launch(int launch_type)
 		if (info->win) {
 			_APPS_D("There is a window already");
 			apps_layout_show(info->win, EINA_TRUE);
-#if 0
-			if (!tutorial_is_exist() && initial_popup) {
-				util_create_check_popup(info->win, NULL, _popup_clicked_cb);
-			}
-#endif
 			return;
 		}
 
@@ -605,11 +528,7 @@ HAPI void apps_main_launch(int launch_type)
 		if (APPS_ERROR_FAIL == apps_layout_show(info->win, EINA_TRUE)) {
 			_APPS_E("Cannot show tray");
 		}
-#if 0
-		if (!tutorial_is_exist() && initial_popup) {
-			util_create_check_popup(info->win, NULL, _popup_clicked_cb);
-		}
-#endif
+
 	}
 
 	_execute_cbs(info, APPS_APP_STATE_RESET);

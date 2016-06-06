@@ -252,12 +252,6 @@ static int _handler_page_show(const char *id, int category, void *view, void *da
 	Evas_Object *page = view;
 	Evas_Object *scroller = _scroller_get();
 	retv_if(scroller == NULL, NOTI_BROKER_ERROR_FAIL);
-#if 0
-	if (tutorial_is_exist() == 1) {
-		_E("tutorial is exist, can't bring the page");
-		return NOTI_BROKER_ERROR_FAIL;
-	}
-#endif
 	scroller_bring_in_page(scroller, page, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
 
 	return NOTI_BROKER_ERROR_NONE;
@@ -383,12 +377,6 @@ static int _handler_window_activate(const char *id, int category, void *view, vo
 {
 	Evas_Object *win = main_get_info()->win;
 	retv_if(win == NULL, NOTI_BROKER_ERROR_FAIL);
-#if 0
-	if (tutorial_is_exist() == 1) {
-		_E("tutorial is exist, can't activate home window");
-		return NOTI_BROKER_ERROR_FAIL;
-	}
-#endif
 	elm_win_activate(win);
 
 	if (apps_main_is_visible() == EINA_TRUE) {
@@ -529,11 +517,6 @@ static void _scroller_smart_cb(void *data, Evas_Object *scroller, void *event_in
 static key_cb_ret_e _noti_broker_back_cb(void *data)
 {
 	int ret = EVENT_RET_CONTINUE;
-#if 0
-	if (tutorial_is_exist() == 1) {
-		return KEY_CB_RET_CONTINUE;
-	}
-#endif
 	ret = noti_broker_event_fire_to_plugin(EVENT_SOURCE_VIEW, EVENT_TYPE_KEY_BACK, NULL);
 	if (ret == EVENT_RET_STOP) {
 		_W("stop back key execution");

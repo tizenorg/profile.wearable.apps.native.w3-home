@@ -100,10 +100,6 @@ static void _mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info
 	scroller_info_s *scroller_info = NULL;
 	_D("scroller mouse up");
 
-#if 0 //TBD
-	home_dbus_scroll_booster_signal_send(0);
-#endif
-
 	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
 	ret_if(!scroller_info);
 	scroller_info->mouse_down = 0;
@@ -208,10 +204,6 @@ static void _elm_box_pack_start(Evas_Object *scroller, Evas_Object *page)
 	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
 	ret_if(!scroller_info);
 
-#if 0 /* EFL Private feature */
-	elm_scroller_origin_reverse_set(scroller, EINA_TRUE, EINA_TRUE);
-#endif
-
 	_D("pack_start a page(%p) into the scroller(%p), origin_reverse(1)", page, scroller);
 	elm_box_pack_start(scroller_info->box, page);
 	/* recalculate : child box with pages -> parent box */
@@ -230,10 +222,6 @@ static void _elm_box_pack_end(Evas_Object *scroller, Evas_Object *page)
 
 	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
 	ret_if(!scroller_info);
-
-#if 0 /* EFL Private feature */
-	elm_scroller_origin_reverse_set(scroller, EINA_FALSE, EINA_FALSE);
-#endif
 
 	_D("pack_end a page(%p) into the scroller(%p), origin_reverse(0)", page, scroller);
 	elm_box_pack_end(scroller_info->box, page);
@@ -260,15 +248,9 @@ static void _elm_box_pack_before(Evas_Object *scroller, Evas_Object *page, Evas_
 	switch (reverse_factor) {
 	case -1:
 	case 0:
-#if 0 /* EFL Private feature */
-		elm_scroller_origin_reverse_set(scroller, EINA_TRUE, EINA_TRUE);
-#endif
 		_D("pack_before a page(%p) before a page(%p) into the scroller(%p), origin_reverse(1)", page, before, scroller);
 		break;
 	case 1:
-#if 0 /* EFL Private feature */
-		elm_scroller_origin_reverse_set(scroller, EINA_FALSE, EINA_FALSE);
-#endif
 		_D("pack_before a page(%p) before a page(%p) into the scroller(%p), origin_reverse(0)", page, before, scroller);
 		break;
 	default:
@@ -302,16 +284,10 @@ static void _elm_box_pack_after(Evas_Object *scroller, Evas_Object *page, Evas_O
 	reverse_factor = _set_scroller_reverse_by_page(scroller, after);
 	switch (reverse_factor) {
 	case -1:
-#if 0 /* EFL Private feature */
-		elm_scroller_origin_reverse_set(scroller, EINA_TRUE, EINA_TRUE);
-#endif
 		_D("pack_after a page(%p) after a page(%p) into the scroller(%p), origin_reverse(1)", page, after, scroller);
 		break;
 	case 0:
 	case 1:
-#if 0 /* EFL Private feature */
-		elm_scroller_origin_reverse_set(scroller, EINA_FALSE, EINA_FALSE);
-#endif
 		_D("pack_after a page(%p) after a page(%p) into the scroller(%p), origin_reverse(0)", page, after, scroller);
 		break;
 	default:
@@ -370,16 +346,10 @@ static void _elm_box_unpack(Evas_Object *scroller, Evas_Object *page)
 	reverse_factor = _set_scroller_reverse_by_page(scroller, page);
 	switch (reverse_factor) {
 	case -1:
-#if 0 /* EFL Private feature */
-		elm_scroller_origin_reverse_set(scroller, EINA_TRUE, EINA_TRUE);
-#endif
 		_D("unpack a page(%p) from the scroller(%p), origin_reverse(1)", page, scroller);
 		break;
 	case 0:
 	case 1:
-#if 0 /* EFL Private feature */
-		elm_scroller_origin_reverse_set(scroller, EINA_FALSE, EINA_FALSE);
-#endif
 		_D("unpack a page(%p) from the scroller(%p), origin_reverse(0)", page, scroller);
 		break;
 	default:
@@ -2093,9 +2063,6 @@ static inline void _page_region_show(Evas_Object *scroller, int index, scroller_
 	cur_freezed = elm_object_scroll_freeze_get(scroller_info->box);
 
 	if (is_freezed) scroller_unfreeze(scroller);
-#if 0 /* EFL Private feature */
-	elm_scroller_origin_reverse_set(scroller, EINA_FALSE, EINA_FALSE);
-#endif
 	_D("Page show now : %d(%p)", index, page);
 	elm_scroller_page_show(scroller, index, 0);
 	if (is_freezed && cur_freezed) scroller_freeze(scroller);

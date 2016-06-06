@@ -216,12 +216,6 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 		return 0;
 	}
 
-#if 0 // For now, nodisplay of widget is always 1
-	if (widget_service_get_nodisplay(widget_id) == 1) {
-		DbgPrint("NoDisplay: %s\n", widget_id);
-		return 0;
-	}
-#endif
 
 	cnt = WIDGET_NR_OF_SIZE_LIST;
 	ret = widget_service_get_supported_size_types(widget_id, &cnt, &size_types); 

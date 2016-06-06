@@ -190,13 +190,6 @@ static Eina_Bool _longpress_timer_cb(void *data)
 		break;
 	case PAGE_DIRECTION_CENTER:
 		if (util_feature_enabled_get(FEATURE_CLOCK_SELECTOR) == 1) {
-#if 0
-			if (clock_service_clock_selector_launch() > 0) {
-				evas_object_data_set(layout_info->pressed_page, DATA_KEY_PAGE_ONHOLD_COUNT, (void*)1);
-				evas_object_data_set(layout, PRIVATE_DATA_KEY_CENTER_LONG_PRESSED, (void*)1);
-				scroller_freeze(layout_info->scroller);
-			}
-#endif
 		} else {
 			no_effect = 1;
 		}
@@ -393,14 +386,6 @@ static void _bezel_down_cb(void *data)
 
 	ret_if(!layout);
 
-#if 0
-	b = bundle_create();
-	if (b != NULL)
-	{
-		bundle_add(b, "__WINDICATOR_OP__", "__SHOW_MOMENT_VIEW__");
-		bundle_add(b, "__EFFECT__", "ON");
-        }
-#endif
 	pid = aul_launch_app("org.tizen.windicator", b);
 
 	_D("aul_launch_app: %s(%d)", "org.tizen.windicator", pid);
@@ -656,15 +641,6 @@ static Evas_Event_Flags _flick_end_cb(void *data, void *event_info)
 	int vector_y = ei->momentum.y2 - ei->momentum.y1;
 	int distance_x = abs( ei->momentum.x1 - ei->momentum.x2);
 	int distance_y = abs(vector_y);
-
-#if 0 //DEBUG
-	_D("gesture_down_y:%d", gesture_down_y);
-	_D("ei->momentum.my:%d", ei->momentum.my);
-	_D("is_flickup_done:%d", is_flickup_done);
-	_D("vector_y:%d", vector_y);
-	_D("distance_x:%d", distance_x);
-	_D("distance_y:%d", distance_y);
-#endif
 
 	if (vector_y < 0 &&
 		distance_y >= THRESHOLD_BEZEL_UP_END_D_H && //cannot use momentum

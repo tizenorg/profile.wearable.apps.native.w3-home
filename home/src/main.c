@@ -32,7 +32,7 @@
 #include <dlog.h>
 #include <app_preference.h>
 #include <widget_viewer_evas.h>
-
+#include <efl_extension.h>
 #include "bg.h"
 #include "conf.h"
 #include "layout.h"
@@ -87,7 +87,7 @@
 static main_s main_info = {
 	.theme = NULL,
 	.layout = NULL,
-
+	.clock_focus = NULL,
 	.state = APP_STATE_CREATE,
 	.is_mapbuf = 0,
 	.apps_pid = 0,
@@ -126,43 +126,6 @@ static void _home_visibility_vconf_set(int is_visible)
 		_E("Failed to set key:%s(%d) value:%d", VCONFKEY_HOME_VISIBILITY, ret, is_visible);
 	}
 }
-
-
-#if 0
-static int _is_window_on_top(void)
-{
-	int pid = -1;
-	char *cmd = NULL;
-
-	pid = util_find_top_visible_window(&cmd);
-	if (pid == -1) {
-		_E("Failed to get top visible window pid");
-	}
-
-	if (pid == getpid()) {
-		free(cmd);
-		return 1;
-	}
-
-	free(cmd);
-
-	return 0;
-}
-#endif
-
-#if 0
-static int _is_tutorial_enabled(void)
-{
-	int ret = 0;
-	int tutorial_enabled = 0;
-	if ((ret = vconf_get_int(VCONF_KEY_HOME_IS_TUTORIAL, &tutorial_enabled)) != 0) {
-		_E("Cannot get the vconf for %s %d", VCONF_KEY_HOME_IS_TUTORIAL, ret);
-		return 0;
-	}
-
-	return tutorial_enabled;
-}
-#endif
 
 
 static int _is_lcd_turned_on(void)
@@ -393,25 +356,6 @@ static void _tts_cb(void *data, Evas_Object *obj, void *event_info)
 	ecore_job_add(_activate_window_job_cb, NULL);
 }
 
-
-#if 0
-static void _tutorial_cb(keynode_t *node, void *data)
-{
-	int tutorial_enabled = _is_tutorial_enabled();
-
-	if (tutorial_enabled == 0) {
-		if (main_info.state == APP_STATE_RESUME) {
-			_home_visibility_vconf_set(1);
-		} else {
-			_home_visibility_vconf_set(0);
-		}
-
-		popup_show(POPUP_STAGE_AFTER_TUTORIAL);
-	}
-}
-#endif
-
-
 static void _init_theme(void)
 {
 	main_info.theme = elm_theme_new();
@@ -542,40 +486,22 @@ static int _dead_cb(int pid, void *data)
 }
 
 
-
-#if 0 /* EFL private features */
-static Eina_Bool _window_effect_setting_cb(void *data)
-{
-	gesture_home_window_effect_set(1);
-
-	return ECORE_CALLBACK_CANCEL;
-}
-#endif
-
-
-
 static void _resume_cb(void *data)
 {
 	_D("Resumed");
-
+	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb,main_get_info()->clock_focus)) {
+											_E("Cannot register the key callback");
+										}
 	if (main_info.state == APP_STATE_RESUME) {
 		_E("resumed already");
 		return;
 	}
 
-#if 0 /* EFL private features */
-	ecore_timer_add(0.2f, _window_effect_setting_cb, NULL);
-#endif
-
 	if (apps_main_is_visible() && main_info.is_win_visible == 0) {
 		_E("Apps is showing");
 		return;
 	}
-#if 0
-	if (_is_tutorial_enabled() == 0) {
-		_home_visibility_vconf_set(1);
-	}
-#endif
+
 	main_info.state = APP_STATE_RESUME;
 	_execute_cbs(APP_STATE_RESUME);
 
@@ -592,7 +518,8 @@ static void _resume_cb(void *data)
 static void _pause_cb(void *data)
 {
 	_D("Paused");
-
+	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
+	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
 	if (main_info.state == APP_STATE_PAUSE) {
 		_E("paused already");
 		return;
@@ -770,30 +697,13 @@ static Eina_Bool _visibility_timeout_cb(void *data)
 
 
 
-//static Eina_Bool _window_visibility_cb(void *data, int type, void *event)
+
 static void _window_visibility_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	//Ecore_X_Event_Window_Visibility_Change *ev = event_info;
-	//ret_if(!ev);
-
+	
 	if (!main_info.win) {
 		return;
 	}
-
-	//Ecore_X_Window xWin = elm_win_xwindow_get(main_info.win);
-
-	//if (xWin != ev->win) {
-	//	return;
-	//}
-
-	//_W("Window [0x%X] is now visible(%d)", xWin, ev->fully_obscured);
-
-	//if (ev->fully_obscured == 1) {
-	//	main_info.is_win_visible = 0;
-	//} else {
-	//	main_info.is_win_visible = 1;
-	//}
-
 	if (main_info.is_service_initialized == 0) {
 		if (main_info.safety_init_timer) {
 			/**
@@ -830,20 +740,11 @@ static void _window_visibility_cb(void *data, Evas_Object *obj, void *event_info
 
 static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
 {
-	//Ecore_X_Event_Window_Focus_In *ev = event;
-
 	if (!main_info.win) {
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	//Ecore_X_Window xWin = elm_win_xwindow_get(main_info.win);
-	//if (xWin == ev->win) {
-		_D("focus in");
-		_resume_cb(NULL);
-	//} else {
-	//	_E("win[%d], ev->win[%d]", xWin, ev->win);
-	//}
-
+	
 	return ECORE_CALLBACK_PASS_ON;
 }
 
@@ -851,35 +752,12 @@ static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
 
 static Eina_Bool _window_focus_out_cb(void *data, int type, void *event)
 {
-	//Ecore_X_Event_Window_Focus_Out *ev = event;
 
 	if (!main_info.win) {
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-#if 0
-	Ecore_X_Window xWin = elm_win_xwindow_get(main_info.win);
-	if (xWin == ev->win) {
-		_D("focus out");
-		_pause_cb(NULL);
 
-		if (tutorial_is_exist()) {
-			Ecore_X_Window xwin = ecore_x_window_focus_get();
-			if (tutorial_is_apps(xwin)) {
-				_D("tutorial shows apps");
-				tutorial_set_transient_for(xwin);
-			} else if (tutorial_is_indicator(xwin)) {
-				_D("tutorial shows indicator");
-				tutorial_set_transient_for(xwin);
-			} else {
-				_E("Cannot reach here");
-			}
-		}
-
-	} else {
-		_E("win[%d], ev->win[%d]", xWin, ev->win);
-	}
-#endif
 		_D("focus out");
 		_pause_cb(NULL);
 
@@ -1005,34 +883,7 @@ static bool _create_cb(void *data)
 		_E("Failed to register the changed_apps_order callback");
 	}
 	/* wms vconf has to be dealt after pushing pages */
-#if 0
-	if (vconf_notify_key_changed(VCONF_KEY_HOME_IS_TUTORIAL, _tutorial_cb, NULL) < 0) {
-		_E("Failed to register the tutorial callback");
-	}
-#endif
-	retv_if(vconf_get_bool(VCONFKEY_SETAPPL_ACCESSIBILITY_TTS, &main_info.is_tts) < 0, W_HOME_ERROR_FAIL);
-	_check_lang();
 
-	wms_register_setup_wizard_vconf();
-
-#if 0 //TBD
-	home_gesture_init();
-	if (home_dbus_register_cb(DBUS_EVENT_LCD_ON, _lcd_on_cb, NULL) != W_HOME_ERROR_NONE) {
-		_E("Failed to register lcd status changed cb");
-	}
-	if (home_dbus_register_cb(DBUS_EVENT_LCD_OFF, _lcd_off_cb, NULL) != W_HOME_ERROR_NONE) {
-		_E("Failed to register lcd status changed cb");
-	}
-##else
-	if (device_add_callback(DEVICE_CALLBACK_DISPLAY_STATE, _display_state_cb, NULL) < 0) {
-		_E("Failed to add the display state callback");
-	}
-#endif
-#if 0
-	if (home_dbus_register_cb(DBUS_EVENT_ALPM_MANAGER_STATE_CHANGED, _alpm_manager_status_changed_cb, NULL) != W_HOME_ERROR_NONE) {
-		_E("Failed to register alpm manager status changed cb");
-	}
-#endif
 	/**
 	 * Register the X Event handlers before creating our Window.
 	 * If you don't want to be bothered by timing issue of these **cking events ;)
@@ -1110,17 +961,6 @@ static bool _create_cb(void *data)
 	if (!main_info.safety_init_timer) {
 		_E("Failed to create a fallback init timer for safety");
 	}
-#if 0
-	if (preference_get_int(VCONF_KEY_HOME_IS_TUTORIAL_ENABLED_TO_RUN, &tutorial_enabled) != 0) {
-		_E("Cannot get the vconf for %s", VCONF_KEY_HOME_IS_TUTORIAL_ENABLED_TO_RUN);
-	}
-
-	if (tutorial_enabled && util_feature_enabled_get(FEATURE_TUTORIAL) == 1) {
-		if (!tutorial_create(main_info.layout)) {
-			_E("Cannot create a tutorial");
-		}
-	}
-#endif
 	/**
 	 * Dead callback should be called after initialize all services.
 	 * So we should register this at the last of this function.
@@ -1163,18 +1003,9 @@ static void _terminate_cb(void *data)
 
 	layout_info = evas_object_data_get(main_info.layout, DATA_KEY_LAYOUT_INFO);
 	ret_if(!layout_info);
-#if 0
-	if (layout_info->tutorial) {
-		tutorial_destroy(layout_info->tutorial);
-		layout_info->tutorial = NULL;
-	}
-#endif
 	_destroy_theme();
 
 	vconf_ignore_key_changed(VCONF_KEY_WMS_APPS_ORDER, _change_apps_order_cb);
-#if 0
-	vconf_ignore_key_changed(VCONF_KEY_HOME_IS_TUTORIAL, _tutorial_cb);
-#endif
 	effect_fini();
 
 
@@ -1286,29 +1117,6 @@ static void _app_control(app_control_h service, void *data)
 
 			_D("Powerkey operation");
 
-#if 0
-			if(tutorial_exist) {
-				is_window_on_top = 1;
-			} else {
-				apps_main_launch(APPS_LAUNCH_HIDE);
-			}
-
-			if (is_clock_displayed == 1) {
-				_D("clock is displayed");
-				if (is_window_on_top == 1) {
-					_D("home window is top");
-					if (_is_lcd_turned_on() == 1) {
-						if (layout_is_idle(layout) == 1) {
-							home_dbus_lcd_off_signal_send();
-						} else {
-							_W("home isn't in idle");
-						}
-					}
-				}
-			} else if (!tutorial_exist) {
-				scroller_bring_in_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
-			}
-#endif
 			key_cb_execute(KEY_TYPE_HOME);
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_EDIT, strlen(HOME_SERVICE_VALUE_EDIT))) {
 			_D("Edit operation");
@@ -1329,10 +1137,6 @@ static void _app_control(app_control_h service, void *data)
 			_D("First boot operation");
 			main_info.first_boot = 1;
 		}
-
-		//if (is_window_on_top == 0) {
-		//	ecore_job_add(_activate_window_job_cb, NULL);
-		//}
 
 		free(service_val);
 	} else {

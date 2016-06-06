@@ -28,46 +28,6 @@
 #define BG_TYPE_COLOR 0
 #define BG_TYPE_IMAGE 1
 #define BG_TYPE_GALLERY 2
-
-#if 0 // There is no conformant in the wearable.
-static Evas_Object *_create_conformant(Evas_Object *win)
-{
-	Evas_Object *conformant = NULL;
-	conformant = (Evas_Object *) app_get_preinitialized_conformant();
-	if (!conformant) conformant = elm_conformant_add(win);
-	retv_if(NULL == conformant, NULL);
-
-	evas_object_size_hint_weight_set(conformant, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	elm_win_resize_object_add(win, conformant);
-
-	elm_object_signal_emit(conformant, "elm,state,indicator,overlap", "elm");
-	elm_object_signal_emit(conformant, "elm,state,virtualkeypad,disable", "");
-	elm_object_signal_emit(conformant, "elm,state,clipboard,disable", "");
-
-	evas_object_data_set(conformant, DATA_KEY_WIN, win);
-	evas_object_data_set(win, DATA_KEY_CONFORMANT, conformant);
-	evas_object_show(conformant);
-
-	return conformant;
-}
-
-
-
-void _destroy_conformant(Evas_Object *win)
-{
-	Evas_Object *conformant = NULL;
-	ret_if(!win);
-
-	conformant = evas_object_data_del(win, DATA_KEY_CONFORMANT);
-	ret_if(!conformant);
-
-	evas_object_data_del(conformant, DATA_KEY_WIN);
-	evas_object_del(conformant);
-}
-#endif
-
-
-
 #define DEFAULT_HOME_BG_PATH "/opt/share/settings/Wallpapers/Home_default.png"
 char *_bg_filename(void)
 {

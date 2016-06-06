@@ -137,6 +137,7 @@ EXEC_PROGRAM("${UNAME}" ARGS "-m" OUTPUT_VARIABLE "ARCH")
 ADD_EXECUTABLE(${PROJECT_NAME}
 	src/bg.c
 	src/clock.c
+	src/rotary_eext.c
 	src/db.c
 	src/dbus.c
 	src/dbus_util.c

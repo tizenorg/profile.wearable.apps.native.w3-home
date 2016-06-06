@@ -659,13 +659,6 @@ static void _up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 			apps_scroller_move_item_prev(item_info->scroller, virtual_item, item, virtual_item);
 		}
 	}
-#if 0
-	move_anim = evas_object_data_del(item, PRIVATE_DATA_KEY_ITEM_ANIM_FOR_MOVING);
-	if (move_anim) {
-		ecore_animator_del(move_anim);
-		move_anim = NULL;
-	}
-#endif
 	move_anim = ecore_animator_add(_anim_move_item_to_empty_position, item);
 	ret_if(!move_anim);
 	evas_object_data_set(item, PRIVATE_DATA_KEY_ITEM_ANIM_FOR_MOVING, move_anim);
@@ -803,18 +796,6 @@ HAPI Evas_Object *item_create(Evas_Object *scroller, item_info_s *item_info)
 	evas_object_image_file_set(icon, item_info->icon, NULL);
 	evas_object_image_filled_set(icon, EINA_TRUE);
 	evas_object_show(icon);
-#if 0
-	//Apply image effect
-	ea_effect_h *ea_effect_stroke = ea_image_effect_create();
-	ea_image_effect_add_outer_shadow(ea_effect_stroke, 0, 1.0, 1.5, 0x4C000000);
-	ea_object_image_effect_set(icon, ea_effect_stroke);
-	ea_image_effect_destroy(ea_effect_stroke);
-
-	ea_effect_h *ea_effect = ea_image_effect_create();
-	ea_image_effect_add_outer_shadow(ea_effect, -90, 4.0, 1.5, 0x4C000000);
-	ea_object_image_effect_set(icon, ea_effect);
-	ea_image_effect_destroy(ea_effect);
-#endif
 
 	/* We have to check the icon size after ea_effect */
 	evas_object_image_size_get(icon, &w_ef, &h_ef);

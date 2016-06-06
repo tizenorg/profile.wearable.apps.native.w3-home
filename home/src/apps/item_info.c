@@ -87,12 +87,6 @@ HAPI item_info_s *apps_item_info_create(const char *appid)
 	if (!enabled) goto ERROR;
 
 	goto_if(PMINFO_R_OK != pkgmgrinfo_pkginfo_get_type(pkghandle, &type), ERROR);
-#if 0
-#ifdef RUN_ON_DEVICE
-	int support_mode = 0;
-	goto_if(PMINFO_R_OK != pkgmgrinfo_pkginfo_get_support_mode(pkghandle, &support_mode), ERROR);
-#endif
-#endif
 	if (pkgid) {
 		item_info->pkgid = strdup(pkgid);
 		goto_if(NULL == item_info->pkgid, ERROR);
@@ -128,16 +122,6 @@ HAPI item_info_s *apps_item_info_create(const char *appid)
 		item_info->icon = strdup(DEFAULT_ICON);
 		goto_if(NULL == item_info->icon, ERROR);
 	}
-#if 0
-#ifdef RUN_ON_DEVICE
-	if (support_mode & PMINFO_MODE_PROP_SCREEN_READER)
-		item_info->tts = 1;
-	else
-		item_info->tts = 0;
-#else
-	item_info->tts = 1;
-#endif
-#endif
 	pkgmgrinfo_appinfo_destroy_appinfo(appinfo_h);
 	if (pkghandle) pkgmgrinfo_pkginfo_destroy_pkginfo(pkghandle);
 

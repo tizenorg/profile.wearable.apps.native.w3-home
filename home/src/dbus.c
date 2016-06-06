@@ -294,14 +294,6 @@ HAPI void *home_dbus_connection_get(void)
 
 HAPI void home_dbus_init(void *data)
 {
-#if 0
-	if(_dbus_sig_attach(
-		DBUS_WAKEUP_GESTURE_PATH,
-		DBUS_WAKEUP_GESTURE_INTERFACE,
-		DBUS_WAKEUP_GESTURE_MEMBER_WAKEUP) != W_HOME_ERROR_NONE) {
-		_E("Failed to attach gesture signal filter");
-	}
-#endif
 
 	if(_dbus_sig_attach(
 		DBUS_LOW_BATTERY_PATH,

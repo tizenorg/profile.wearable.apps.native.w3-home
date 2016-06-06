@@ -768,45 +768,6 @@ static Eina_Bool _access_action_forward_cb(void *data, Evas_Object *focus, Elm_A
 }
 
 
-#if 0
-static Eina_Bool _access_action_mouse_cb(void *data, Evas_Object *focus, Elm_Access_Action_Info *action_info)
-{
-	Evas_Object *page = data;
-	page_info_s *page_info;
-	int must;
-
-	page_info = evas_object_data_get(page, DATA_KEY_PAGE_INFO);
-	if (!page_info) {
-		_E("Page info is not valid\n");
-		/* Do not change the highlight in this case, so return EINA_TRUE */
-		return EINA_FALSE;
-	}
-
-	if (page_info->highlighted == EINA_FALSE) {
-		_D("Highlight is not exists");
-		return EINA_FALSE;
-	}
-
-	if (widget_viewer_evas_is_faulted(page_info->item)) {
-		_D("Faulted box, do not send any events");
-		return EINA_FALSE;
-	}
-
-	if (s_info.is_scrolling) {
-		_D("I don't want to do anything!");
-		return EINA_FALSE;
-	}
-
-	must = action_info->mouse_type != 1;
-
-	_D("Access action(%s) for focus(%p <> %p) is called", action_type_string(action_info->action_type), focus, page_info->focus);
-
-	/* Highligh off and then reset highlight from return callback _widget_access_action_ret_cb() */
-	return EINA_TRUE;
-}
-#endif
-
-
 static char *_access_widget_read_cb(void *data, Evas_Object *obj)
 {
 	Evas_Object *page = data;
