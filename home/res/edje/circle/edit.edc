@@ -20,6 +20,9 @@
 
 #define PLUS_MIN 90 90
 
+images {
+	image: "tw_bottom_btn_bg.png" COMP;
+}
 styles {
 	style {
 		name: "max_text_style";
@@ -118,8 +121,121 @@ group {
 				visible: 1;
 			}
 		}
+		part {
+			name: "edit_rect";
+			type: RECT;
+			scale: 1;
+			mouse_events: 0;
+			description {
+				state: "default" 0.0;
+				rel1 { relative: 0.0 0.75; to: "bg"; }
+				rel2 { relative: 1.0 1.0; to: "bg"; }
+				color: 0 0 0 0;
+				align: 0.5 0.5;
+				fixed: 1 1;
+				visible: 0;
+			    }
+			description {
+				state: "show" 0.50;
+				inherit: "default" 0.0;
+				visible: 1;
+			    }
+			}
+		part {
+			name: "edit_image";
+			type: IMAGE;
+			scale: 1;
+			mouse_events: 1;
+			description {
+				state: "default" 0.0;
+				rel1 { relative: 0.0 0.0; to: "edit_rect"; }
+				rel2 { relative: 1.0 1.0; to: "edit_rect"; }
+				image {
+					normal: "tw_bottom_btn_bg.png";
+				}
+				color: 169 169 169 30;
+				//color_class: "AO045";
+				fixed: 1 1;
+				visible: 0;
+			}
+			description {
+				state: "show" 0.50;
+				inherit: "default" 0.0;
+				visible: 1;
+			}
+		}
+		part {
+			name: "edit_text_rect";
+			type: RECT;
+			scale: 1;
+			//mouse_events: 0;
+			repeat_events: 1;
+			description {
+				state: "default" 0.0;
+				rel1 { relative: 0.0 0.0; to: "edit_image"; }
+				rel2 { relative: 1.0 1.0; to: "edit_image"; }
+				color: 0 0 0 0;
+				align: 0.5 0.5;
+				fixed: 1 1;
+				visible: 0;
+			    }
+			description {
+				state: "show" 0.50;
+				inherit: "default" 0.0;
+				visible: 1;
+			    }
+			}
+		part {
+			name: "edit_text";
+			type: TEXT;
+			scale: 1;
+			//mouse_events: 0;
+			repeat_events: 1;
+			description {
+				state: "default" 0.0;
+				rel1 { relative: 0.0 0.0; to: "edit_text_rect"; }
+				rel2 { relative: 1.0 1.0; to: "edit_text_rect"; }
+				text {
+                     text: "SETTINGS";
+                     font: "Sans";
+                     size:20;
+                }
+				fixed: 1 1;
+				visible: 0;
+			}
+			description {
+				state: "show" 0.50;
+				inherit: "default" 0.0;
+				visible: 1;
+			}
+		}
 	} // parts
 	programs {
+		program {
+			signal: "edit,show";
+			source: "edit";
+			action: STATE_SET "show" 0.0;
+			target: "edit_rect";
+			target: "edit_image";
+			target: "edit_text";
+			target: "edit_text_rect";
+			transition: LINEAR 0.2;
+		}
+		program {
+			signal: "edit,hide";
+			source: "edit";
+			action: STATE_SET "default" 0.0;
+			target: "edit_rect";
+			target: "edit_image";
+			target: "edit_text";
+			transition: LINEAR 0.2;
+		}
+		program {
+		   name: "edit_click";
+		   signal: "mouse,clicked,*";
+		   source: "edit_image";
+		   action: SIGNAL_EMIT "edit_click" "";
+		}
 		program {
 			signal: "init";
 			source: "edit";
