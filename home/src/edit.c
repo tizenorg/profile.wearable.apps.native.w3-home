@@ -855,20 +855,25 @@ HAPI void edit_change_focus(Evas_Object *edit_scroller, Evas_Object *page_curren
 	ret_if(!page_info);
 	ret_if(!page_info->page_inner);
 	ret_if(!page_info->item);
-	ret_if(!page_info->id);
-	ret_if(!page_info->layout);
+	if(page_info->layout)
+		layout_info = evas_object_data_get(page_info->layout, DATA_KEY_LAYOUT_INFO);
+	if(layout_info && page_info->id)
+	{
+		if (strcmp(page_info->id, SHORTCUT_WIDGET_ID) == 0)	{
+			_D( " Showing edit button for page %s", page_info->id);
+			elm_object_signal_emit(layout_info->edit, "edit,show", "edit");
+		}
+		else {
+			_D( " Hiding edit button for page %s", page_info->id);
+			elm_object_signal_emit(layout_info->edit, "edit,hide", "edit");
+		}
 
-	layout_info = evas_object_data_get(page_info->layout, DATA_KEY_LAYOUT_INFO);
-	ret_if(!layout_info);
-
-	if (strcmp(page_info->id, SHORTCUT_WIDGET_ID) == 0)	{
-		_D( " Showing edit button for page %s", page_info->id);
-		elm_object_signal_emit(layout_info->edit, "edit,show", "edit");
-    }
-    else {
-        _D( " Hiding edit button for page %s", page_info->id);
-        elm_object_signal_emit(layout_info->edit, "edit,hide", "edit");
-    }
+	}
+	else
+	{
+		_D( " Hiding edit button for page %s", page_info->id);
+		elm_object_signal_emit(layout_info->edit, "edit,hide", "edit");
+	}
 
 	/* Blocker has to be disabled even if this is unfocusable */
 	elm_object_signal_emit(page_info->page_inner, "disable", "blocker");
