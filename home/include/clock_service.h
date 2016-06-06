@@ -19,7 +19,7 @@
 #define __CLOCK_SERVICE_H
 
 #include <Evas.h>
-
+#include "key.h"
 #define PAGE_CLOCK_EDJE_FILE EDJEDIR"/page_clock.edj"
 
 #define CLOCK_RET_OK 0
@@ -120,5 +120,5 @@
 
 extern void clock_service_init(Evas_Object *win);
 extern void clock_service_fini(void);
-
+extern key_cb_ret_e _eext_rotary_selector_cb(void *data);
 #endif

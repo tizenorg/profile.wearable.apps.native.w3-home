@@ -32,7 +32,7 @@
 #include <dlog.h>
 #include <app_preference.h>
 #include <widget_viewer_evas.h>
-
+#include <efl_extension.h>
 #include "bg.h"
 #include "conf.h"
 #include "layout.h"
@@ -87,7 +87,7 @@
 static main_s main_info = {
 	.theme = NULL,
 	.layout = NULL,
-
+	.clock_focus = NULL,
 	.state = APP_STATE_CREATE,
 	.is_mapbuf = 0,
 	.apps_pid = 0,
@@ -557,7 +557,9 @@ static Eina_Bool _window_effect_setting_cb(void *data)
 static void _resume_cb(void *data)
 {
 	_D("Resumed");
-
+	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb,main_get_info()->clock_focus)) {
+											_E("Cannot register the key callback");
+										}
 	if (main_info.state == APP_STATE_RESUME) {
 		_E("resumed already");
 		return;
@@ -592,7 +594,8 @@ static void _resume_cb(void *data)
 static void _pause_cb(void *data)
 {
 	_D("Paused");
-
+	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
+	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
 	if (main_info.state == APP_STATE_PAUSE) {
 		_E("paused already");
 		return;
