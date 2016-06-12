@@ -63,6 +63,8 @@
 #define MOVE_RIGHT 1
 
 #define THRESHOLD_BEZEL_UP_H 60
+#define THRESHOLD_BEZEL_DOWN_H 100
+#define THRESHOLD_BEZEL_DOWN_X_DIST 10
 #define THRESHOLD_BEZEL_UP_END_D_H 25
 #define THRESHOLD_BEZEL_UP_MOVE_D_H 25
 #define THRESHOLD_MOMENTUM_FLICK_Y 450
@@ -558,7 +560,7 @@ static Evas_Event_Flags _flick_start_cb(void *data, void *event_info)
 
 	gesture_down_y = (int) evas_object_data_get(layout, PRIVATE_DATA_KEY_LAYOUT_G_DOWN_Y);
 
-	if (gesture_down_y <= THRESHOLD_BEZEL_UP_H
+	if (gesture_down_y <= THRESHOLD_BEZEL_DOWN_H
 		&& ei->momentum.my >= THRESHOLD_MOMENTUM_FLICK_Y) {
 		evas_object_data_set(layout, PRIVATE_DATA_KEY_READY_TO_BEZEL_DOWN, (void *) 1);
 	}
@@ -598,6 +600,7 @@ static Evas_Event_Flags _flick_move_cb(void *data, void *event_info)
 			if (gesture_down_y >= (main_get_info()->root_h - THRESHOLD_BEZEL_UP_H)) {
 				gesture_execute_cbs(BEZEL_UP);
 			}
+
 			evas_object_smart_callback_call(layout, LAYOUT_SMART_SIGNAL_FLICK_UP, layout);
 			evas_object_data_set(layout, PRIVATE_DATA_KEY_LAYOUT_G_FKICKUP_DONE, (void *) 1);
 		}
@@ -632,15 +635,16 @@ static Evas_Event_Flags _flick_end_cb(void *data, void *event_info)
 	retv_if(!layout, EVAS_EVENT_FLAG_NONE);
 	retv_if(!ei, EVAS_EVENT_FLAG_NONE);
 
-	if (evas_object_data_del(layout, PRIVATE_DATA_KEY_READY_TO_BEZEL_DOWN)) {
-		gesture_execute_cbs(BEZEL_DOWN);
-	}
-
 	int is_flickup_done = (int) evas_object_data_get(layout, PRIVATE_DATA_KEY_LAYOUT_G_FKICKUP_DONE);
 	gesture_down_y = (int) evas_object_data_get(layout, PRIVATE_DATA_KEY_LAYOUT_G_DOWN_Y);
 	int vector_y = ei->momentum.y2 - ei->momentum.y1;
 	int distance_x = abs( ei->momentum.x1 - ei->momentum.x2);
 	int distance_y = abs(vector_y);
+
+	if (evas_object_data_del(layout, PRIVATE_DATA_KEY_READY_TO_BEZEL_DOWN)
+				&& (distance_x <= THRESHOLD_BEZEL_DOWN_X_DIST)) {
+		gesture_execute_cbs(BEZEL_DOWN);
+	}
 
 	if (vector_y < 0 &&
 		distance_y >= THRESHOLD_BEZEL_UP_END_D_H && //cannot use momentum
@@ -649,6 +653,7 @@ static Evas_Event_Flags _flick_end_cb(void *data, void *event_info)
 			if (gesture_down_y >= (main_get_info()->root_h - THRESHOLD_BEZEL_UP_H)) {
 				gesture_execute_cbs(BEZEL_UP);
 			}
+
 			evas_object_smart_callback_call(layout, LAYOUT_SMART_SIGNAL_FLICK_UP, layout);
 			evas_object_data_set(layout, PRIVATE_DATA_KEY_LAYOUT_G_FKICKUP_DONE, (void *) 1);
 		}
@@ -874,6 +879,7 @@ HAPI void layout_destroy(Evas_Object *win)
 	main_unregister_cb(APP_STATE_RESUME, _resume_result_cb);
 	main_unregister_cb(APP_STATE_RESET, _reset_result_cb);
 	gesture_unregister_cb(BEZEL_UP, _bezel_up_cb);
+	gesture_unregister_cb(BEZEL_DOWN, _bezel_down_cb);
 	key_unregister_cb(KEY_TYPE_BEZEL_UP, _bezel_up_key_cb);
 
 	evas_object_data_del(layout, DATA_KEY_WIN);
