@@ -180,42 +180,20 @@ static void _destroy_layout(instance_info_s *info)
 }
 
 
-static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
+static void _window_focus_in_cb(void *data, Evas *e, void *event_info)
 {
-	instance_info_s *info = data;
-	//Ecore_X_Event_Window_Focus_In *ev = event;
-
-//	Ecore_X_Window xWin = elm_win_xwindow_get(info->win);
-//	if(xWin == ev->win) {
-		_APPS_D("focus in");
-		noti_broker_event_fire_to_plugin(EVENT_SOURCE_VIEW, EVENT_TYPE_APPS_SHOW, NULL);
-		apps_main_resume();
-//	}
-//	else {
-//		_APPS_E("win[%d], ev->win[%d]", xWin, ev->win);
-//	}
-
-	return ECORE_CALLBACK_PASS_ON;
+	_APPS_D("focus in");
+	noti_broker_event_fire_to_plugin(EVENT_SOURCE_VIEW, EVENT_TYPE_APPS_SHOW, NULL);
+	apps_main_resume();
 }
 
 
 
-static Eina_Bool _window_focus_out_cb(void *data, int type, void *event)
+static void _window_focus_out_cb(void *data, Evas *e, void *event_info)
 {
-	instance_info_s *info = data;
-	//Ecore_X_Event_Window_Focus_Out *ev = event;
-
-	//Ecore_X_Window xWin = elm_win_xwindow_get(info->win);
-	//if(xWin == ev->win) {
-		_APPS_D("focus out");
-		noti_broker_event_fire_to_plugin(EVENT_SOURCE_VIEW, EVENT_TYPE_APPS_HIDE, NULL);
-		apps_main_pause();
-	//}
-	//else {
-	//	_APPS_E("win[%d], ev->win[%d]", xWin, ev->win);
-	//}
-
-	return ECORE_CALLBACK_PASS_ON;
+	_APPS_D("focus out");
+	noti_broker_event_fire_to_plugin(EVENT_SOURCE_VIEW, EVENT_TYPE_APPS_HIDE, NULL);
+	apps_main_pause();
 }
 
 
@@ -223,11 +201,6 @@ static Eina_Bool _window_focus_out_cb(void *data, int type, void *event)
 #define ROTATION_TYPE_NUMBER 1
 static apps_error_e _init_app_win(instance_info_s *info, const char *name, const char *title)
 {
-	unsigned int opaque_val = 0;
-	Ecore_X_Atom opaque_atom;
-	Ecore_X_Window xwin;
-	Ecore_X_Window root_win;
-
 	retv_if(!name, APPS_ERROR_INVALID_PARAMETER);
 	retv_if(!title, APPS_ERROR_INVALID_PARAMETER);
 
@@ -423,60 +396,6 @@ HAPI void apps_main_fini()
 	_destroy_layout(info);
 	_destroy_app_win(info);
 }
-
-
-
-static void _toast_popup_destroy_cb(Evas_Object *parent, Evas_Object *popup)
-{
-	ret_if(!popup);
-	ret_if(!parent);
-
-	evas_object_del(popup);
-	evas_object_data_del(parent, DATA_KEY_CHECK_POPUP);
-}
-
-
-
-static Eina_Bool _destroy_animator_cb(void *data)
-{
-	Evas_Object *parent = data;
-	Evas_Object *popup = NULL;
-
-	retv_if(!parent, ECORE_CALLBACK_CANCEL);
-
-	popup = evas_object_data_get(parent, DATA_KEY_CHECK_POPUP);
-	retv_if(!popup, ECORE_CALLBACK_CANCEL);
-
-	_toast_popup_destroy_cb(parent, popup);
-
-	return ECORE_CALLBACK_CANCEL;
-}
-
-
-
-static void _popup_clicked_cb(void *data, Evas_Object *obj, void *event_info)
-{
-	Evas_Object *popup = NULL;
-	Evas_Object *check = NULL;
-	Evas_Object *parent = NULL;
-	int state = 0;
-
-	parent = data;
-	ret_if(!parent);
-
-	popup = evas_object_data_get(parent, DATA_KEY_CHECK_POPUP);
-	ret_if(!popup);
-	check = evas_object_data_del(popup, DATA_KEY_CHECK);
-	ret_if(!check);
-
-	state = (int)elm_check_state_get(check);
-	_D("check state is %d", state);
-
-	if (state) vconf_set_int(VCONFKEY_APPS_IS_INITIAL_POPUP, 0);
-
-	ecore_animator_add(_destroy_animator_cb, parent);
-}
-
 
 
 HAPI void apps_main_launch(int launch_type)

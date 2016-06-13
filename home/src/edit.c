@@ -751,7 +751,7 @@ static char *_access_remove_button_name_cb(void *data, Evas_Object *obj)
     return tmp;
 }
 
-static void _edit_button_click_cb(void *data, Evas_Object *obj, void *event_info)
+static void _edit_button_click_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
 	// Launch the app-shortcut launcher app
 	_D("_edit_button_click_cb" );

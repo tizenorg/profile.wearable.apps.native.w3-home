@@ -22,6 +22,7 @@
 #include <bundle.h>
 #include <dlog.h>
 #include <widget_viewer_evas.h>
+#include <aul.h>
 
 #include "util.h"
 #include "conf.h"

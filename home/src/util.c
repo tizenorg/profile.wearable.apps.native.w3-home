@@ -501,7 +501,7 @@ HAPI void apps_util_launch_with_arg(Evas_Object *win, const char *app_id, const 
 	b = bundle_decode((bundle_raw *) arg, len);
 
 	/* AUL requests : Reset the caller appid as App-tray */
-	const char *value = bundle_get_val(b, AUL_K_CALLER_APPID);
+	const char *value = (char *)bundle_get_val(b, AUL_K_CALLER_APPID);
 	if (value) bundle_del(b, AUL_K_CALLER_APPID);
 
 	home_dbus_cpu_booster_signal_send();
@@ -634,19 +634,6 @@ static void _toast_popup_destroy_cb(void *data, Evas_Object *obj, void *event_in
 
 	evas_object_data_del(parent, DATA_KEY_POPUP);
 }
-
-
-
-static char *_toast_popup_access_info_cb(void *data, Evas_Object *obj)
-{
-	retv_if(!data, NULL);
-
-	char *tmp = strdup((char*)data);
-	retv_if(!tmp, NULL);
-
-	return tmp;
-}
-
 
 
 /* This API is not allowed to use on the others */

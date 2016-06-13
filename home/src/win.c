@@ -81,7 +81,6 @@ HAPI Evas_Object *win_create(const char *name)
 {
 	Evas_Object *win = NULL;
 	main_s *info = NULL;
-	Ecore_X_Window xwin;
 
 	info = main_get_info();
 	retv_if(!info, NULL);

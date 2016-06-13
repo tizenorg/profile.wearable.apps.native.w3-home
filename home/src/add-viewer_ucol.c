@@ -558,8 +558,8 @@ HAPI int add_viewer_ucol_compare(const char *src, const char *dest)
 	UChar *src_uni;
 	UChar *dest_uni;
 	UCollationResult res;
-	int32_t dest_len;
-	int32_t src_len;
+	int32_t dest_len = 0;
+	int32_t src_len = 0;
 	int len;
 
 	if (!src || !dest) {

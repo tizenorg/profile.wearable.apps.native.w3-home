@@ -436,7 +436,6 @@ HAPI int apps_item_info_is_support_tts(const char *appid)
 	pkgmgrinfo_appinfo_h appinfo_h = NULL;
 	pkgmgrinfo_pkginfo_h pkghandle = NULL;
 	char *pkgid = NULL;
-	int support_mode = 0;
 	int istts = 0;
 
 	retv_if(!appid, 0);
@@ -451,14 +450,6 @@ HAPI int apps_item_info_is_support_tts(const char *appid)
 		break_if(NULL == pkghandle);
 	} while (0);
 
-#if 0
-	goto_if(PMINFO_R_OK != pkgmgrinfo_pkginfo_get_support_mode(pkghandle, &support_mode), ERROR);
-
-	if (support_mode & PMINFO_MODE_PROP_SCREEN_READER)
-		istts = 1;
-	else
-		istts = 0;
-#endif
 	pkgmgrinfo_appinfo_destroy_appinfo(appinfo_h);
 	if (pkghandle) pkgmgrinfo_pkginfo_destroy_pkginfo(pkghandle);
 

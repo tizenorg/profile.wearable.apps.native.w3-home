@@ -288,67 +288,11 @@ HAPI void apps_pkgmgr_item_list_affect_appid(const char *app_id, Eina_Bool (*_af
 }
 
 
-
-static Eina_Bool _enable_item(const char *appid, Evas_Object *item, void *data)
-{
-	void (*_func_item_enable)(Evas_Object *);
-	Evas_Object *grid = evas_object_data_get(item, DATA_KEY_GRID);
-	retv_if(NULL == grid, EINA_FALSE);
-
-	_func_item_enable = evas_object_data_get(grid, DATA_KEY_FUNC_ENABLE_ITEM);
-	retv_if(NULL == _func_item_enable, EINA_FALSE);
-
-	_func_item_enable(item);
-
-	return EINA_TRUE;
-}
-
-
-
-
-static int _enable_cb(const pkgmgrinfo_appinfo_h handle, void *user_data)
-{
-	char *appid = NULL;
-	pkgmgrinfo_appinfo_get_appid(handle, &appid);
-	apps_pkgmgr_item_list_affect_appid(appid, _enable_item, NULL);
-	return 0;
-}
-
-
-
 HAPI apps_error_e apps_pkgmgr_item_list_enable_mounted_item(void)
 {
 	//retv_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_mounted_list(_enable_cb, NULL), APPS_ERROR_FAIL);
 	return APPS_ERROR_NONE;
 }
-
-
-
-static Eina_Bool _disable_item(const char *appid, Evas_Object *item, void *data)
-{
-	void (*_func_item_disable)(Evas_Object *);
-	Evas_Object *grid = evas_object_data_get(item, DATA_KEY_GRID);
-	retv_if(NULL == grid, EINA_FALSE);
-
-	_func_item_disable = evas_object_data_get(grid, DATA_KEY_FUNC_DISABLE_ITEM);
-	retv_if(NULL == _func_item_disable, EINA_FALSE);
-
-	_func_item_disable(item);
-
-	return EINA_TRUE;
-}
-
-
-
-
-static int _disable_cb(const pkgmgrinfo_appinfo_h handle, void *user_data)
-{
-	char *appid = NULL;
-	pkgmgrinfo_appinfo_get_appid(handle, &appid);
-	apps_pkgmgr_item_list_affect_appid(appid, _disable_item, NULL);
-	return 0;
-}
-
 
 
 HAPI apps_error_e apps_pkgmgr_item_list_disable_unmounted_item(void)

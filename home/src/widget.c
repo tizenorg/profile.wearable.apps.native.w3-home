@@ -111,54 +111,6 @@ static const char *action_type_string(int type)
 	}
 }
 
-static void push_pended_event_list(Evas_Object *obj, Elm_Access_Action_Info *info, void (*cb)(Evas_Object *obj, int ret, void *data), void *data)
-{
-	struct pended_access_event *_info;
-
-	_info = malloc(sizeof(*_info));
-	if (!_info) {
-		_E("malloc:%s\n", strerror(errno));
-		return;
-	}
-
-	memcpy(&_info->info, info, sizeof(*info));
-	_info->widget = obj;
-	_info->cb = cb;
-	_info->data = data;
-	_info->ttl = MAX_TTL;
-
-	s_info.pended_event_list = eina_list_append(s_info.pended_event_list, _info);
-}
-
-
-
-static void try_again_send_event(struct pended_access_event *info)
-{
-	if (info->ttl < 0) {
-		_E("Event TTL reach to the end");
-		free(info);
-		return;
-	}
-
-	s_info.pended_event_list = eina_list_prepend(s_info.pended_event_list, info);
-}
-
-
-
-static struct pended_access_event *pop_pended_event_list(void)
-{
-	struct pended_access_event *info;
-
-	info = eina_list_nth(s_info.pended_event_list, 0);
-	if (info) {
-		s_info.pended_event_list = eina_list_remove(s_info.pended_event_list, info);
-		info->ttl--;
-	}
-
-	return info;
-}
-
-
 
 static void del_cb(void *data, Evas *e, Evas_Object *widget, void *event_info)
 {
@@ -464,50 +416,6 @@ static void _widget_deleted_cb(void *data, Evas_Object *obj, void *event_info)
 
 
 
-static void _widget_access_action_ret_cb(Evas_Object *obj, int ret, void *data)
-{
-	Evas_Object *page = data;
-	page_info_s *page_info;
-
-	page_info = evas_object_data_get(page, DATA_KEY_PAGE_INFO);
-	ret_if(!page_info);
-
-	switch (ret) {
-	case WIDGET_ACCESS_STATUS_FIRST:
-	case WIDGET_ACCESS_STATUS_LAST:
-	{
-		Elm_Access_Action_Info action_info;
-		memset(&action_info, 0, sizeof(action_info));
-		action_info.action_type = ELM_ACCESS_ACTION_UNHIGHLIGHT;
-	}
-	case WIDGET_ACCESS_STATUS_ERROR: /* In case of error, we have to set focus on our page */
-		page_info->need_to_unhighlight = EINA_FALSE;
-		page_info->highlight_changed = EINA_FALSE;
-		page_info->need_to_read = EINA_TRUE;
-
-		/* Update highlight */
-		_D("The result of access action is (%d) %s", ret, page_info->highlighted ? "hl" : "unhl");
-		elm_access_highlight_set(page_info->focus);
-		break;
-	case WIDGET_ACCESS_STATUS_DONE:
-	case WIDGET_ACCESS_STATUS_READ:
-	default:
-		if (page_info->highlighted) {
-			page_info->need_to_unhighlight = EINA_TRUE;
-			if (!page_info->highlight_changed) {
-				page_info->highlight_changed = EINA_TRUE;
-				_D("Need to unhighlight");
-				elm_access_highlight_set(page_info->focus);
-			} else {
-				_D("Do not change the highlight");
-			}
-		} else {
-			_D("page_info->highlight EINA_FALSE");
-		}
-	}
-}
-
-
 
 static Eina_Bool _highlight_action_cb(void *data, Evas_Object *focus, Elm_Access_Action_Info *action_info)
 {
@@ -622,7 +530,6 @@ static Eina_Bool _access_action_scroll_cb(void *data, Evas_Object *focus, Elm_Ac
 {
 	Evas_Object *page = data;
 	page_info_s *page_info;
-	int must = 0;
 
 	page_info = evas_object_data_get(page, DATA_KEY_PAGE_INFO);
 	if (!page_info) {
@@ -639,7 +546,6 @@ static Eina_Bool _access_action_scroll_cb(void *data, Evas_Object *focus, Elm_Ac
 	if (action_info->mouse_type == 0) { // MOUSE_DOWN
 		s_info.is_scrolling = EINA_TRUE;
 		page_info->is_scrolled_object = EINA_TRUE;
-		must = 1;
 	} else if (action_info->mouse_type == 2) { // MOUSE_UP
 		s_info.is_scrolling = EINA_FALSE;
 
@@ -648,7 +554,6 @@ static Eina_Bool _access_action_scroll_cb(void *data, Evas_Object *focus, Elm_Ac
 		}
 
 		page_info->is_scrolled_object = EINA_FALSE;
-		must = 1;
 	} else if (s_info.is_scrolling != EINA_TRUE) {
 		return EINA_FALSE;
 	}

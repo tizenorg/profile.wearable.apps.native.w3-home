@@ -776,7 +776,7 @@ static void preview_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_i
 	cbdata->geo.obj = obj;
 
 	if (s_info.enable_dnd) {
-		int delay;
+		int delay = 0.5;
 		double fdelay;
 
 		//delay = SYSTEM_SETTINGS_TAP_AND_HOLD_DELAY_SHORT; /* default 0.5 sec */

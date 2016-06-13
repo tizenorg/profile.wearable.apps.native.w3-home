@@ -60,16 +60,6 @@ static Evas_Object *_scroller_get(void)
 }
 
 
-
-static void _apps_clicked_cb(void *cbdata, Evas_Object *obj, void *event_info)
-{
-	if (util_feature_enabled_get(FEATURE_APPS) == 1) {
-		apps_main_launch(APPS_LAUNCH_SHOW);
-	}
-}
-
-
-
 static void _del_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Evas_Object *page = obj;
@@ -155,8 +145,6 @@ ERR:
 
 static void _clock_view_exchange(Evas_Object *item)
 {
-	Eina_Bool ret = EINA_TRUE;
-	Evas_Object *priv_clock = NULL;
 	page_info_s *page_info = NULL;
 
 	page_info = evas_object_data_get(clock_info_s.clock_page, DATA_KEY_PAGE_INFO);
@@ -171,19 +159,6 @@ static void _clock_view_exchange(Evas_Object *item)
 		evas_object_repeat_events_set(item, EINA_TRUE);
 	}
 }
-
-
-
-static Evas_Object *_clock_view_empty_add(void)
-{
-	Evas_Object *scroller = _scroller_get();
-	retv_if(scroller == NULL, NULL);
-
-	Evas_Object *page = _clock_view_add(scroller, NULL);
-
-	return page;
-}
-
 
 
 static void __watch_added(void *data, Evas_Object *obj, void *event_info)
@@ -247,8 +222,6 @@ static void _wms_clock_vconf_cb(keynode_t *node, void *data)
 
 void clock_service_init(Evas_Object *win)
 {
-	Evas_Object *clock = NULL;
-	Evas_Object *page = NULL;
 	Evas_Object *scroller = _scroller_get();
 	app_control_h watch_control;
 	char *pkg_name = NULL;

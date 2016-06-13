@@ -738,30 +738,30 @@ static void _window_visibility_cb(void *data, Evas_Object *obj, void *event_info
 
 
 
-static Eina_Bool _window_focus_in_cb(void *data, int type, void *event)
+static void _window_focus_in_cb(void *data, Evas *e, void *event_info)
 {
 	if (!main_info.win) {
-		return ECORE_CALLBACK_PASS_ON;
+		return;
 	}
 
 	
-	return ECORE_CALLBACK_PASS_ON;
+	return;
 }
 
 
 
-static Eina_Bool _window_focus_out_cb(void *data, int type, void *event)
+static void _window_focus_out_cb(void *data, Evas *e, void *event_info)
 {
 
 	if (!main_info.win) {
-		return ECORE_CALLBACK_PASS_ON;
+		return;
 	}
 
 
 		_D("focus out");
 		_pause_cb(NULL);
 
-	return ECORE_CALLBACK_PASS_ON;
+	return;
 }
 
 
@@ -868,8 +868,6 @@ static void _check_lang(void)
 static bool _create_cb(void *data)
 {
 	Evas_Object *bg = NULL;
-	//int tutorial_enabled = 0;
-	Ecore_Event_Handler *handler;
 
 	_D("Created");
 	home_dbus_init(NULL);
@@ -882,23 +880,6 @@ static bool _create_cb(void *data)
 	if (vconf_notify_key_changed(VCONF_KEY_WMS_APPS_ORDER, _change_apps_order_cb, NULL) < 0) {
 		_E("Failed to register the changed_apps_order callback");
 	}
-	/* wms vconf has to be dealt after pushing pages */
-
-	/**
-	 * Register the X Event handlers before creating our Window.
-	 * If you don't want to be bothered by timing issue of these **cking events ;)
-	 */
-	/*handler = ecore_event_handler_add(EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, NULL);
-	if (!handler) {
-		_E("Failed to add an ecore event handler (FOCUS_IN)");
-	}
-	evas_object_data_set(main_info.win, PRIVATE_DATA_KEY_FOCUS_IN_EVENT_HANDLER, handler);
-
-	handler = ecore_event_handler_add(EVAS_CALLBACK_CANVAS_FOCUS_OUT, _window_focus_out_cb, NULL);
-	if (!handler) {
-		_E("Failed to add an ecore event handler (FOCUS_OUT)");
-	}
-	evas_object_data_set(main_info.win, PRIVATE_DATA_KEY_FOCUS_OUT_EVENT_HANDLER, handler);*/
 
 	evas_object_smart_callback_add(main_info.win, "visibility,changed", _window_visibility_cb, NULL);
 
@@ -1103,14 +1084,7 @@ static void _app_control(app_control_h service, void *data)
 	_D("Service value : %s", service_val);
 
 	if (service_val) {
-		int is_clock_displayed = 0;
-		//int is_window_on_top = _is_window_on_top();
-		//is_window_on_top = (apps_main_is_visible() == EINA_TRUE) ? 0 : is_window_on_top;
-		Evas_Object *layout = _layout_get();
 		Evas_Object *scroller = _scroller_get();
-		if (scroller_get_current_page_direction(scroller) == PAGE_DIRECTION_CENTER) {
-			is_clock_displayed = 1;
-		}
 
 		if (!strncmp(service_val, HOME_SERVICE_VALUE_POWERKEY, strlen(HOME_SERVICE_VALUE_POWERKEY))) {
 			//int tutorial_exist = tutorial_is_exist();
@@ -1165,7 +1139,6 @@ int main(int argc, char *argv[])
 	int ret;
 	ui_app_lifecycle_callback_s lifecycle_callback = {0, };
 	app_event_handler_h event_handlers[5] = {NULL, };
-	char *clock_pkgname;
 
 	if (CRITICAL_LOG_INIT(util_basename(argv[0])) < 0) {
 		_E("Failed to initiate the critical log system");
