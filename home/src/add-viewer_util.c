@@ -287,7 +287,8 @@ HAPI char *add_viewer_util_highlight_keyword(const char *name, const char *filte
 
 	highlighted_name = malloc(ret_len);
 	if (!highlighted_name) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char err_buf[256] = { 0, };
+		ErrPrint("Heap: %s\n", strerror_r(errno, err_buf, sizeof(err_buf)));
 		return NULL;
 	}
 

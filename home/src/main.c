@@ -21,18 +21,21 @@
 #include <bundle.h>
 #include <Ecore.h>
 #include <efl_assist.h>
+#include <efl_extension.h>
 #include <Elementary.h>
 #include <errno.h>
 #include <device/display.h>
 #include <widget.h>
 #include <widget_service.h>
 #include <widget_errno.h>
+#include <widget_viewer.h>
+#include <widget_viewer_evas.h>
+
 #include <unistd.h>
 #include <vconf.h>
 #include <dlog.h>
 #include <app_preference.h>
 #include <widget_viewer_evas.h>
-#include <efl_extension.h>
 #include "bg.h"
 #include "conf.h"
 #include "layout.h"
@@ -362,6 +365,7 @@ static void _init_theme(void)
 	elm_theme_ref_set(main_info.theme, NULL);
 	//elm_theme_extension_add(main_info.theme, EDJEDIR"/index.edj");
 	elm_theme_extension_add(main_info.theme, EDJEDIR"/style.edj");
+	_D(" Anirudha : Path to theme .edj file: %s", EDJEDIR);
 }
 
 

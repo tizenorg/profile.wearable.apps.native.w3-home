@@ -1,0 +1,324 @@
+/*
+ * Samsung API
+ * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/license/
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include "conf.edc"
+#include "../color_classes.edc"
+
+styles {
+	style {
+		name: "addviewer,title";
+		base: "font=Tizen text_class=AT016 style=shadow shadow_color=#0000004C font_size=30 align=center color=#FFFFFF color_class=AT016 wrap=word"; # ellipsis=1.0
+		tag: "br" "\n";
+		tag: "hilight" "+ font=Tizen:style=Medium";
+		tag: "b" "+ font=Tizen:style=Medium";
+		tag: "tag" "\t";
+	}
+	style {
+		name: "preview,title";
+		base: "font=Tizen text_class=AT015 style=shadow shadow_color=#0000004C font_size=30 align=center color=#FFFFFF color_class=AT015 wrap=word ellipsis=1.0"; # ellipsis=1.0
+		tag: "br" "\n";
+		tag: "hilight" "+ font=Tizen:style=Bold";
+		tag: "b" "+ font=Tizen:style=Bold";
+		tag: "tag" "\t";
+	}
+	style {
+		name: "preview,title,dim";
+		base: "font=Tizen text_class=AT015 style=shadow shadow_color=#0000004C font_size=30 align=center color=#FFFFFF color_class=AT015 wrap=word ellipsis=1.0"; # ellipsis=1.0
+		tag: "br" "\n";
+		tag: "hilight" "+ font=Tizen:style=Bold";
+		tag: "b" "+ font=Tizen:style=Bold";
+		tag: "tag" "\t";
+	}
+	style {
+		name: "preview,title,press";
+		base: "font=Tizen text_class=AT015 style=shadow shadow_color=#0000004C font_size=30 align=center color=#FFFFFF color_class=AT015 wrap=word ellipsis=1.0"; # ellipsis=1.0
+		tag: "br" "\n";
+		tag: "hilight" "+ font=Tizen:style=Bold";
+		tag: "b" "+ font=Tizen:style=Bold";
+		tag: "tag" "\t";
+	}
+}
+
+images {
+	image: "b_widget_favorite_bg.png" COMP;
+	image: "widget_circle_bg_stroke.png" COMP;
+	image: "b_home_screen_widget_line_ef.png" COMP;
+	image: "b_home_screen_edit_cover.png" COMP;
+	image: "b_home_screen_edit_cover_ef.png" COMP;
+	image: "b_home_screen_widget_check.png" COMP;
+	image: "b_home_screen_widget_check_ef.png" COMP;
+}
+
+#define HEIGHT (ADD_VIEWER_TEXT_HEIGHT + ADD_VIEWER_PAD + ADD_VIEWER_PREVIEW_HEIGHT)
+
+collections {
+	group {
+		name: "bg";
+		parts {
+			part {
+				name: "bg_bottom";
+				type: RECT;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; }
+					rel2 { relative: 1.0 1.0; }
+					color: 0 0 0 0;
+				}
+			}
+			part {
+				name: "bg";
+				type: RECT;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; }
+					rel2 { relative: 1.0 1.0; }
+					color_class: "AO041";
+					visible: 0;
+				}
+			}
+			part {
+				name: "empty";
+				type: TEXT;
+				scale: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; }
+					rel2 { relative: 1.0 1.0; }
+					text {
+						text_class: "AT0132";
+						align: 0.5 0.5;
+						ellipsis: 0.0;
+						min: 1 1;
+					}
+					visible: 1;
+				}
+			}
+		}
+	}
+
+	/* Icon group */
+	group {
+		name: "default,1x1";
+	}
+	group {
+		name: "default,2x2";
+	}
+
+	/* Preview group */
+	group {
+		name: "preview,1x1";
+	}
+	group {
+		name: "preview,2x2";
+		script {
+			public g_focus = 0;
+		}
+		parts {
+			part {
+				name: "entire,bg";
+				type: RECT;
+				scale: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; }
+					rel2 { relative: 1.0 1.0; }
+					color: 0 0 0 0;
+				}
+			}
+			part {
+				name: "title";
+				type: SWALLOW;
+				scale: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.5 0.0; to: "preview"; }
+					rel2 { relative: 0.5 0.0; to: "preview"; }
+					min: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
+					max: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
+					align: 0.5 1.0;
+					fixed: 1 1;
+					visible: 1;
+				}
+				description {
+					state: "hide" 0.0;
+					inherit: "default" 0.0;
+				}
+				description {
+					state: "pressed" 0.0;
+					inherit: "default" 0.0;
+				}
+			}
+			part {
+				name: "pad";
+				type: SPACER;
+				scale: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 ADD_VIEWER_TEXT_HEIGHT/HEIGHT; }
+					rel2 { relative: 1.0 (ADD_VIEWER_TEXT_HEIGHT+ADD_VIEWER_PAD)/HEIGHT; }
+				}
+			}
+
+			part {
+				name: "bg";
+				type: SWALLOW;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "preview"; }
+					rel2 { relative: 1.0 1.0; to, "preview"; }
+				}
+			}
+
+			part {
+				name: "gradient,bg";
+				type: IMAGE;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "preview"; }
+					rel2 { relative: 1.0 1.0; to, "preview"; }
+					image { normal: "b_widget_favorite_bg.png"; }
+					color_class: "AO031";
+					visible: 0;
+				}
+				description {
+					state: "show" 0.0;
+					inherit: "default" 0.0;
+					visible: 1;
+				}
+			}
+			part {
+				name: "preview";
+				type: SWALLOW;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 (ADD_VIEWER_TEXT_HEIGHT+ADD_VIEWER_PAD)/HEIGHT; }
+					rel2 { relative: 1.0 1.0; }
+				}
+				description {
+					state: "pressed" 0.0;
+					rel1 { relative: 5/ADD_VIEWER_PREVIEW_WIDTH (ADD_VIEWER_TEXT_HEIGHT+ADD_VIEWER_PAD+5)/HEIGHT; }
+					rel2 { relative: (ADD_VIEWER_PREVIEW_WIDTH-5)/ADD_VIEWER_PREVIEW_WIDTH (HEIGHT-5)/HEIGHT; }
+				}
+			}
+			part {
+				name: "check";
+				type: IMAGE;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: (ADD_VIEWER_PREVIEW_WIDTH-54)/ADD_VIEWER_PREVIEW_WIDTH (ADD_VIEWER_TEXT_HEIGHT+ADD_VIEWER_PAD)/HEIGHT; }
+					rel2 { relative: 1.0 (ADD_VIEWER_TEXT_HEIGHT+ADD_VIEWER_PAD+54)/HEIGHT; }
+					image {
+						normal: "b_home_screen_widget_check.png";
+					}
+					color_class: "AO042";
+					min: 54 54;
+					visible: 0;
+				}
+				description {
+					state: "show" 0.0;
+					inherit: "default" 0.0;
+					visible: 1;
+				}
+			}
+			part {
+				name: "preview,dbg";
+				type: RECT;
+				mouse_events: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { to, "preview"; }
+					rel2 { to, "preview"; }
+					color: 0 0 0 0;
+				}
+			}
+		} // parts
+
+		programs {
+			program {
+				name: "pressed";
+				source: "preview,dbg";
+				signal: "mouse,down,1";
+				script {
+					if (get_int(g_focus) != 0) {
+						set_state(PART:"preview", "pressed", 0.0);
+						set_state(PART:"title", "pressed", 0.0);
+					} else {
+						set_state(PART:"preview", "pressed", 0.0);
+						set_state(PART:"title", "hide", 0.0);
+					}
+				}
+			}
+			program {
+				name: "released";
+				source: "preview,dbg";
+				signal: "mouse,up,1";
+				script {
+					if (get_int(g_focus) != 0) {
+						set_state(PART:"preview", "default", 0.0);
+						set_state(PART:"title", "default", 0.0);
+					} else {
+						set_state(PART:"preview", "default", 0.0);
+						set_state(PART:"title", "hide", 0.0);
+					}
+				}
+			}
+			program {
+				name: "released,force";
+				source: "preview,dbg";
+				signal: "reset";
+				action: STATE_SET "default" 0.0;
+				target: "preview";
+			}
+			program {
+				name: "clicked";
+				source: "preview,dbg";
+				signal: "mouse,clicked,1";
+				action: SIGNAL_EMIT "clicked" "preview";
+			}
+
+			program {
+				name: "enable,bg";
+				source: "gradient,bg";
+				signal: "enable";
+				action: STATE_SET "show" 0.0;
+				target: "gradient,bg";
+			}
+			program {
+				name: "disable,bg";
+				source: "gradient,bg";
+				signal: "disable";
+				action: STATE_SET "default" 0.0;
+				target: "gradient,bg";
+			}
+			program {
+				name: "duplicated,mark,show";
+				signal: "show";
+				source: "duplicated";
+				action: STATE_SET "show" 0.0;
+				target: "check";
+			}
+			program {
+				name: "duplicated,mark,hide";
+				signal: "hide";
+				source: "duplicated";
+				action: STATE_SET "default" 0.0;
+				target: "check";
+			}
+		} // programs
+	} // group
+} // collections
+
+/* End of a file */
