@@ -14,6 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+#define ADD_VIEWER_DATA_KEY_INDEX_INFO "a_d_k_i"
+#define INDEX_EVEN_ITEM_NUM 20
+#define INDEX_ODD_ITEM_NUM 19
 
 #include <stdio.h>
 #include <unistd.h>
@@ -26,7 +30,7 @@
 #include <Elementary.h>
 #include <efl_assist.h>
 #include <efl_extension.h>
-#include <ui_extension.h>
+//#include <ui_extension.h>
 
 #include "add-viewer.h"
 #include "add-viewer_pkgmgr.h"
@@ -53,9 +57,6 @@ typedef struct {
 } page_index_s;
 
 
-#define ADD_VIEWER_DATA_KEY_INDEX_INFO "a_d_k_i"
-#define INDEX_EVEN_ITEM_NUM 20
-#define INDEX_ODD_ITEM_NUM 19
 static const char *_item_style_get(int index, int even)
 {
 	static const char g_it_style_odd[INDEX_ODD_ITEM_NUM][20] = {

@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "conf.edc"
-#include "../color_classes.edc"
-
+#include "../../include/conf.h"
 
 styles {
 	style {
@@ -76,7 +74,6 @@ collections {
 					rel1 { relative: 0.0 0.0; }
 					rel2 { relative: 1.0 1.0; }
 					color_class: BG_EDIT_COLOR_CODE;
-					color: 0 0 0 0;
 					visible: 1;
 				}
 			}
@@ -110,8 +107,8 @@ collections {
 				mouse_events: 1;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to, "bg_bottom";}
-					rel2 { relative: 0.1 0.2; to, "bg_bottom";}
+					rel1 { relative: 0.0 0.0; to, "index_region";}
+					rel2 { relative: 1.0 1.0; to, "index_region";}
 					visible: 1;
 				}
 				description {
@@ -171,29 +168,6 @@ collections {
 					rel1 { relative: 0.0 0.0; }
 					rel2 { relative: 1.0 1.0; }
 					min: ADD_VIEWER_PREVIEW_WIDTH HEIGHT;
-				}
-			}
-			part {
-				name: "title";
-				type: SWALLOW;
-				scale: 0.5;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.5 0.0; to: "preview"; }
-					rel2 { relative: 0.5 0.0; to: "preview"; }
-					min: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
-					max: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
-					align: 0.5 1.0;
-					fixed: 1 1;
-					visible: 1;
-				}
-				description {
-					state: "hide" 0.0;
-					inherit: "default" 0.0;
-				}
-				description {
-					state: "pressed" 0.0;
-					inherit: "default" 0.0;
 				}
 			}
 			part {
@@ -293,7 +267,7 @@ collections {
 					color_class: "AO0492";
 					min: 266 266;
 					max: 266 266;
-					visible: 1;
+					visible: 0;
 					align: 0.5 0.5;
 				}
 				description {

@@ -20,10 +20,13 @@
 
 typedef struct {
 	Evas_Object *win;
+	Evas_Object *conform;
+	//Eext_Circle_Surface *surface;
 	Evas *e;
 	Evas_Object *layout;
 	Evas_Object *clock_focus;
 	Ecore_Event_Handler *handler;
+	//Ea_Theme_Color_Table *color_theme;
 	Eina_List *font_theme;
 	Elm_Theme *theme;
 
@@ -42,6 +45,7 @@ typedef struct {
 	int is_alpm_clock_enabled;
 	int is_lcd_on;
 	int is_win_visible;
+	int is_win_on_top;
 	int is_wide_character;
 
 	Eina_List *cbs_list[APP_STATE_MAX];
