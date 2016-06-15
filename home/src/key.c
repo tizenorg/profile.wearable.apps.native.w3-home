@@ -34,7 +34,7 @@
 
 
 
-#define CB_LIST_MAX 4
+#define CB_LIST_MAX 7
 static struct {
 	Eina_Bool pressed;
 	Ecore_Event_Handler *press_handler;
