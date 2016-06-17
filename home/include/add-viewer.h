@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -20,7 +20,12 @@
  * "selected"
  * "dnd"
  */
-
+#define WEATHER_WIDGET_ID "com.samsung.weather-widget"
+#define CALENDAR_NEXT_EVENT_WIDGET_ID "com.samsung.w-calendar2.widget.next-event"
+#define APPSHORTCUT_WIDGET_ID "com.samsung.app-widget.dbox"
+#define APPSHORTCUT_WIDGET_PREVIEW RESDIR"/widget_preview/appshortcut/apps_widget_preview.png"
+#define APPSHORTCUT_WIDGET_LOCALE_PREVIEW RESDIR"/widget_preview/appshortcut/%s/apps_widget_preview.png"
+ 
 struct add_viewer_event_info {
 	struct {
 		Evas_Object *obj;
@@ -45,5 +50,4 @@ extern Evas_Object *evas_object_add_viewer_add(Evas_Object *parent);
 extern void evas_object_add_viewer_conf_set(int type, int flag);
 extern int evas_object_add_viewer_access_action(Evas_Object *obj, int type, void *info);
 extern int evas_object_add_viewer_reload(void);
-
 /* End of a file */

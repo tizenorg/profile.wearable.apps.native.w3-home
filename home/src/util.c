@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -28,8 +28,12 @@
 #include <string.h>
 #include <vconf.h>
 #include <efl_assist.h>
+#include <efl_extension.h>
 #include <pkgmgr-info.h>
 #include <widget_service.h>
+
+#include <unicode/unum.h>
+#include <unicode/ustring.h>
 
 #include "conf.h"
 #include "log.h"
@@ -942,10 +946,162 @@ HAPI void util_activate_home_window(void)
 	if (apps_main_is_visible() == EINA_TRUE) {
 		apps_main_launch(APPS_LAUNCH_HIDE);
 	}
+}
 
+HAPI void util_raise_home_window(int force_notify)
+{
 	Evas_Object *win = main_get_info()->win;
 	if (win) {
 		elm_win_activate(win);
 	}
 }
+
+/* You have to free the returned value */
+HAPI char *util_get_count_str_from_icu(int count)
+{
+	char *p = NULL;
+	char *locale_tmp = NULL;
+	char *ret_str = NULL;
+	char locale[LOCALE_LEN] = { 0, };
+	char res[LOCALE_LEN] = { 0, };
+
+	UErrorCode status = U_ZERO_ERROR;
+	UNumberFormat *num_fmt;
+	UChar result[20] = { 0, };
+
+	uint32_t number = count;
+	int32_t len = (int32_t) (sizeof(result) / sizeof((result)[0]));
+
+	locale_tmp = vconf_get_str(VCONFKEY_REGIONFORMAT);
+	retv_if(!locale_tmp, NULL);
+
+	strcpy(locale, locale_tmp);
+	free(locale_tmp);
+
+	if(locale[0] != '\0') {
+		p = strstr(locale, ".UTF-8");
+		if (p) *p = 0;
+	}
+
+	num_fmt = unum_open(UNUM_DEFAULT, NULL, -1, locale, NULL, &status);
+	unum_format(num_fmt, number, result, len, NULL, &status);
+	u_austrcpy(res, result);
+	unum_close(num_fmt);
+
+	ret_str = strdup(res);
+	return ret_str;
+}
+
+HAPI int util_is_arbic()
+{
+	int ret = 0;
+	char *locale_tmp = vconf_get_str(VCONFKEY_LANGSET);
+	retv_if(!locale_tmp, 0);
+
+	if(!strncmp(locale_tmp, "ar", 2))
+	{
+		ret = 1;
+	}
+
+	return ret;
+}
+
+
+#define PRIVATE_DATE_KEY_CIRCLE_SCROLLER_OBJ "p_d_k_c_s_o_cso"
+HAPI void util_uxt_scroller_set_rotary_event_enabled(Evas_Object *scroller, Eina_Bool enabled)
+{
+	ret_if(scroller == NULL);
+
+	Evas_Object *circle_scroller = evas_object_data_get(scroller, PRIVATE_DATE_KEY_CIRCLE_SCROLLER_OBJ);
+
+	eext_rotary_object_event_activated_set(circle_scroller, enabled);
+	
+/*	if (circle_scroller == NULL) {
+		Eext_Circle_Surface *surf = main_get_info()->surface;
+		if (surf) {
+			circle_scroller = eext_circle_object_scroller_add(scroller, surf);
+			if (circle_scroller) {
+				eext_circle_object_scroller_policy_set(circle_scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+				eext_rotary_object_event_activated_set(circle_scroller, enabled);
+				evas_object_data_set(scroller, PRIVATE_DATE_KEY_CIRCLE_SCROLLER_OBJ, circle_scroller);
+			} else {
+				_E("Failed to create circle scroller of %p", scroller);
+			}
+		} else {
+			_E("Failed to get surface object");
+		}
+	} else {
+		eext_rotary_object_event_activated_set(circle_scroller, enabled);
+	}*/
+}
+
+HAPI int util_host_vender_id_get(void)
+{
+	return 0;
+	//int ret = W_HOME_VENDOR_ID_UNKNOWN;
+
+/*	char *vender = vconf_get_str(VCONFKEY_WMS_HOST_STATUS_VENDOR);
+	if (vender) {
+		if (strcmp(vender, HOME_HOST_VENDOR_LO) == 0) {
+			ret = W_HOME_VENDOR_ID_LO;
+		}
+		else if (strcmp(vender, HOME_HOST_V
+		ENDER_SAMSUNG) == 0) {
+			ret = W_HOME_VENDOR_ID_SAMSUNG;
+		}
+
+		free(vender);
+	}*/
+
+	//return ret;
+}
+
+#ifdef __MDM_ENABLED__
+HAPI void util_mdm_get_service()
+{
+	if (mdm_get_service() == MDM_RESULT_SUCCESS)
+	{
+		_W("mdm_get_service is success");
+		/* MDM Á¤Ã¥ °¡Á®¿À±â */
+		apps_main_set_mdm_policy(true);
+	}
+	else
+	{
+		_W("mdm_get_service is fail");
+		/* ±âÁ¸ APP ±â´É »ç¿ë¿¡ ¹®Á¦°¡ ¾ø¾î¾ßÇÔ. */
+		apps_main_set_mdm_policy(false);
+	}
+}
+
+
+HAPI void util_mdm_release_service()
+{
+//	if (apps_main_get_mdm_policy() == true)
+	{
+		_W("mdm release service");
+		mdm_release_service();
+	}
+}
+
+HAPI int util_mdm_is_restricted(const char *appid)
+{
+	retv_if(!appid, 0);
+
+	if (apps_main_get_mdm_policy() == false)
+	{
+		_W("mdm restrict is false");
+		return 0;
+	}
+
+	mdm_status_t status;
+	status = mdm_get_application_uninstallation_disabled(appid);
+	if (status == MDM_DISABLED) {
+		_SD("#MDM app[%s] is diabled", appid);
+		return 1;
+
+	}
+	return 0;
+}
+#endif
+
 // End of a file

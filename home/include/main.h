@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -20,10 +20,13 @@
 
 typedef struct {
 	Evas_Object *win;
+	Evas_Object *conform;
+	//Eext_Circle_Surface *surface;
 	Evas *e;
 	Evas_Object *layout;
 	Evas_Object *clock_focus;
 	Ecore_Event_Handler *handler;
+	//Ea_Theme_Color_Table *color_theme;
 	Eina_List *font_theme;
 	Elm_Theme *theme;
 
@@ -42,6 +45,7 @@ typedef struct {
 	int is_alpm_clock_enabled;
 	int is_lcd_on;
 	int is_win_visible;
+	int is_win_on_top;
 	int is_wide_character;
 
 	Eina_List *cbs_list[APP_STATE_MAX];

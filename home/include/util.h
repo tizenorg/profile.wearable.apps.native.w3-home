@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -21,11 +21,14 @@
 #include <bundle.h>
 #include <Evas.h>
 
+#define UTIL_TOAST_POPUP_TIMER 3.0
+
 /* Key */
 #define DATA_KEY_ADD_VIEWER "av"
 #define DATA_KEY_BG "bg"
 #define DATA_KEY_CHECK "ch"
 #define DATA_KEY_CHECK_POPUP "ch_pp"
+#define DATA_KEY_CONFIRM_POPUP "cirm_pp"
 #define DATA_KEY_CONFORMANT "cf"
 #define DATA_KEY_EDIT_INFO "ed_if"
 #define DATA_KEY_EDIT_MODE "ed_md"
@@ -78,19 +81,29 @@
 #define DATA_KEY_ITEM_HEIGHT "it_h"
 #define DATA_KEY_ITEM_WIDTH "it_w"
 #define DATA_KEY_LAYOUT "ly"
+#define DATA_KEY_APPS_LAYOUT "apps_ly"
+#define DATA_KEY_APPS_EDIT_LAYOUT "apps_ed_ly"
 #define DATA_KEY_LAYOUT_IS_PAUSED "ly_is_ps"
 #define DATA_KEY_LAYOUT_FOCUS_ON "ly_fcs_on"
 #define DATA_KEY_LAYOUT_HIDE_TIMER "ly_hd_tm"
 #define DATA_KEY_LIST "ls"
+#define DATA_KEY_ITEM_INFO_LIST "it_info_list"
+#define DATA_KEY_EDIT_ITEM_INFO_LIST "edit_it_info_list"
 #define DATA_KEY_LIST_INDEX "ls_ix"
 #define DATA_KEY_POPUP "pp"
 #define DATA_KEY_SCROLLER "sc"
+#define DATA_KEY_EDIT_SCROLLER "esc"
 #define DATA_KEY_TIMER "timer"
 #define DATA_KEY_WIN "win"
 #define DATA_KEY_IS_VIRTUAL_ITEM "vit"
 #define DATA_KEY_IS_ORDER_CHANGE "ioc"
 #define DATA_KEY_ITEM_UNINSTALL_RESERVED "i_u_r"
-
+#define DATA_KEY_APPS_ITEM_FROM_ORDER "a_i_from_o"
+#define DATA_KEY_APPS_ITEM_TO_ORDER "a_i_to_o"
+#define DATA_KEY_APPS_EVENT_UPPER_IS_ON "apps_ev_io"
+#define DATA_KEY_PROGRESS_POPUP "prog_pp"
+#define DATA_KEY_APPS_IS_LOADING "apps_i_loading"
+#define DATA_KEY_IS_COMPANION_PACKAGE "is_comp_pkg"
 #define STR_SIGNAL_EMIT_SIGNAL_ROTATE "rotate"
 #define STR_SIGNAL_EMIT_SIGNAL_UNROTATE "unrotate"
 
@@ -167,6 +180,7 @@ typedef enum {
 	APP_STATE_LANGUAGE_CHANGED,
 	APP_STATE_TERMINATE,
 	APP_STATE_POWER_OFF,
+	APP_STATE_WIN_ACTIVATED,
 	APP_STATE_MAX,
 } app_state_e;
 
@@ -219,6 +233,17 @@ enum {
 };
 
 
+enum {
+	TUTORIAL_LANGUAGE_NORMAL = 0,
+	TUTORIAL_LANGUAGE_MALI,
+	TUTORIAL_LANGUAGE_GEORGIA,
+};
+
+typedef enum {
+	W_HOME_VENDOR_ID_UNKNOWN = -1,
+	W_HOME_VENDOR_ID_SAMSUNG = 1,
+	W_HOME_VENDOR_ID_LO,
+} w_home_vendor_e;
 
 #if !defined(_EDJ)
 #define _EDJ(a) elm_layout_edje_get(a)
@@ -231,6 +256,14 @@ extern void _evas_object_event_move_cb(void *data, Evas *e, Evas_Object *obj, vo
 extern void _evas_object_event_show_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 extern void _evas_object_event_hide_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 extern void _evas_object_event_changed_size_hints_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
+extern void util_uxt_scroller_set_rotary_event_enabled(Evas_Object *scroller, Eina_Bool enabled);
+extern int util_create_confirm_popup(Evas_Object *parent, const char* text, void _clicked_cb(void *, Evas_Object *, void *));
+extern int util_create_toast_popup(Evas_Object *parent, const char* text);
+extern int util_create_check_popup(Evas_Object *parent, const char* text, void _clicked_cb(void *, Evas_Object *, void *));
+extern int util_create_uninstall_progress_popup(Evas_Object *parent, const char *text);
+extern void util_create_popup_with_button(Evas_Object *parent, const char* text);
+extern void util_activate_home_window(void);
+extern void util_raise_home_window(int force_notify);
 
 extern void util_post_message_for_launch_fail(const char *name);
 extern void util_launch(const char *package, const char *name);
@@ -242,6 +275,13 @@ extern int util_launch_app(const char *appid, const char *key, const char *value
 extern int util_feature_enabled_get(int feature);
 
 extern int util_find_top_visible_window(char **command);
+extern int util_get_app_type(const char *appid);
+extern char *util_get_appid_by_pkgname(const char *pkgname);
+extern const char *util_basename(const char *name);
+extern double util_timestamp(void);
+extern char *util_get_count_str_from_icu(int count);
+extern int util_is_arbic();
+extern int util_host_vender_id_get(void);
 
 //apps
 extern void apps_util_launch(Evas_Object *win, const char *package, const char *name);
@@ -252,8 +292,6 @@ extern void apps_util_launch_with_bundle(Evas_Object *win, const char *app_id, b
 extern void apps_util_post_message_for_launch_fail(const char *name);
 extern void apps_util_notify_to_home(int pid);
 
-extern int util_create_toast_popup(Evas_Object *parent, const char* text);
-extern int util_create_check_popup(Evas_Object *parent, const char* text, void _clicked_cb(void *, Evas_Object *, void *));
 
 extern int util_get_app_type(const char *appid);
 extern char *util_get_appid_by_pkgname(const char *pkgname);
@@ -261,5 +299,5 @@ extern char *util_get_appid_by_pkgname(const char *pkgname);
 extern const char *util_basename(const char *name);
 extern double util_timestamp(void);
 
-extern void util_activate_home_window(void);
+
 #endif /* __W_HOME_UTIL_H__ */

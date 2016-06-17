@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -287,7 +287,8 @@ HAPI char *add_viewer_util_highlight_keyword(const char *name, const char *filte
 
 	highlighted_name = malloc(ret_len);
 	if (!highlighted_name) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		char err_buf[256] = { 0, };
+		ErrPrint("Heap: %s\n", strerror_r(errno, err_buf, sizeof(err_buf)));
 		return NULL;
 	}
 

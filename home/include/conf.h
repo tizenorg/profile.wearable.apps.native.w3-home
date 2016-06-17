@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -17,6 +17,16 @@
 
 #ifndef _W_HOME_CONF_H_
 #define _W_HOME_CONF_H_
+
+#define BG_DEFAULT_COLOR_CODE "AO0114"
+#define BG_EDIT_COLOR_CODE "AO0113"
+
+/* VI */
+#define HOME_SCROLLER_PAGE_BRINGIN_FRICTION (0.27)
+#define HOME_SCROLLER_PAGE_SCROLL_FRICTION (0.12)
+#define HOME_SCROLLER_VI_SCALE_RATE (0.91)
+#define HOME_SCROLLER_VI_ROTARY_START_SCALE_DURATION (0.25)
+#define HOME_SCROLLER_EDGE_WIDTH (88.0)
 
 /* Layout */
 #define BASE_WIDTH (360.0)
@@ -42,7 +52,7 @@
 #define INDEX_THUMBNAIL_HOME_IND_SIZE 20 20
 
 #define PAGE_EDIT_PAD_WIDTH (5.0)
-#define PAGE_EDIT_SIDE_PAD_WIDTH (40+16)
+#define PAGE_EDIT_SIDE_PAD_WIDTH (58)
 
 #define ITEM_EDIT_EF_WIDTH 234
 #define ITEM_EDIT_EF_HEIGHT 234

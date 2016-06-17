@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -29,6 +29,7 @@
 #include <Elementary.h>
  #include <efl_assist.h>
 #include <efl_extension.h>
+#include <vconf.h>
 
 #include "add-viewer.h"
 #include "add-viewer_pkgmgr.h"
@@ -41,8 +42,8 @@
 // #include "dbox.h"
 
 #include "bg.h"
- #include "util.h"
  #include "rotary.h"
+ #include "util.h"
 
 #if defined(LOG_TAG)
 #undef LOG_TAG
@@ -97,7 +98,7 @@ struct click {
 	} geo;
 };
 
-static Evas_Object *winset_preview_add(struct widget_data *widget_data, Evas_Object *parent, struct add_viewer_package *package, const char *name, int type, int no_event);
+static Evas_Object *winset_preview_add(struct widget_data *widget_data, Evas_Object *parent, struct add_viewer_package *package, const char *name, const char *appname, int widget_count, int type, int no_event);
 
 static inline void append_padding(Evas_Object *box, int padding)
 {
@@ -109,24 +110,80 @@ static inline void append_padding(Evas_Object *box, int padding)
 		return;
 	}
 
-	evas_object_resize(pad, 0.001, padding);
-	evas_object_size_hint_min_set(pad, 0.001, padding);
+	evas_object_resize(pad, 1, padding);
+	evas_object_size_hint_min_set(pad, ELM_SCALE_SIZE(1), ELM_SCALE_SIZE(padding));
 	evas_object_show(pad);
 	elm_box_pack_end(box, pad);
 }
+
+static void show_progress(struct widget_data *widget_data)
+{
+	Evas_Object *scroller = widget_data->scroller;
+	Evas_Object *box = elm_object_content_get(scroller);
+
+	Evas_Object *widget = NULL;
+	Eina_List *list = NULL;
+	int h_page = 0;
+	Evas_Coord x;
+
+	if (!scroller) {
+		ErrPrint("Failed to load the widget scroller\n");
+		return;
+	}
+
+	if (!box) {
+		return;
+	}
+
+	list = elm_box_children_get(box);
+	if (!list) {
+		return;
+	}
+
+	widget_data->progress = elm_progressbar_add(widget_data->bg);
+	elm_object_style_set(widget_data->progress, "process");
+	evas_object_size_hint_align_set(widget_data->progress, EVAS_HINT_FILL, 0.5);
+	evas_object_size_hint_weight_set(widget_data->progress, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	elm_progressbar_pulse(widget_data->progress, EINA_TRUE);
+	evas_object_show(widget_data->progress);
+	evas_object_smart_member_add(widget_data->progress, widget_data->add_viewer);
+	evas_object_clip_set(widget_data->progress, widget_data->stage);
+	elm_object_part_content_set(widget_data->bg, "progress", widget_data->progress);
+	elm_progressbar_pulse(widget_data->progress, EINA_TRUE);
+
+	evas_object_geometry_get(box, &x, NULL, NULL, NULL);
+	x -= (ADD_VIEWER_PAGE_WIDTH >> 1);
+	h_page = -(x / ADD_VIEWER_PAGE_WIDTH);
+
+	widget = eina_list_nth(list, h_page);
+	if (widget) {
+		evas_object_hide(widget);
+	}
+	widget = eina_list_nth(list, h_page + 2);
+	if (widget) {
+		evas_object_hide(widget);
+	}
+
+	elm_object_signal_emit(widget_data->bg, "hide", "index");
+
+	elm_scroller_movement_block_set(widget_data->scroller, ELM_SCROLLER_MOVEMENT_BLOCK_HORIZONTAL);
+}
+
 
 static Eina_Bool normal_loader_cb(struct widget_data *widget_data, void *container)
 {
 	struct add_viewer_package *package;
 	Evas_Object *thumb_item;
 	Eina_List *l;
-	char *name;
+	char *name = NULL;
+	char *appname = NULL;
 	char *filter;
 
 	l = (Eina_List *)evas_object_data_get(container, "list");
 	if (!l) {
 		l = add_viewer_package_list_handle();
 		if (!l) {
+			ErrPrint("Failed to get package handler\n");
 			goto cancel;
 		}
 
@@ -142,21 +199,53 @@ static Eina_Bool normal_loader_cb(struct widget_data *widget_data, void *contain
 		goto out;
 	}
 
+	char *widget_id = add_viewer_package_list_pkgname(package);
+	if (widget_id) {
+		if (!strcmp(widget_id, CALENDAR_NEXT_EVENT_WIDGET_ID)) {
+			if (util_host_vender_id_get() == W_HOME_VENDOR_ID_LO) {
+				ErrPrint("not supported:%s", widget_id);
+				goto out;
+			}
+		}
+	}
+
+	int max_instance = add_viewer_package_get_max_instance_count(package);
+	int num_instance = add_viewer_package_is_skipped(package);
+	if (max_instance != 0 && (max_instance <= num_instance)) {
+		ErrPrint("max instance:%d skipped:%d\n", max_instance, num_instance);
+		goto out;
+	}
+
+	int widget_count = add_viewer_package_get_widget_count_in_package(package);
+
 	filter = evas_object_data_get(container, "filter");
 	if (filter) {
 		name = (char *)add_viewer_package_list_name(package);
+		appname = (char *)add_viewer_package_list_appname(package);
 		if (add_viewer_ucol_case_search(name, filter) < 0) {
+			goto out;
+		}
+		if (add_viewer_ucol_case_search(appname, filter) < 0) {
 			goto out;
 		}
 
 		name = add_viewer_util_highlight_keyword(name, filter);
-		DbgPrint("Filtered: %s\n", name);
+		appname = add_viewer_util_highlight_keyword(appname, filter);
+
+		thumb_item = winset_preview_add(widget_data, container, package, name, appname, widget_count, WIDGET_SIZE_TYPE_2x2, 0);
+		WarnPrint("Added: %p %s %s\n", thumb_item, name, appname);
+		free(name);
+		free(appname);
 	} else {
 		name = elm_entry_utf8_to_markup(add_viewer_package_list_name(package));
+		appname = elm_entry_utf8_to_markup(add_viewer_package_list_appname(package));
+
+		thumb_item = winset_preview_add(widget_data, container, package, name, appname, widget_count, WIDGET_SIZE_TYPE_2x2, 0);
+		WarnPrint("Added: %p %s %s\n", thumb_item, name, appname);
+		free(name);
+		free(appname);
 	}
 
-	thumb_item = winset_preview_add(widget_data, container, package, name, WIDGET_SIZE_TYPE_2x2, 0);
-	free(name);
 	evas_object_data_set(thumb_item, "package", package);
 	elm_box_pack_end(container, thumb_item);
 
@@ -178,7 +267,7 @@ cancel:
 		eina_list_free(l);
 		/* TODO: "No content" hide */
 
-		append_padding(container, 96);
+		append_padding(container, ADD_VIEWER_PREVIEW_PAD_V);
 	}
 
 	return ECORE_CALLBACK_CANCEL;
@@ -214,15 +303,30 @@ static int reload_list_cb(struct add_viewer_package *package, void *data)
 		(void)evas_object_data_del(container, "list");
 	}
 
-	append_padding(container, ADD_VIEWER_PREVIEW_PAD_TOP);
+	append_padding(container, 0);
 
-	l = add_viewer_package_list_handle();
+	while (normal_loader_cb(widget_data, container) == ECORE_CALLBACK_RENEW);
+	children = elm_box_children_get(container);
+	if (children) {
+		Evas_Object *pad1 = eina_list_nth(children, 0);
+		Evas_Object *pad2 = eina_list_nth(children, eina_list_count(children) - 1);
+
+		children = eina_list_remove(children, pad1);
+		children = eina_list_remove(children, pad2);
+
+		if (children) {
+			add_viewer_index_update(widget_data->index, children);
+			eina_list_free(children);
+		}
+	}
+
+/* l = add_viewer_package_list_handle();
 	if (l) {
 		elm_object_part_text_set(widget_data->bg, "empty", "");
 		while (normal_loader_cb(widget_data, container) == ECORE_CALLBACK_RENEW);
 	} else {
 		elm_object_part_text_set(widget_data->bg, "empty", _("IDS_ST_BODY_EMPTY"));
-	}
+	} */
 
 	/* To set the first focus */
 	evas_object_smart_callback_call(widget_data->scroller, "scroll", NULL);
@@ -519,7 +623,7 @@ HAPI void winset_access_object_add(Evas_Object *parent, Evas_Object *layout, con
 		return;
 	}
 
-	strcpy(text, name);
+	strncpy(text, name, len);
 
 	ao = evas_object_data_get(layout, "access,object");
 	if (ao) {
@@ -561,7 +665,11 @@ static void _change_focus(Evas_Object *scroller, Evas_Object *focus_widget)
 	pre_focus = evas_object_data_get(scroller, "focused");
 	if (pre_focus == focus_widget) return;
 
-	elm_object_signal_emit(focus_widget, "show", "line");
+	if (pre_focus) {
+		elm_object_signal_emit(focus_widget, "show", "line");
+	} else {
+		elm_object_signal_emit(focus_widget, "show,no,vi", "line");
+	}
 	evas_object_data_set(scroller, "focused", focus_widget);
 
 	if (pre_focus && pre_focus != focus_widget) {
@@ -571,6 +679,7 @@ static void _change_focus(Evas_Object *scroller, Evas_Object *focus_widget)
 
 static void _widget_scroll_cb(void *data, Evas_Object *obj, void *event_info)
 {
+	struct widget_data *widget_data = data;
 	Evas_Object *box = data;
 	Evas_Object *scroller = obj;
 	Evas_Object *focus_widget = NULL;
@@ -607,7 +716,8 @@ static void _widget_scroll_cb(void *data, Evas_Object *obj, void *event_info)
 		return;
 	}
 
-	_change_focus(scroller, focus_widget);
+	_change_focus(widget_data, focus_widget);
+	add_viewer_index_bringin(widget_data->index, focus_widget);
 }
 
 static int widget_data_setup(struct widget_data *widget_data, Evas_Object *parent)
@@ -626,6 +736,8 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 		widget_data->bg = NULL;
 		return WIDGET_ERROR_FAULT;
 	}
+
+	//elm_object_part_text_set(widget_data->bg, "text", _("IDS_HS_OPT_ADD"));
 
 	widget_data->scroller = elm_scroller_add(widget_data->parent);
 	if (!widget_data->scroller) {
@@ -656,7 +768,8 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 	elm_scroller_policy_set(widget_data->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
 	elm_scroller_content_min_limit(widget_data->scroller, EINA_FALSE, EINA_TRUE);
 	elm_scroller_propagate_events_set(widget_data->scroller, EINA_TRUE);
-	elm_scroller_bounce_set(widget_data->scroller, EINA_TRUE, EINA_TRUE);
+	elm_scroller_bounce_set(widget_data->scroller, EINA_FALSE, EINA_TRUE);
+	elm_scroller_bounce_set(widget_data->scroller, EINA_FALSE, EINA_FALSE);;
 	elm_object_style_set(widget_data->scroller, "effect");
 	elm_scroller_page_size_set(widget_data->scroller, 324, ADD_VIEWER_PAGE_HEIGHT);
 
@@ -672,16 +785,15 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 
 	evas_object_smart_member_add(widget_data->scroller, widget_data->add_viewer);
 	evas_object_clip_set(widget_data->scroller, widget_data->stage);
+	util_uxt_scroller_set_rotary_event_enabled(widget_data->scroller, EINA_TRUE);
 
- /*	util_uxt_scroller_set_rotary_event_enabled(widget_data->scroller, EINA_TRUE);
-    widget_data->index = add_viewer_index_create(widget_data->bg);
+	widget_data->index = add_viewer_index_create(widget_data->bg);
 	evas_object_show(widget_data->index);
 	evas_object_smart_member_add(widget_data->index, widget_data->add_viewer);
 	evas_object_clip_set(widget_data->index, widget_data->stage);
 	elm_object_part_content_set(widget_data->bg, "index", widget_data->index);
-*/
-	return WIDGET_ERROR_NONE;
 
+	return WIDGET_ERROR_NONE;
 }
 
 static void del_cb(void *data, Evas *e, Evas_Object *container, void *event_info)
@@ -694,11 +806,13 @@ static Eina_Bool long_press_cb(void *data)
 	struct click *cbdata = data;
 	int x;
 	int y;
+	int widget_count = 0;
 
 	evas_object_geometry_get(cbdata->geo.obj, &x, &y, NULL, NULL);
 
 	if (cbdata->geo.x == x && cbdata->geo.y == y) {
-		const char *name;
+		const char *name = NULL;
+		const char *appname = NULL;
 		Evas_Coord w;
 		Evas_Coord h;
 		struct add_viewer_event_info info = {
@@ -713,8 +827,10 @@ static Eina_Bool long_press_cb(void *data)
 		};
 
 		name = add_viewer_package_list_name(cbdata->package);
+		appname = add_viewer_package_list_appname(cbdata->package);
+		widget_count = add_viewer_package_get_widget_count_in_package(cbdata->package);
 
-		info.move.obj = winset_preview_add(cbdata->widget_data, cbdata->geo.obj, cbdata->package, name, cbdata->size, 1);
+		info.move.obj = winset_preview_add(cbdata->widget_data, cbdata->geo.obj, cbdata->package, name, appname, widget_count, cbdata->size, 1);
 		if (!info.move.obj) {
 			ErrPrint("Failed to create a preview object\n");
 		} else {
@@ -852,6 +968,36 @@ static void preview_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_i
 	}
 }
 
+static char *cur_locale(void)
+{
+	char *language = NULL;
+	language = vconf_get_str(VCONFKEY_LANGSET);
+	if (language) {
+		char *ptr = NULL;
+
+		ptr = language;
+		while (*ptr) {
+			if (*ptr == '.') {
+				*ptr = '\0';
+				break;
+			}
+
+			if (*ptr == '_') {
+				*ptr = '-';
+			}
+
+			ptr++;
+		}
+	} else {
+		language = strdup("en-us");
+		if (!language) {
+			ErrPrint("Heap: %d\n", errno);
+		}
+	}
+
+	return language;
+}
+
 static void _operator_name_slide_mode_set(Evas_Object *name)
 {
 	Evas_Object *name_edje;
@@ -884,7 +1030,7 @@ static void _operator_name_slide_mode_set(Evas_Object *name)
 	elm_label_slide_go(name);
 }
 
-static Evas_Object *winset_preview_add(struct widget_data *widget_data, Evas_Object *parent, struct add_viewer_package *package, const char *name, int type, int no_event)
+static Evas_Object *winset_preview_add(struct widget_data *widget_data, Evas_Object *parent, struct add_viewer_package *package, const char *name, const char *appname, int widget_count, int type, int no_event)
 {
 	const char *size_str;
 	const char *icon_group;
@@ -895,19 +1041,46 @@ static Evas_Object *winset_preview_add(struct widget_data *widget_data, Evas_Obj
 	int h;
 	int ret;
 	int idx;
-	char *filename;
+	char *filename  = NULL;
 	Evas_Object *bg;
 	char buf[512] = {0, };
 
-	filename = widget_service_get_preview_image_path(add_viewer_package_list_pkgname(package), type);
+	char *widget_id = add_viewer_package_list_pkgname(package);
+	if (widget_id) {
+		if (!strcmp(widget_id, APPSHORTCUT_WIDGET_ID)) {
+			if (util_host_vender_id_get() == W_HOME_VENDOR_ID_LO) {
+				char preview_path[512] = {0,};
+				char *locale = cur_locale();
+				if (locale) {
+					snprintf(preview_path, sizeof(preview_path) - 1, APPSHORTCUT_WIDGET_LOCALE_PREVIEW, locale);
+					if (ecore_file_exists(preview_path) == EINA_TRUE) {
+						filename = strdup(preview_path);
+					}
+					free(locale);
+				}
+				if (!filename) {
+					if (ecore_file_exists(APPSHORTCUT_WIDGET_PREVIEW) == EINA_TRUE) {
+						filename = strdup(APPSHORTCUT_WIDGET_PREVIEW);
+					}
+				}
+			}
+		}
+	}
+	if (!filename) {
+		filename = widget_service_get_preview_image_path(add_viewer_package_list_pkgname(package), type);
+	}
 
 	switch (type) {
+	case WIDGET_SIZE_TYPE_1x1:
+		size_str = "preview,1x1";
+		icon_group = "default,1x1";
+		idx = 8;
+		break;
 	case WIDGET_SIZE_TYPE_2x2:
 		size_str = "preview,2x2";
 		icon_group = "default,2x2";
 		idx = 8;
 		break;
-	case WIDGET_SIZE_TYPE_1x1:
 	case WIDGET_SIZE_TYPE_2x1:
 	case WIDGET_SIZE_TYPE_4x1:
 	case WIDGET_SIZE_TYPE_4x2:
@@ -1186,5 +1359,74 @@ HAPI int evas_object_add_viewer_reload(void)
 
 	return 0;
 }
+
+HAPI int evas_object_add_viewer_page_move(Evas_Object *obj, int direction)
+{
+	struct widget_data *widget_data;
+
+	if (!evas_object_smart_type_check(obj, ADD_VIEWER_CLASS_NAME)) {
+		return WIDGET_ERROR_INVALID_PARAMETER;
+	}
+
+	widget_data = evas_object_smart_data_get(obj);
+	if (!widget_data) {
+		return WIDGET_ERROR_FAULT;
+	}
+	if (!widget_data->scroller) {
+		return WIDGET_ERROR_FAULT;
+	}
+
+	Evas_Object *box = elm_object_content_get(widget_data->scroller);
+	if (!box) {
+		return WIDGET_ERROR_FAULT;
+	}
+
+	Eina_List *list = elm_box_children_get(box);
+	if (!list) {
+		return WIDGET_ERROR_FAULT;
+	}
+
+	int x = 0, h_page = 0;
+	evas_object_geometry_get(box, &x, NULL, NULL, NULL);
+	x -= (ADD_VIEWER_PAGE_WIDTH >> 1);
+	h_page = -(x / ADD_VIEWER_PAGE_WIDTH);
+
+	if (direction == 0) {
+		elm_scroller_page_bring_in(widget_data->scroller, h_page - 1, 0);
+	} else {
+		elm_scroller_page_bring_in(widget_data->scroller, h_page + 1, 0);
+	}
+	eina_list_free(list);
+
+	return WIDGET_ERROR_NONE;
+}
+
+/*HAPI int evas_object_add_viewer_rotary_activation_set(Evas_Object *obj, Eina_Bool enable)
+{
+	struct widget_data *widget_data;
+
+	if (!evas_object_smart_type_check(obj, ADD_VIEWER_CLASS_NAME)) {
+		return WIDGET_ERROR_INVALID_PARAMETER;
+	}
+
+	widget_data = evas_object_smart_data_get(obj);
+	if (!widget_data) {
+		return WIDGET_ERROR_FAULT;
+	}
+
+	Evas_Object *act_obj = rotary_activation_object_get(obj);
+	act_obj = (act_obj == NULL) ? widget_data->scroller : act_obj;
+	if (act_obj) {
+		if (enable) {
+			eext_rotary_object_event_activated_set(obj, EINA_TRUE);
+			eext_rotary_object_event_activated_set(widget_data->scroller, EINA_TRUE);
+		} else {
+			eext_rotary_object_event_activated_set(obj, EINA_FALSE);
+			eext_rotary_object_event_activated_set(widget_data->scroller, EINA_FALSE);
+		}
+	}
+
+	return WIDGET_ERROR_NONE;
+}*/
 
 /* End of a file */

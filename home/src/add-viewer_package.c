@@ -1,12 +1,12 @@
 /*
  * Samsung API
- * Copyright (c) 2009-2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the License);
+ * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/license/
+ * http://floralicense.org/license/
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an AS IS BASIS,
@@ -70,9 +70,11 @@ struct add_viewer_package {
 	char *name; /*!< Display name */
 	char *pkgname; /*!< Package name */
 	char *icon;
+	char *appname;
 	int disabled;
 	int skipped;
 	char *pkgid;
+	int max_instance;
 
 	struct {
 		char *key;
@@ -257,7 +259,8 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 #endif
 			preview = calloc(1, sizeof(*preview));
 			if (!preview) {
-				ErrPrint("Heap: %s\n", strerror(errno));
+				char err_buf[256] = { 0, };		
+				ErrPrint("Heap: %s\n", strerror_r(errno, err_buf, sizeof(err_buf)));
 				EINA_LIST_FREE(preview_list, preview) {
 					free(preview);
 				}
@@ -405,6 +408,7 @@ static void package_delete(struct add_viewer_package *package)
 
 	free(package->name);
 	free(package->pkgid);
+	free(package->appname);
 	free(package->pkgname);
 	free(package->icon);
 	free(package->extra.key);
@@ -544,10 +548,14 @@ HAPI int add_viewer_package_init(void)
 		ErrPrint("Failed to initialize the pkgmgr\n");
 	}
 
+
 	ret = widget_service_get_widget_list(widget_list_callback, NULL);
 	if (ret > 0) {
 		cnt += ret;
+	} else {
+		ErrPrint("Failed to get widget list:%d\n", ret);
 	}
+
 
 	add_viewer_pkgmgr_add_event_callback(PKGMGR_EVENT_INSTALL, pkgmgr_install_cb, NULL);
 	add_viewer_pkgmgr_add_event_callback(PKGMGR_EVENT_UPDATE, pkgmgr_update_cb, NULL);
@@ -671,9 +679,19 @@ HAPI const char *add_viewer_package_list_name(struct add_viewer_package *package
 	return package->name;
 }
 
+HAPI const char *add_viewer_package_list_appname(struct add_viewer_package *package)
+{
+	return package->appname;
+}
+
 HAPI const char *add_viewer_package_list_pkgname(struct add_viewer_package *package)
 {
 	return package->pkgname;
+}
+
+HAPI const char *add_viewer_package_list_pkgid(struct add_viewer_package *package)
+{
+	return package->pkgid;
 }
 
 HAPI const char *add_viewer_package_list_icon(struct add_viewer_package *package)
@@ -765,6 +783,59 @@ HAPI int add_viewer_package_list_set_icon(struct add_viewer_package *package, co
 
 	package->icon = new_name;
 	return 0;
+}
+
+HAPI int add_viewer_package_list_set_appname(struct add_viewer_package *package, const char *appname)
+{
+	char *new_name;
+
+	if (appname) {
+		new_name = strdup(appname);
+		if (!new_name) {
+			ErrPrint("Heap: %s\n", strerror(errno));
+			return -ENOMEM;
+		}
+	} else {
+		new_name = NULL;
+	}
+
+	if (package->appname) {
+		free(package->appname);
+	}
+
+	package->appname = new_name;
+	return 0;
+}
+
+HAPI int add_viewer_package_get_widget_count_in_package(struct add_viewer_package *package)
+{
+	if (!package) {
+		return 0;
+	}
+	if (!package->pkgid) {
+		return 0;
+	}
+
+	int count = 0;
+	Eina_List *l;
+	struct add_viewer_package *package_node = NULL;
+
+	EINA_LIST_FOREACH(s_info.package_list, l, package_node) {
+		if (package_node) {
+			if (package_node->pkgid) {
+				if (!strcmp(package_node->pkgid, package->pkgid)) {
+					count++;
+				}
+			}
+		}
+	}
+
+	return count;
+}
+
+HAPI int add_viewer_package_get_max_instance_count(struct add_viewer_package *package)
+{
+	return package->max_instance;
 }
 
 HAPI void *add_viewer_package_list_preview_list(struct add_viewer_package *package)
@@ -869,6 +940,7 @@ HAPI int add_viewer_package_reload_name(void)
 	struct add_viewer_package *package;
 	Eina_List *new_list = NULL;
 
+
 	EINA_LIST_FREE(s_info.package_list, package) {
 		name = package->name;
 		icon = package->icon;
@@ -883,6 +955,7 @@ HAPI int add_viewer_package_reload_name(void)
 
 		new_list = eina_list_sorted_insert(new_list, sort_cb, package);
 	}
+
 
 	s_info.package_list = new_list;
 	return 0;
