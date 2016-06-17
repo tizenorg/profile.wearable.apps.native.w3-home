@@ -25,6 +25,7 @@
 #include <unicode/ustring.h>
 #include <vconf.h>
 #include <widget_viewer_evas.h>
+#include <app_control.h>
 
 #include "util.h"
 #include "add-viewer.h"
@@ -755,7 +756,63 @@ static void _edit_button_click_cb(void *data, Evas_Object *obj, const char *emis
 {
 	// Launch the app-shortcut launcher app
 	_D("_edit_button_click_cb" );
-	util_launch_app(SHORTCUT_APP_ID, NULL, NULL);
+	Evas_Object *layout =data;
+	layout_info_s *layout_info = NULL;
+	Evas_Object* focus_page=NULL;
+	page_info_s *page_info = NULL;
+	char* widget_id = NULL;
+	if(!layout)
+	{
+		_E("layout is null " );
+		return;
+	}
+	layout_info = evas_object_data_get(layout, DATA_KEY_LAYOUT_INFO);
+	if(!layout_info || !layout_info->scroller) {
+		_E("layout info is null " );
+		return;
+	}
+	
+	focus_page = scroller_get_focused_page(layout_info->scroller);
+	if(!focus_page)
+	{
+		_E("focus page is null " );
+		return;
+	}
+	page_info = evas_object_data_get(focus_page , DATA_KEY_PAGE_INFO);
+	if(!page_info )
+	{
+		_E("focus page_info is null " );
+		return;
+	}
+	widget_id = widget_viewer_evas_get_widget_id(page_info->item);
+
+	_D("widget_id:%s",widget_id);
+	if(!widget_id)
+	{
+		_E("widget id is null " );
+		return;
+	}
+
+	_D("launch normal");
+	app_control_h service = NULL;
+
+	ret_if(APP_CONTROL_ERROR_NONE != app_control_create(&service));
+	ret_if(NULL == service);
+
+	app_control_set_operation(service, APP_CONTROL_OPERATION_MAIN);
+	app_control_add_extra_data(service, "instance_id",widget_id);
+	app_control_set_app_id(service,SHORTCUT_APP_ID);
+
+
+	int ret = app_control_send_launch_request(service, NULL, NULL);
+	if (APP_CONTROL_ERROR_NONE != ret) {
+		LOGE("error");
+		app_control_destroy(service);
+		return;
+	}
+
+	app_control_destroy(service);
+	//util_launch_app(SHORTCUT_APP_ID, NULL, NULL);
 }
 
 
@@ -2644,7 +2701,8 @@ HAPI Evas_Object *_create_right_layout(Evas_Object *layout)
 
 	elm_object_part_content_set(layout, "edit", edit);
 	elm_object_part_content_set(edit, "scroller", edit_scroller);
-	elm_object_signal_callback_add(edit, "edit_click", "", _edit_button_click_cb, NULL);
+//	elm_object_signal_callback_add(edit, "edit_click", "", _edit_button_click_cb, NULL);
+	elm_object_signal_callback_add(edit, "edit_click", "", _edit_button_click_cb, layout);
 
 	edit_info->layout = layout;
 	edit_info->scroller = edit_scroller;
