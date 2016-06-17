@@ -281,7 +281,7 @@ _item_create(Evas_Object *rotary_selector)
 
 					/* Set the icon of the selector item. */
 					eext_rotary_selector_item_part_content_set(item,
-																			 "item,icon",
+																			 "item,bg_image",
 																			 EEXT_ROTARY_SELECTOR_ITEM_STATE_NORMAL,
 																			 image);
 
