@@ -179,8 +179,8 @@ collections {
 				scale: 0.5;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.5 0.0; to: "preview"; }
-					rel2 { relative: 0.5 0.0; to: "preview"; }
+					rel1 { relative: 0.5 ((ADD_VIEWER_HEIGHT_PAD_TOP + ADD_VIEWER_TEXT_HEIGHT + ADD_VIEWER_PREVIEW_HEIGHT)/HEIGHT); }
+					rel2 { relative: 0.5 ((ADD_VIEWER_HEIGHT_PAD_TOP + ADD_VIEWER_TEXT_HEIGHT + ADD_VIEWER_PREVIEW_HEIGHT + ADD_VIEWER_TEXT_HEIGHT)/HEIGHT); }
 					min: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
 					max: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
 					align: 0.5 1.0;
