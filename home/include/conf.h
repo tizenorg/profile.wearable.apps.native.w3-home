@@ -162,7 +162,7 @@
 
 /* Configuration */
 #define BOOTING_STATE_DONE 1
-#define MAX_WIDGET 5
+#define MAX_WIDGET 15
 #define LONGPRESS_THRESHOLD 15
 #define LONGPRESS_TIME 0.5f
 #define INDEX_UPDATE_TIME 0.1f

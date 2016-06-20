@@ -76,6 +76,13 @@ typedef struct {
 	Eina_Bool appended;
 	Eina_Bool need_to_read;
 	void *faulted_hl_timer;
+
+	struct _sub_page {
+		int num;
+		int start_index;
+		int selected_index;
+	} sub_page;
+
 } page_info_s;
 
 extern page_info_s *page_info_create(const char *id, const char *subid, double period);

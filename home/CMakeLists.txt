@@ -170,6 +170,9 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	src/add-viewer_util.c
 	src/add-viewer_package.c
 	src/add-viewer_index.c
+	src/page_indicator.c
+	src/index_imp_custom.c
+	src/index_imp_winset.c
 	src/wms.c
 	src/apps/bg.c
 	src/apps/db.c

@@ -2661,7 +2661,7 @@ HAPI Evas_Object *_create_right_layout(Evas_Object *layout)
 	}
 	edit_info->scroller = edit_scroller;
 
-	edit_scroller_info->index[PAGE_DIRECTION_RIGHT] = index_create(edit, edit_scroller, PAGE_DIRECTION_RIGHT);
+	edit_scroller_info->index[PAGE_DIRECTION_RIGHT] = index_create(INDEX_TYPE_WINSET, edit, edit_scroller, PAGE_DIRECTION_RIGHT);
 	if (!edit_scroller_info->index[PAGE_DIRECTION_RIGHT]) _E("Cannot create the right index");
 	else elm_object_part_content_set(edit, "index", edit_scroller_info->index[PAGE_DIRECTION_RIGHT]);
 
@@ -2806,7 +2806,7 @@ HAPI Evas_Object *_create_left_layout(Evas_Object *layout)
 	}
 	edit_info->scroller = edit_scroller;
 
-	edit_scroller_info->index[PAGE_DIRECTION_LEFT] = index_create(edit, edit_scroller, PAGE_DIRECTION_LEFT);
+	edit_scroller_info->index[PAGE_DIRECTION_LEFT] = index_create(INDEX_TYPE_WINSET, edit, edit_scroller, PAGE_DIRECTION_LEFT);
 	if (!edit_scroller_info->index[PAGE_DIRECTION_LEFT]) _E("Cannot create the left index");
 	else elm_object_part_content_set(edit, "index", edit_scroller_info->index[PAGE_DIRECTION_LEFT]);
 

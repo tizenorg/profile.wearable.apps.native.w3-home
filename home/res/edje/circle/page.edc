@@ -45,9 +45,8 @@ images {
 	image: "b_widget_favorite_bg.png" COMP;
 }
 
-collections {
-	base_scale: 1.3;
-
+collections {	
+base_scale: 1.3;
 group {
 	name: "page";
 	parts {
@@ -883,6 +882,7 @@ group {
 			name : "mask";
 			type : IMAGE;
 			repeat_events: 1;
+			scale: 0.76;
 			description {
 			 state: "default" 0.0;
 			 rel1 { relative: 0.5 0.5; to: "bg"; }
@@ -937,12 +937,12 @@ group {
 		part {
 			name : "plus_text";
 			type : TEXT;
-			scale : 1;
+			scale : 0.8;
 			repeat_events: 1;
 			description {
 			state: "default" 0.0;
-			rel1 { relative: 0.36 0.63; to: "bg"; }
-			rel2 { relative: 0.65 0.63; to: "bg"; }
+			rel1 { relative: 0.34 0.65; to: "bg"; }
+			rel2 { relative: 0.65 0.65; to: "bg"; }
 			text {
 				 text: "Add widget";
 				 font: "Sans";

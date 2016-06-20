@@ -16,18 +16,9 @@
  */
 
 #include "conf.edc"
-#include "../color_classes.edc"
-
-images {
-	image: "bouncing_bottom_edge.png" COMP;
-	image: "bouncing_bottom_glow.png" COMP;
-	image: "bouncing_left_edge.png" COMP;
-	image: "bouncing_left_glow.png" COMP;
-	image: "bouncing_right_edge.png" COMP;
-	image: "bouncing_right_glow.png" COMP;
-}
 
 collections {
+	base_scale: 1.3;
 	group {
 		name: "layout";
 		parts {
@@ -40,6 +31,70 @@ collections {
 					state: "default" 0.0;
 					rel1 { relative: 0.0 0.0; }
 					rel2 { relative: 1.0 1.0; }
+				}
+			}
+			part {
+				name: "comformant";
+				type: SWALLOW;
+				scale: 1;
+				mouse_events: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+					visible: 0;
+				}
+			}
+			part {
+				name: "apps";
+				type: SWALLOW;
+				scale: 1;
+				mouse_events: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+				}
+			}
+			part {
+				name: "move.bg";
+				type: RECT;
+				mouse_events: 0;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+					color_class : BG_DEFAULT_COLOR_CODE;
+					color: 0 0 0 255;
+					visible : 1;
+				}
+				description {
+					state: "hide" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+					color_class : BG_DEFAULT_COLOR_CODE;
+					color: 0 0 0 255;
+					visible : 0;
+				}
+			}
+			part {
+				name: "move.bg,clip";
+				type: RECT;
+				mouse_events: 0;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+					color: 255 255 255 255;
+					visible : 1;
+				}
+				description {
+					state: "hide" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+					color_class : BG_DEFAULT_COLOR_CODE;
+					color: 0 0 0 255;
+					visible : 0;
 				}
 			}
 			part {
@@ -67,15 +122,27 @@ collections {
 				mouse_events: 1;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to, "bg";}
-					rel2 { relative: 1.0 1.0; to, "bg";}
+					rel1 { relative: 0.0 0.0; to, "scroller";}
+					rel2 { relative: 1.0 1.0; to, "scroller";}
 					color: 255 255 255 255;
 					visible: 1;
 				}
 				description {
 					state: "show" 0.0;
 					inherit: "default" 0.0;
-					color: 255 255 255 0;
+					color: 0 0 0 0;
+				}
+				description {
+					state: "up" 0.0;
+					inherit: "default" 0.0;
+					//rel1 { relative: 0.0 (-322)/360; to, "bg"; offset: 0 -1;}
+					//rel2 { relative: 1.0 (-322+360)/360; to, "bg"; }
+					visible: 1;
+				}
+				description {
+					state: "up,hide" 0.0;
+					inherit: "up" 0.0;
+					visible: 0;
 				}
 			}
 			part {
@@ -106,12 +173,25 @@ collections {
 					inherit: "default" 0.0;
 					visible: 0;
 				}
+				description {
+					state: "up" 0.0;
+					//rel1 { relative: 0.0 (-322)/360; to, "scroller_region"; offset: 0 -1;}
+					//rel2 { relative: 1.0 (-322+360)/360; to, "scroller_region";}
+					//rel1 { relative: 0.0 0.0; to, "bg"; }
+					//rel2 { relative: 1.0 -1.0; to, "bg"; }
+					visible: 1;
+				}
+				description {
+					state: "up,hide" 0.0;
+					inherit: "up" 0.0;
+					visible: 0;
+				}
 			}
 			part {
 				name: "index_region";
 				type: SPACER;
 				scale: 1;
-				mouse_events: 1;
+				mouse_events: 0;
 				description {
 					state: "default" 0.0;
 					rel1 { relative: 0.0 INDICATOR_START_Y/BASE_HEIGHT; to, "bg"; }
@@ -121,6 +201,7 @@ collections {
 			part {
 				name: "left_index,clip";
 				type: RECT;
+				mouse_events: 0;
 				description {
 					state: "default" 0.0;
 					rel1 { relative: 0.0 0.0; to, "index_region"; }
@@ -139,7 +220,7 @@ collections {
 				type: SWALLOW;
 				scale: 1;
 				clip_to: "left_index,clip";
-				mouse_events: 1;
+				mouse_events: 0;
 				description {
 					state: "default" 0.0;
 					rel1 { relative: 0.0 0.0; to, "index_region";}
@@ -153,27 +234,30 @@ collections {
 				}
 			}
 			part {
-				name: "right_index,clip";
-				type: RECT;
+				name: "right_index";
+				type: SWALLOW;
+				scale: 1;
+				clip_to: "move.bg,clip";
+				mouse_events: 0;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to, "index_region"; }
-					rel2 { relative: 1.0 1.0; to, "index_region"; }
-					color: 255 255 255 255;
+					rel1 { relative: 0.0 0.0; to, "index_region";}
+					rel2 { relative: 1.0 1.0; to, "index_region";}
 					visible: 1;
 				}
 				description {
 					state: "hide" 0.0;
 					inherit: "default" 0.0;
-					color: 255 255 255 0;
+					visible: 0;
 				}
 			}
 			part {
-				name: "right_index";
+				name: "index";
 				type: SWALLOW;
 				scale: 1;
-				clip_to: "right_index,clip";
+				clip_to: "move.bg,clip";
 				mouse_events: 1;
+				repeat_events: 1;
 				description {
 					state: "default" 0.0;
 					rel1 { relative: 0.0 0.0; to, "index_region";}
@@ -198,7 +282,44 @@ collections {
 				}
 			}
 			part {
+				name: "edit,bg";
+				type: RECT;
+				mouse_events: 0;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+					color_class : "AO0111";
+					visible : 0;
+				}
+				description {
+					state: "show" 0.0;
+					rel1 { relative: 0.0 0.0; to, "bg";}
+					rel2 { relative: 1.0 1.0; to, "bg";}
+					color_class : "AO0111";
+					visible : 1;
+				}
+			}
+			part {
 				name: "edit";
+				type: SWALLOW;
+				clip_to: "scroller,clip";
+				scale: 1;
+				mouse_events: 1;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "edit_region";}
+					rel2 { relative: 1.0 1.0; to, "edit_region";}
+					visible: 0;
+				}
+				description {
+					state: "show" 0.0;
+					inherit: "default" 0.0;
+					visible: 1;
+				}
+			}
+			part {
+				name: "clocklist";
 				type: SWALLOW;
 				clip_to: "scroller,clip";
 				scale: 1;
@@ -227,29 +348,10 @@ collections {
 				}
 			}
 			part {
-				name: "add_viewer,clip";
-				type: RECT;
-				scale: 1;
-				mouse_events: 1;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to, "bg";}
-					rel2 { relative: 1.0 1.0; to, "bg";}
-					color: 255 255 255 0;
-					visible: 1;
-				}
-				description {
-					state: "show" 0.0;
-					inherit: "default" 0.0;
-					color: 255 255 255 255;
-				}
-			}
-			part {
 				name: "add_viewer";
 				type: SWALLOW;
 				scale: 1;
 				mouse_events: 1;
-				clip_to: "add_viewer,clip";
 				description {
 					state: "default" 0.0;
 					rel1 { relative: 0.0 0.0; to, "add_viewer_region";}
@@ -257,40 +359,91 @@ collections {
 					visible: 0;
 				}
 				description {
+					state: "show,ready" 0.0;
+					inherit: "default" 0.0;
+					map {
+					  on: 1;
+					  smooth: 1;
+					  zoom.x: 1.7;
+					  zoom.y: 1.7;
+					  color: 0 0 0 0 0;
+					  color: 1 0 0 0 0;
+					  color: 2 0 0 0 0;
+					  color: 3 0 0 0 0;
+					}
+					visible: 1;
+				}
+				description {
 					state: "show" 0.0;
 					inherit: "default" 0.0;
+					map {
+					  on: 1;
+					  smooth: 1;
+					  zoom.x: 1.0;
+					  zoom.y: 1.0;
+					  color: 0 255 255 255 255;
+					  color: 1 255 255 255 255;
+					  color: 2 255 255 255 255;
+					  color: 3 255 255 255 255;
+					}
+					visible: 1;
+				}
+				description {
+					state: "showed" 0.0;
+					inherit: "default" 0.0;
+					visible: 1;
+				}
+				description {
+					state: "hide,ready" 0.0;
+					inherit: "default" 0.0;
+					map {
+					  on: 1;
+					  smooth: 1;
+					  zoom.x: 1.0;
+					  zoom.y: 1.0;
+					  color: 0 255 255 255 255;
+					  color: 1 255 255 255 255;
+					  color: 2 255 255 255 255;
+					  color: 3 255 255 255 255;
+					}
+					visible: 1;
+				}
+				description {
+					state: "hide" 0.0;
+					inherit: "default" 0.0;
+					map {
+					  on: 1;
+					  smooth: 1;
+					  zoom.x: 1.7;
+					  zoom.y: 1.7;
+					  color: 0 0 0 0 0;
+					  color: 1 0 0 0 0;
+					  color: 2 0 0 0 0;
+					  color: 3 0 0 0 0;
+					}
 					visible: 1;
 				}
 			}
 			part {
-				name: "left_checker";
-				type: SWALLOW;
-				mouse_events: 1;
+				name: "factory_info_region";
+				type: SPACER;
+				scale: 1;
+				mouse_events: 0;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 0.2 1.0; to: "bg"; }
-					visible: 0;
-				}
-				description {
-					state: "show" 0.0;
-					inherit: "default" 0.0;
-					visible: 1;
+					rel1 { to, "scroller"; }
+					rel2 { to, "scroller"; }
 				}
 			}
 			part {
-				name: "right_checker";
+				name: "factory_info";
 				type: SWALLOW;
-				mouse_events: 1;
+				scale: 1;
+				mouse_events: 0;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.8 0.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
-					visible: 0;
-				}
-				description {
-					state: "show" 0.0;
-					inherit: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to, "factory_info_region";}
+					rel2 { relative: 1.0 1.0; to, "factory_info_region";}
 					visible: 1;
 				}
 			}
@@ -312,180 +465,76 @@ collections {
 					visible: 1;
 				}
 			}
-			part {
-				name: "bottom,clipper";
-				type: RECT;
-				mouse_events: 0;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 1.0; to: "bouncing,bottom,edge"; }
-					rel2 { relative: 1.0 1.0; to: "bouncing,bottom,edge"; }
-					visible: 1;
-				}
-				description {
-					state: "show";
-					inherit: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bouncing,bottom,glow"; }
-					rel2 { relative: 1.0 1.0; to: "bouncing,bottom,edge"; }
-				}
-			}
-			part {
-				name: "bouncing,bottom,edge";
-				type: IMAGE;
-				scale: 1;
-				mouse_events: 0;
-				clip_to: "bottom,clipper";
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 1.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
-					image {
-						normal: "bouncing_bottom_edge.png";
-					}
-					color_class: "B019";
-					min: 360 2;
-					fixed: 1 1;
-					align: 0.5 1.0;
-					visible: 1;
-				}
-			}
-			part {
-				name: "bouncing,bottom,glow";
-				type: IMAGE;
-				scale: 1;
-				mouse_events: 0;
-				clip_to: "bottom,clipper";
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bouncing,bottom,edge"; }
-					rel2 { relative: 1.0 0.0; to: "bouncing,bottom,edge"; }
-					image {
-						normal: "bouncing_bottom_glow.png";
-					}
-					color_class: "B018E";
-					min: 360 50;
-					fixed: 1 1;
-					align: 0.5 1.0;
-					visible: 1;
-				}
-			}
-			part {
-				name: "left,clipper";
-				type: RECT;
-				mouse_events: 0;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bouncing,left,edge"; }
-					rel2 { relative: 0.0 1.0; to: "bouncing,left,edge"; }
-					visible: 1;
-				}
-				description {
-					state: "show";
-					inherit: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bouncing,left,edge"; }
-					rel2 { relative: 1.0 1.0; to: "bouncing,left,glow"; }
-				}
-			}
-			part {
-				name: "bouncing,left,edge";
-				type: IMAGE;
-				scale: 1;
-				mouse_events: 0;
-				clip_to: "left,clipper";
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 0.0 1.0; to: "bg"; }
-					image {
-						normal: "bouncing_left_edge.png";
-					}
-					color_class: "B019";
-					min: 1 480;
-					fixed: 1 1;
-					align: 0.0 0.5;
-					visible: 1;
-				}
-			}
-			part {
-				name: "bouncing,left,glow";
-				type: IMAGE;
-				scale: 1;
-				mouse_events: 0;
-				clip_to: "left,clipper";
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 1.0 0.0; to: "bouncing,left,edge"; }
-					rel2 { relative: 1.0 1.0; to: "bouncing,left,edge"; }
-					image {
-						normal: "bouncing_left_glow.png";
-					}
-					color_class: "B018E";
-					min: 50 480;
-					fixed: 1 1;
-					align: 0.0 0.5;
-					visible: 1;
-				}
-			}
-			part {
-				name: "right,clipper";
-				type: RECT;
-				mouse_events: 0;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 1.0 0.0; to: "bouncing,right,edge"; }
-					rel2 { relative: 1.0 1.0; to: "bouncing,right,edge"; }
-					visible: 1;
-				}
-				description {
-					state: "show";
-					inherit: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bouncing,right,glow"; }
-					rel2 { relative: 1.0 1.0; to: "bouncing,right,edge"; offset: 1 0; }
-				}
-			}
-
-			part {
-				name: "bouncing,right,edge";
-				type: IMAGE;
-				scale: 1;
-				mouse_events: 0;
-				clip_to: "right,clipper";
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 1.0 0.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
-					image {
-						normal: "bouncing_right_edge.png";
-					}
-					color_class: "B019";
-					min: 1 480;
-					fixed: 1 1;
-					align: 1.0 0.5;
-					visible: 1;
-				}
-			}
-			part {
-				name: "bouncing,right,glow";
-				type: IMAGE;
-				scale: 1;
-				mouse_events: 0;
-				clip_to: "right,clipper";
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bouncing,right,edge"; }
-					rel2 { relative: 0.0 1.0; to: "bouncing,right,edge"; }
-					image {
-						normal: "bouncing_right_glow.png";
-					}
-					color_class: "B018E";
-					min: 50 480;
-					fixed: 1 1;
-					align: 1.0 0.5;
-					visible: 1;
-				}
-			}
 		}
 		programs {
+			program {
+				signal: "up,scroller";
+				source: "layout";
+				action: STATE_SET "up" 0.0;
+				target: "scroller,clip";
+				target: "scroller";
+				after: "complete,up";
+			}
+			program {
+				signal: "up,show,scroller";
+				source: "layout";
+				action: STATE_SET "up" 0.0;
+				target: "scroller,clip";
+				target: "scroller";
+			}
+			program {
+				signal: "up,hide,scroller";
+				source: "layout";
+				action: STATE_SET "up,hide" 0.0;
+				target: "scroller,clip";
+				target: "scroller";
+			}
+			program {
+				signal: "down,scroller";
+				source: "layout";
+				action: STATE_SET "default" 0.0;
+				target: "scroller,clip";
+				target: "scroller";
+				after: "complete,down";
+			}
+			program{
+				name: "longpress,end";
+				signal: "longpress,end";
+				source: "layout";
+				action: SIGNAL_EMIT "longpress,end" "event";
+			}
+			program{
+				name: "longpress,start";
+				signal: "longpress,start";
+				source: "layout";
+				action: SIGNAL_EMIT "longpress,start" "event";
+			}
+			program{
+				name: "complete,up";
+				signal: "complete,up";
+				source: "layout";
+				action: SIGNAL_EMIT "complete,up" "event";
+			}
+			program{
+				name: "complete,down";
+				signal: "complete,down";
+				source: "layout";
+				action: SIGNAL_EMIT "complete,down" "event";
+			}
+			program {
+				signal: "show,move.bg";
+				source: "layout";
+				action: STATE_SET "default" 0.0;
+				target: "move.bg";
+				target: "move.bg,clip";
+			}
+			program {
+				signal: "hide,move.bg";
+				source: "layout";
+				action: STATE_SET "hide" 0.0;
+				target: "move.bg";
+				target: "move.bg,clip";
+			}
 			program {
 				signal: "opacity";
 				source: "layout";
@@ -500,17 +549,27 @@ collections {
 			}
 			program {
 				signal: "show";
-				source: "checker";
-				action: STATE_SET "show" 0.0;
-				target: "left_checker";
-				target: "right_checker";
+				source: "index";
+				action: STATE_SET "default" 0.0;
+				target: "index";
 			}
 			program {
 				signal: "hide";
-				source: "checker";
+				source: "index";
+				action: STATE_SET "hide" 0.0;
+				target: "index";
+			}
+			program {
+				signal: "show";
+				source: "right_index";
 				action: STATE_SET "default" 0.0;
-				target: "left_checker";
-				target: "right_checker";
+				target: "right_index";
+			}
+			program {
+				signal: "hide";
+				source: "right_index";
+				action: STATE_SET "hide" 0.0;
+				target: "right_index";
 			}
 			program {
 				signal: "block";
@@ -539,128 +598,186 @@ collections {
 			}
 			program {
 				signal: "show";
-				source: "right_index";
-				action: STATE_SET "default" 0.0;
-				target: "right_index,clip";
+				source: "edit";
+				script: {
+					 set_state(PART:"edit", "show", 0.0);
+					 emit("edit,show", "edit");
+				}
 			}
 			program {
 				signal: "hide";
-				source: "right_index";
-				action: STATE_SET "hide" 0.0;
-				target: "right_index,clip";
-				transition: LINEAR 0.2;
+				source: "edit";
+				script: {
+					 set_state(PART:"edit", "default", 0.0);
+					 emit("edit,hide", "edit");
+				}
 			}
 			program {
 				signal: "show";
-				source: "edit";
-				action: STATE_SET "show" 0.0;
-				target: "edit";
+				source: "clocklist";
+				script: {
+					 set_state(PART:"clocklist", "show", 0.0);
+				}
 			}
 			program {
 				signal: "hide";
-				source: "edit";
-				action: STATE_SET "default" 0.0;
-				target: "edit";
+				source: "clocklist";
+				script: {
+					 set_state(PART:"clocklist", "default", 0.0);
+				}
+			}
+			program {
+				signal: "show";
+				source: "edit,bg";
+				script: {
+					 set_state(PART:"edit,bg", "show", 0.0);
+				}
+			}
+			program {
+				signal: "hide";
+				source: "edit,bg";
+				script: {
+					 set_state(PART:"edit,bg", "default", 0.0);
+				}
 			}
 			program {
 				signal: "show";
 				source: "scroller";
 				action: STATE_SET "default" 0.0;
 				target: "scroller";
-				target: "left_index";
-				target: "right_index";
 			}
 			program {
 				signal: "hide";
 				source: "scroller";
 				action: STATE_SET "hide" 0.0;
 				target: "scroller";
-				target: "left_index";
-				target: "right_index";
 			}
 			program {
 				signal: "show";
 				source: "add_viewer";
+				script {
+					stop_programs_on(PART:"add_viewer");
+					set_state(PART:"add_viewer", "show,ready", 0.0);
+					set_state(PART:"blocker", "enable", 0.0);
+				}
+				after: "add_viewer,show,after";
+			}
+			program {
+				name: "add_viewer,show,after";
 				action: STATE_SET "show" 0.0;
-				target: "add_viewer,clip";
 				target: "add_viewer";
-				target: "scroller,clip";
-				transition: LINEAR 0.1;
+				in: 0.01 0;
+				transition: CUBIC_BEZIER 0.4 0.25 0.46 0.45 1.0;
+				after: "add_viewer,show,done";
+			}
+			program {
+				name: "add_viewer,show,done";
+				script {
+					set_state(PART:"add_viewer", "showed", 0.0);
+					set_state(PART:"scroller,clip", "show", 0.0);
+					set_state(PART:"blocker", "default", 0.0);
+					emit("add_viewer,show", "add_viewer");
+				}
 			}
 			program {
 				signal: "hide";
 				source: "add_viewer";
-				action: STATE_SET "default" 0.0;
-				target: "add_viewer,clip";
+				script {
+					stop_programs_on(PART:"add_viewer");
+					set_state(PART:"scroller,clip", "default", 0.0);
+					set_state(PART:"add_viewer", "hide,ready", 0.0);
+					set_state(PART:"blocker", "enable", 0.0);
+				}
+				after: "add_viewer,hide,after";
+			}
+			program {
+				name: "add_viewer,hide,after";
+				action: STATE_SET "hide" 0.0;
 				target: "add_viewer";
-				target: "scroller,clip";
-				transition: LINEAR 0.1;
-				after: "hide,after";
+				in: 0.01 0;
+				transition: CUBIC_BEZIER 0.4 0.25 0.46 0.45 1.0;
+				after: "add_viewer,hide,done";
 			}
 			program {
 				signal: "hide,instant";
 				source: "add_viewer";
 				action: STATE_SET "default" 0.0;
-				target: "add_viewer,clip";
 				target: "add_viewer";
 				target: "scroller,clip";
-				after: "hide,after";
+				after: "add_viewer,hide,done";
 			}
 			program {
-				name: "hide,after";
-				source: "add_viewer";
-				action: SIGNAL_EMIT "add_viewer,hide" "add_viewer";
-			}
-			program {
-				name: "bottom,show";
-				signal: "bottom,show";
-				source: "layout";
-				action: STATE_SET "show" 0.0;
-				target: "bottom,clipper";
-				transition: LINEAR 0.2;
-				after: "bottom,hide";
-			}
-			program {
-				name: "bottom,hide";
-				signal: "bottom,hide";
-				source: "layout";
-				action: STATE_SET "default" 0.0;
-				target: "bottom,clipper";
-			}
-			program {
-				name: "left,show";
-				signal: "left,show";
-				source: "layout";
-				action: STATE_SET "show" 0.0;
-				target: "left,clipper";
-				transition: LINEAR 0.2;
-				after: "left,hide";
-			}
-			program {
-				name: "left,hide";
-				signal: "left,hide";
-				source: "layout";
-				action: STATE_SET "default" 0.0;
-				target: "left,clipper";
-			}
-			program {
-				name: "right,show";
-				signal: "right,show";
-				source: "layout";
-				action: STATE_SET "show" 0.0;
-				target: "right,clipper";
-				transition: LINEAR 0.2;
-				after: "right,hide";
-			}
-			program {
-				name: "right,hide";
-				signal: "right,hide";
-				source: "layout";
-				action: STATE_SET "default" 0.0;
-				target: "right,clipper";
+				name: "add_viewer,hide,done";
+				script {
+					set_state(PART:"add_viewer", "default", 0.0);
+					set_state(PART:"blocker", "default", 0.0);
+					emit("add_viewer,hide", "add_viewer");
+				}
 			}
 		}
 	} // group
+
+	images {
+		image: "b_end_effect_right_bg.png" COMP;
+		image: "b_end_effect_right_edge_bg.png" COMP;
+	}
+
+	group {
+		name: "edge,right";
+		parts {
+			part {
+				name: "bg";
+				type: SPACER;
+				scale: 1;
+				description {
+					state: "default" 0.0;
+					min: HOME_SCROLLER_EDGE_WIDTH BASE_HEIGHT;
+					rel1.relative: 0.0 0.0;
+					rel2.relative: 1.0 1.0;
+				}
+			}
+			part {
+				name: "edge,bg";
+				type: IMAGE;
+				scale: 1;
+				mouse_events: 0;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to: "bg"; }
+					rel2 { relative: 1.0 0.0; to: "bg"; }
+					image {
+						normal: "b_end_effect_right_bg.png";
+					}
+					min: HOME_SCROLLER_EDGE_WIDTH BASE_HEIGHT;
+					max: HOME_SCROLLER_EDGE_WIDTH BASE_HEIGHT;
+					align: 0.0 0.0;
+					fixed: 1 1;
+					visible: 1;
+					color_class: "B019";
+				}
+			}
+			part {
+				name: "edge";
+				type: IMAGE;
+				scale: 1;
+				mouse_events: 0;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; to: "bg"; }
+					rel2 { relative: 1.0 0.0; to: "bg"; }
+					image {
+						normal: "b_end_effect_right_edge_bg.png";
+					}
+					min: HOME_SCROLLER_EDGE_WIDTH BASE_HEIGHT;
+					max: HOME_SCROLLER_EDGE_WIDTH BASE_HEIGHT;
+					align: 0.0 0.0;
+					fixed: 1 1;
+					visible: 1;
+					color_class: "B019";
+				}
+			}
+		}
+	}
 } // collections
 
 

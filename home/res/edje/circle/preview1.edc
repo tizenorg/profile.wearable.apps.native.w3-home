@@ -64,7 +64,6 @@ images {
 #define HEIGHT (ADD_VIEWER_HEIGHT_PAD_TOP + ADD_VIEWER_TEXT_HEIGHT + ADD_VIEWER_PREVIEW_HEIGHT + ADD_VIEWER_TEXT_HEIGHT + ADD_VIEWER_HEIGHT_PAD_BOTTOM)
 
 collections {
-base_scale: 1.3;
 	group {
 		name: "bg";
 		parts {
@@ -110,8 +109,8 @@ base_scale: 1.3;
 				mouse_events: 1;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0;}
-					rel2 { relative: 1.0 0.25;}
+					rel1 { relative: 0.0 0.0; to, "bg_bottom";}
+					rel2 { relative: 1.0 0.2; to, "bg_bottom";}
 					visible: 1;
 				}
 				description {
@@ -181,8 +180,8 @@ base_scale: 1.3;
 					state: "default" 0.0;
 					rel1 { relative: 0.5 0.0; to: "preview"; }
 					rel2 { relative: 0.5 0.0; to: "preview"; }
-				//	min: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
-				//	max: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
+					min: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
+					max: ADD_VIEWER_TEXT_WIDTH ADD_VIEWER_TEXT_HEIGHT;
 					align: 0.5 1.0;
 					fixed: 1 1;
 					visible: 1;

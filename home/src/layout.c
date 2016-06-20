@@ -812,11 +812,11 @@ HAPI Evas_Object *layout_create(Evas_Object *win)
 	scroller_info->unpack_page_inners_on_scroll = 1;
 	scroller_info->scroll_effect = 1;
 
-	scroller_info->index[PAGE_DIRECTION_LEFT] = index_create(layout, scroller, PAGE_DIRECTION_LEFT);
+	scroller_info->index[PAGE_DIRECTION_LEFT] = index_create(INDEX_TYPE_CUSTOM, layout, scroller, PAGE_DIRECTION_LEFT);
 	if (!scroller_info->index[PAGE_DIRECTION_LEFT]) _E("Cannot create the left index");
 	else elm_object_part_content_set(layout, "left_index", scroller_info->index[PAGE_DIRECTION_LEFT]);
 
-	scroller_info->index[PAGE_DIRECTION_RIGHT] = index_create(layout, scroller, PAGE_DIRECTION_RIGHT);
+	scroller_info->index[PAGE_DIRECTION_RIGHT] = index_create(INDEX_TYPE_CUSTOM, layout, scroller, PAGE_DIRECTION_RIGHT);
 	if (!scroller_info->index[PAGE_DIRECTION_RIGHT]) _E("Cannot create the right index");
 	else elm_object_part_content_set(layout, "right_index", scroller_info->index[PAGE_DIRECTION_RIGHT]);
 	layout_hide_index(layout);
