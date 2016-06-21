@@ -64,8 +64,7 @@
 #define MOVE_RIGHT 1
 
 #define THRESHOLD_BEZEL_UP_H 60
-#define THRESHOLD_BEZEL_DOWN_H 100
-#define THRESHOLD_BEZEL_DOWN_X_DIST 10
+#define THRESHOLD_BEZEL_DOWN_X_DIST 20
 #define THRESHOLD_BEZEL_UP_END_D_H 25
 #define THRESHOLD_BEZEL_UP_MOVE_D_H 25
 #define THRESHOLD_MOMENTUM_FLICK_Y 450
@@ -561,7 +560,7 @@ static Evas_Event_Flags _flick_start_cb(void *data, void *event_info)
 
 	gesture_down_y = (int) evas_object_data_get(layout, PRIVATE_DATA_KEY_LAYOUT_G_DOWN_Y);
 
-	if (gesture_down_y <= THRESHOLD_BEZEL_DOWN_H
+	if (ei->momentum.y1 <= THRESHOLD_BEZEL_UP_H
 		&& ei->momentum.my >= THRESHOLD_MOMENTUM_FLICK_Y) {
 		evas_object_data_set(layout, PRIVATE_DATA_KEY_READY_TO_BEZEL_DOWN, (void *) 1);
 	}
