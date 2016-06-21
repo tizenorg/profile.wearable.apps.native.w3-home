@@ -303,7 +303,43 @@ static w_home_error_e _resume_rotary_result_cb(void *data)
 	eext_rotary_object_event_activated_set(nf, EINA_TRUE);
 	main_unregister_cb(APP_STATE_RESUME, _resume_rotary_result_cb);
 	return W_HOME_ERROR_NONE;
+}
+
+void launch_apps_UI(Evas_Object *nf)
+	{
+		_D("");
+		Evas_Object *rotary_selector;
+		evas_object_hide(nf);
+		Evas_Object *new_win =  elm_win_add(nf,"rotary_selector",ELM_WIN_BASIC);
+		rotary_selector = eext_rotary_selector_add(new_win);
+		if(rotary_selector != NULL)
+			_D("rotary selector made ");
+		eext_rotary_object_event_activated_set(rotary_selector, EINA_TRUE);
+		_item_create(rotary_selector);
+		/* Add smart callback */
+		evas_object_smart_callback_add(rotary_selector, "item,selected", _item_selected_cb, NULL);
+		evas_object_smart_callback_add(rotary_selector, "item,clicked", _item_clicked_cb, NULL);
+		evas_object_show(new_win);
+		evas_object_show(rotary_selector);
+
+		if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BACK, _back_key_hide_new_win,new_win)) {
+						_APPS_E("Cannot register the key callback");
+					}
+		if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BACK,_back_key_hide_rotary,rotary_selector)) {
+					_APPS_E("Cannot register the key callback");
+				}
+		if(nf)
+		{
+			if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BACK, _back_key_show_clock,nf)) {
+				_APPS_E("Cannot register the key callback");
+			}
+		}
+		if (W_HOME_ERROR_NONE != main_register_cb(APP_STATE_RESUME, _resume_rotary_result_cb, rotary_selector)) {
+				_E("Cannot register the pause callback");
+			}
+
 	}
+
 key_cb_ret_e  _eext_rotary_selector_cb(void *data)
 {
 	page_info_s *page_info = NULL;
@@ -313,35 +349,8 @@ key_cb_ret_e  _eext_rotary_selector_cb(void *data)
 	//ret_if(!page_info);
 		Evas_Object *temp = scroller_get_focused_page(page_info->scroller);
 		if(temp == main_get_info()->clock_focus)
-		{
-			Evas_Object *rotary_selector;
-						evas_object_hide(nf);
-						Evas_Object *new_win =  elm_win_add(nf,"rotary_selector",ELM_WIN_BASIC);
-						rotary_selector = eext_rotary_selector_add(new_win);
-						if(rotary_selector != NULL)
-							_D("rotary selector made ");
-						eext_rotary_object_event_activated_set(rotary_selector, EINA_TRUE);
-						_item_create(rotary_selector);
-						/* Add smart callback */
-						evas_object_smart_callback_add(rotary_selector, "item,selected", _item_selected_cb, NULL);
-						evas_object_smart_callback_add(rotary_selector, "item,clicked", _item_clicked_cb, NULL);
-						evas_object_show(new_win);
-						evas_object_show(rotary_selector);
-				
-						if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BACK, _back_key_hide_new_win,new_win)) {
-										_APPS_E("Cannot register the key callback");
-									}
-						if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BACK,_back_key_hide_rotary,rotary_selector)) {
-									_APPS_E("Cannot register the key callback");
-								}
-						if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BACK, _back_key_show_clock,nf)) {
-							_APPS_E("Cannot register the key callback");
-						}
-						if (W_HOME_ERROR_NONE != main_register_cb(APP_STATE_RESUME, _resume_rotary_result_cb, rotary_selector)) {
-								_E("Cannot register the pause callback");
-							}
-
-
+		{			
+			launch_apps_UI(nf);
 		}
 		else
 		{

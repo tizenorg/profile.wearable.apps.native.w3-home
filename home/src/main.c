@@ -108,7 +108,7 @@ typedef struct {
 	void *result_data;
 } main_cb_s;
 
-
+extern void launch_apps_UI(Evas_Object *nf);
 
 static void _activate_window_job_cb(void *data);
 
@@ -365,7 +365,6 @@ static void _init_theme(void)
 	elm_theme_ref_set(main_info.theme, NULL);
 	//elm_theme_extension_add(main_info.theme, EDJEDIR"/index.edj");
 	elm_theme_extension_add(main_info.theme, EDJEDIR"/style.edj");
-	_D(" Anirudha : Path to theme .edj file: %s", EDJEDIR);
 }
 
 
@@ -1115,6 +1114,11 @@ static void _app_control(app_control_h service, void *data)
 			_D("First boot operation");
 			main_info.first_boot = 1;
 		}
+		else if (!strncmp(service_val, "launch_apps", strlen("launch_apps"))) {
+			_D("Launch Circular UI");
+			launch_apps_UI(NULL);
+		}
+
 
 		free(service_val);
 	} else {
