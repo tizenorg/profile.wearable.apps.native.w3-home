@@ -914,22 +914,26 @@ HAPI void edit_change_focus(Evas_Object *edit_scroller, Evas_Object *page_curren
 	ret_if(!page_info->item);
 	if(page_info->layout)
 		layout_info = evas_object_data_get(page_info->layout, DATA_KEY_LAYOUT_INFO);
-	if(layout_info && page_info->id)
+
+	if (layout_info)
 	{
-		if (strcmp(page_info->id, SHORTCUT_WIDGET_ID) == 0)	{
-			_D( " Showing edit button for page %s", page_info->id);
-			elm_object_signal_emit(layout_info->edit, "edit,show", "edit");
+		if(page_info->id)
+		{
+			if (strcmp(page_info->id, SHORTCUT_WIDGET_ID) == 0)	{
+				_D( " Showing edit button for page %s", page_info->id);
+				elm_object_signal_emit(layout_info->edit, "edit,show", "edit");
+			}
+			else {
+				_D( " Hiding edit button for page %s", page_info->id);
+				elm_object_signal_emit(layout_info->edit, "edit,hide", "edit");
+			}
+
 		}
-		else {
+		else
+		{
 			_D( " Hiding edit button for page %s", page_info->id);
 			elm_object_signal_emit(layout_info->edit, "edit,hide", "edit");
 		}
-
-	}
-	else
-	{
-		_D( " Hiding edit button for page %s", page_info->id);
-		elm_object_signal_emit(layout_info->edit, "edit,hide", "edit");
 	}
 
 	/* Blocker has to be disabled even if this is unfocusable */
@@ -2952,7 +2956,7 @@ static key_cb_ret_e _edit_back_key_cb(void *data)
 	return KEY_CB_RET_STOP;
 
 OUT:
-	if (!scroller_get_right_page(edit_info->scroller, proxy_page)) {
+	if (edit_info && !scroller_get_right_page(edit_info->scroller, proxy_page)) {
 		Evas_Object *real_page = NULL;
 		int i = 0;
 
@@ -2963,7 +2967,7 @@ OUT:
 		if (real_page) {
 			_D("The last real page is (%p)", real_page);
 			scroller_region_show_page(layout_info->scroller, real_page, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_INSTANT);
-			if (scroller_info->plus_page == real_page) {
+			if (scroller_info && scroller_info->plus_page == real_page) {
 				_D("The last page is the plus page");
 				page_info = evas_object_data_get(real_page, DATA_KEY_PAGE_INFO);
 				if (page_info) {

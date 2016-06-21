@@ -277,21 +277,24 @@ _item_create(Evas_Object *rotary_selector)
 					item = eext_rotary_selector_item_append(rotary_selector);
 					temp = (item_info_s *)eina_list_nth(pkgmgr_list,(i*ROTARY_SELECTOR_PAGE_ITEM_COUNT+j));
 					image = elm_image_add(rotary_selector);
-					elm_image_file_set(image, temp->icon, NULL);
+					if(temp)
+					{
+						elm_image_file_set(image, temp->icon, NULL);
 
-					/* Set the icon of the selector item. */
-					eext_rotary_selector_item_part_content_set(item,
-																			 "item,bg_image",
-																			 EEXT_ROTARY_SELECTOR_ITEM_STATE_NORMAL,
-																			 image);
+						/* Set the icon of the selector item. */
+						eext_rotary_selector_item_part_content_set(item,
+																				 "item,bg_image",
+																				 EEXT_ROTARY_SELECTOR_ITEM_STATE_NORMAL,
+																				 image);
 
-					/* Set the main/sub text visible when the item is selected. */
-					snprintf(buf, sizeof(buf), "%s",temp->name);
-					eext_rotary_selector_item_part_text_set(item, "selector,main_text", buf);
+						/* Set the main/sub text visible when the item is selected. */
+						snprintf(buf, sizeof(buf), "%s",temp->name);
+						eext_rotary_selector_item_part_text_set(item, "selector,main_text", buf);
 
-					snprintf(buf, sizeof(buf), "%s",temp->appid);
-					eext_rotary_selector_item_part_text_set(item, "selector,sub_text", buf);
-					count_apps++;
+						snprintf(buf, sizeof(buf), "%s",temp->appid);
+						eext_rotary_selector_item_part_text_set(item, "selector,sub_text", buf);
+						count_apps++;
+					}
 				}
 			}
 

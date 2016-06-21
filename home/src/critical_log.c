@@ -177,6 +177,7 @@ HAPI int critical_log_init(const char *name)
 {
 	int namelen;
 	char *filename;
+    char err_buf[256] = { 0, };
 
 	if (!name) {
 		ErrPrint("name is NULL");
@@ -184,7 +185,7 @@ HAPI int critical_log_init(const char *name)
 	}
 
 	if (mkdir(SLAVE_LOG_PATH, 0755) < 0) {
-		ErrPrint("mkdir(%s) returns: %s\n", SLAVE_LOG_PATH, strerror(errno));
+		ErrPrint("mkdir(%s) returns: %s\n", SLAVE_LOG_PATH, strerror_r(errno, err_buf, sizeof(err_buf)));
 	}
 
 	if (s_info.fp) {
@@ -228,6 +229,7 @@ HAPI int critical_log_init(const char *name)
 
 HAPI void critical_log_fini(void)
 {
+	char err_buf[256] = { 0, };
 	if (s_info.filename) {
 		DbgFree(s_info.filename);
 		s_info.filename = NULL;
@@ -235,7 +237,7 @@ HAPI void critical_log_fini(void)
 
 	if (s_info.fp) {
 		if (fclose(s_info.fp) != 0) {
-			ErrPrint("fclose: %s\n", strerror(errno));
+			ErrPrint("fclose: %s\n", strerror_r(errno, err_buf, sizeof(err_buf)));
 		}
 		s_info.fp = NULL;
 	}

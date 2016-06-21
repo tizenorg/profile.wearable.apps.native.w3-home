@@ -550,9 +550,13 @@ HAPI void apps_page_edit(Evas_Object *page)
 			continue_if(!item_info);
 
 			page_info_s *page_info = evas_object_data_get(page, DATA_KEY_PAGE_INFO);
-			Evas_Object *scroller = page_info->scroller;
-			continue_if(!scroller);
+			Evas_Object *scroller;
+			if(page_info)
+			{
+				scroller = page_info->scroller;
+			}
 
+			continue_if(!scroller);
 			Evas_Object *virtual_item = item_virtual_create(scroller);
 			evas_object_data_set(virtual_item, DATA_KEY_IS_VIRTUAL_ITEM, (void*)1);
 			apps_page_pack_item(page, virtual_item);

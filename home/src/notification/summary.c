@@ -291,7 +291,6 @@ HAPI Evas_Object *summary_create_page(Evas_Object *parent, const char *pkgname, 
 
 ERROR:
 	if (page) page_destroy(page);
-	if (item) summary_destroy_item(item);
 
 	return NULL;
 }
