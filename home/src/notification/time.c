@@ -145,6 +145,7 @@ static i18n_udate_format_h _get_time_formatter(void)
 
 	char a_best_pattern[BUF_FORMATTER] = {0, };
 	char *a_best_pattern_fixed = NULL;
+	char *saveptr1, *saveptr2;
 
 	int32_t u_best_pattern_capacity;
 	int32_t best_pattern_len;
@@ -170,8 +171,8 @@ static i18n_udate_format_h _get_time_formatter(void)
 	retv_if(!i18n_ustring_copy_au(a_best_pattern, u_best_pattern), NULL);
 	_D("best pattern [%s]", a_best_pattern);
 
-	a_best_pattern_fixed = strtok(a_best_pattern, "a");
-	a_best_pattern_fixed = strtok(a_best_pattern_fixed, " ");
+	a_best_pattern_fixed = strtok_r(a_best_pattern, "a", &saveptr1);
+	a_best_pattern_fixed = strtok_r(a_best_pattern_fixed, " ", &saveptr2);
 	_D("best pattern fixed [%s]", a_best_pattern_fixed);
 
 	if (a_best_pattern_fixed) {
@@ -219,6 +220,7 @@ static i18n_udate_format_h _get_time_formatter_24(void)
 
 	char a_best_pattern[BUF_FORMATTER] = {0.};
 	char *a_best_pattern_fixed = NULL;
+	char *saveptr1, *saveptr2;
 
 	int32_t u_best_pattern_capacity;
 	int32_t best_pattern_len;
@@ -244,8 +246,8 @@ static i18n_udate_format_h _get_time_formatter_24(void)
 	retv_if(!i18n_ustring_copy_au(a_best_pattern, u_best_pattern), NULL);
 	_D("best pattern [%s]", a_best_pattern);
 
-	a_best_pattern_fixed = strtok(a_best_pattern, "a");
-	a_best_pattern_fixed = strtok(a_best_pattern_fixed, " ");
+	a_best_pattern_fixed = strtok_r(a_best_pattern, "a", &saveptr1);
+	a_best_pattern_fixed = strtok_r(a_best_pattern_fixed, " ", &saveptr2);
 	_D("best pattern fixed [%s]", a_best_pattern_fixed);
 
 	if (a_best_pattern_fixed) {

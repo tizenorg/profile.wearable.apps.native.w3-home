@@ -305,6 +305,7 @@ HAPI Eina_List *apps_xml_write_list(const char *xml_file)
 	if(info) {
 		_APPS_E("A node(%s:%s) is not appended into the list", info->pkgid, info->appid);
 		apps_item_info_destroy(info);
+		info = NULL;
 	}
 	goto_if(ret, CRITICAL_ERROR);
 
@@ -312,7 +313,10 @@ HAPI Eina_List *apps_xml_write_list(const char *xml_file)
 	return list;
 
 CRITICAL_ERROR:
-	apps_item_info_destroy(info);
+	if(info) {
+		apps_item_info_destroy(info);
+	}
+
 	_destroy_list(list);
 	_destroy_reader(reader);
 	return NULL;

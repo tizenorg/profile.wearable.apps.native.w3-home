@@ -39,7 +39,6 @@ static int _append_variant(DBusMessageIter *iter, const char *sig, char *param[]
 	char *ch;
 	int i;
 	int int_type;
-	uint64_t int64_type;
 
 	if (!sig || !param)
 		return 0;
@@ -55,8 +54,8 @@ static int _append_variant(DBusMessageIter *iter, const char *sig, char *param[]
 				dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &int_type);
 				break;
 			case 't':
-				int64_type = atoi(param[i]);
-				dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64, &int64_type);
+				int_type = atoi(param[i]);
+				dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &int_type);
 				break;
 			case 's':
 				dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &param[i]);

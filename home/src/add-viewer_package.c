@@ -120,17 +120,20 @@ static int is_preloaded(const char *pkgid)
 
 static int load_name_and_icon(struct add_viewer_package *item)
 {
+	char err_buf[256] = { 0, };
 	item->name = widget_service_get_name(item->pkgname, NULL);
 	item->icon = widget_service_get_icon(item->pkgname, NULL);
 	if (item->icon && access(item->icon, R_OK) != 0) {
 		char *new_icon;
-		ErrPrint("%s - %s\n", item->icon, strerror(errno));
+		strerror_r(errno, err_buf, sizeof(err_buf));
+		ErrPrint("%s - %s\n", item->icon,err_buf );
 		new_icon = strdup(RESDIR"/image/unknown.png");
 		if (new_icon) {
 			free(item->icon);
 			item->icon = new_icon;
 		} else {
-			ErrPrint("Heap: %s\n", strerror(errno));
+			strerror_r(errno, err_buf, sizeof(err_buf));
+			ErrPrint("Heap: %s\n",err_buf );
 		}
 	}
 
@@ -176,7 +179,7 @@ static int load_name_and_icon(struct add_viewer_package *item)
 				icon = RESDIR"/image/unknown.png";
 			}
 
-			ret = add_viewer_package_list_set_icon(item, icon); 
+			ret = add_viewer_package_list_set_icon(item, icon);
 			if (ret != 0) {
 				pkgmgrinfo_appinfo_destroy_appinfo(ai);
 				return ret;
@@ -211,6 +214,7 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 	int ret;
 	int valid_size;
 	struct add_viewer_preview *preview;
+	char err_buf[256] = { 0, };
 	Eina_List *preview_list = NULL;
 
 	if (!widget_id || !appid) {
@@ -220,7 +224,7 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 
 
 	cnt = WIDGET_NR_OF_SIZE_LIST;
-	ret = widget_service_get_supported_size_types(widget_id, &cnt, &size_types); 
+	ret = widget_service_get_supported_size_types(widget_id, &cnt, &size_types);
 	if (ret != WIDGET_ERROR_NONE) {
 		ErrPrint("Size is not valid: %s\n", widget_id);
 		return 0;
@@ -259,8 +263,9 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 #endif
 			preview = calloc(1, sizeof(*preview));
 			if (!preview) {
-				char err_buf[256] = { 0, };		
-				ErrPrint("Heap: %s\n", strerror_r(errno, err_buf, sizeof(err_buf)));
+				char err_buf[256] = { 0, };
+				strerror_r(errno, err_buf, sizeof(err_buf));
+				ErrPrint("Heap: %s\n", err_buf);
 				EINA_LIST_FREE(preview_list, preview) {
 					free(preview);
 				}
@@ -298,7 +303,8 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 
 	item = calloc(1, sizeof(*item));
 	if (!item) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		strerror_r(errno, err_buf, sizeof(err_buf));
+		ErrPrint("Heap: %s\n", err_buf);
 		EINA_LIST_FREE(preview_list, preview) {
 			free(preview);
 		}
@@ -308,7 +314,8 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 
 	item->pkgname = strdup(widget_id);
 	if (!item->pkgname) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		strerror_r(errno,err_buf, sizeof(err_buf));
+		ErrPrint("Heap: %s\n", err_buf);
 		free(item);
 		EINA_LIST_FREE(preview_list, preview) {
 			free(preview);
@@ -319,7 +326,8 @@ static int widget_list_callback(const char *appid, const char *widget_id, int is
 
 	item->pkgid = strdup(appid);
 	if (!item->pkgid) {
-		ErrPrint("Heap: %s\n", strerror(errno));
+		strerror_r(errno, err_buf, sizeof(err_buf));
+		ErrPrint("Heap: %s\n",err_buf );
 		free(item->pkgname);
 		free(item);
 		EINA_LIST_FREE(preview_list, preview) {
@@ -788,11 +796,12 @@ HAPI int add_viewer_package_list_set_icon(struct add_viewer_package *package, co
 HAPI int add_viewer_package_list_set_appname(struct add_viewer_package *package, const char *appname)
 {
 	char *new_name;
-
+	char err_buf[256] = { 0, };
 	if (appname) {
 		new_name = strdup(appname);
 		if (!new_name) {
-			ErrPrint("Heap: %s\n", strerror(errno));
+			strerror_r(errno, err_buf, sizeof(err_buf));
+			ErrPrint("Heap: %s\n",err_buf );
 			return -ENOMEM;
 		}
 	} else {

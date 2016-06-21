@@ -793,7 +793,7 @@ HAPI apps_error_e apps_db_sync(void)
 				break;
 			}
 
-			if (APPS_ERROR_NONE != apps_db_insert_item(pkg_item->appid, pos)) {
+			if (pkg_item && APPS_ERROR_NONE != apps_db_insert_item(pkg_item->appid, pos)) {
 				_APPS_E("Cannot add a package.");
 				break;
 			}
@@ -801,7 +801,7 @@ HAPI apps_error_e apps_db_sync(void)
 			pkg_list->list = eina_list_next(pkg_list->list);
 			pkg_item = eina_list_data_get(pkg_list->list);
 		} else if (serial > 0) {
-			if (APPS_ERROR_NONE != apps_db_remove_item(db_item->appid)) {
+			if (db_item && APPS_ERROR_NONE != apps_db_remove_item(db_item->appid)) {
 				_APPS_E("Cannot remove a package.");
 				break;
 			}

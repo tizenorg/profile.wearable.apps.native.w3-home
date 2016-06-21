@@ -951,6 +951,7 @@ HAPI char *util_get_count_str_from_icu(int count)
 	char *ret_str = NULL;
 	char locale[LOCALE_LEN] = { 0, };
 	char res[LOCALE_LEN] = { 0, };
+	int slen;
 
 	UErrorCode status = U_ZERO_ERROR;
 	UNumberFormat *num_fmt;
@@ -962,7 +963,11 @@ HAPI char *util_get_count_str_from_icu(int count)
 	locale_tmp = vconf_get_str(VCONFKEY_REGIONFORMAT);
 	retv_if(!locale_tmp, NULL);
 
-	strcpy(locale, locale_tmp);
+	slen = strlen(locale_tmp);
+
+	if( slen > 0 && slen <= LOCALE_LEN)
+		strncpy(locale, locale_tmp, slen);
+
 	free(locale_tmp);
 
 	if(locale[0] != '\0') {
