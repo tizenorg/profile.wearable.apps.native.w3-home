@@ -334,7 +334,7 @@ static void _up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 
-
+/*
 static void _bezel_up_cb(void *data)
 {
 	Evas_Object *layout = data;
@@ -377,7 +377,7 @@ static void _bezel_up_cb(void *data)
 	apps_main_show_count_add();
 	apps_main_launch(APPS_LAUNCH_SHOW);
 }
-
+*/
 static void _bezel_down_cb(void *data)
 {
 	Evas_Object *layout = data;
@@ -392,7 +392,7 @@ static void _bezel_down_cb(void *data)
 
 	_D("aul_launch_app: %s(%d)", "org.tizen.windicator", pid);
 }
-
+/*
 static key_cb_ret_e _bezel_up_key_cb(void *data)
 {
 	Evas_Object *layout = data;
@@ -433,7 +433,7 @@ static key_cb_ret_e _bezel_up_key_cb(void *data)
 
 	return KEY_CB_RET_STOP;
 }
-
+*/
 
 
 HAPI void layout_add_mouse_cb(Evas_Object *layout)
@@ -769,19 +769,19 @@ HAPI Evas_Object *layout_create(Evas_Object *win)
 	if (W_HOME_ERROR_NONE != main_register_cb(APP_STATE_RESET, _reset_result_cb, layout)) {
 		_E("Cannot register the reset callback");
 	}
-
+/*
 	if (W_HOME_ERROR_NONE != gesture_register_cb(BEZEL_UP, _bezel_up_cb, layout)) {
 		_E("Cannot register the gesture callback");
 	}
-
+*/
 	if (W_HOME_ERROR_NONE != gesture_register_cb(BEZEL_DOWN, _bezel_down_cb, layout)) {
 		_E("Cannot register the gesture callback");
 	}
-
+/*
 	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_BEZEL_UP, _bezel_up_key_cb, layout)) {
 		_E("Cannot register the key callback");
 	}
-
+*/
 	layout_add_mouse_cb(layout);
 
 	checker = _create_checker(layout, MOVE_LEFT);
@@ -876,9 +876,9 @@ HAPI void layout_destroy(Evas_Object *win)
 	main_unregister_cb(APP_STATE_PAUSE, _pause_result_cb);
 	main_unregister_cb(APP_STATE_RESUME, _resume_result_cb);
 	main_unregister_cb(APP_STATE_RESET, _reset_result_cb);
-	gesture_unregister_cb(BEZEL_UP, _bezel_up_cb);
+/*	gesture_unregister_cb(BEZEL_UP, _bezel_up_cb);*/
 	gesture_unregister_cb(BEZEL_DOWN, _bezel_down_cb);
-	key_unregister_cb(KEY_TYPE_BEZEL_UP, _bezel_up_key_cb);
+/*	key_unregister_cb(KEY_TYPE_BEZEL_UP, _bezel_up_key_cb);*/
 
 	evas_object_data_del(layout, DATA_KEY_WIN);
 
