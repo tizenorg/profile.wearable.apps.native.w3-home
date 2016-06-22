@@ -1,4 +1,4 @@
-Name:	        org.tizen.w-home
+Name:	org.tizen.w-home
 Summary:	Home for the wearable devices
 Version:	0.1.0
 Release:	1
@@ -125,35 +125,6 @@ make_data_directory()
 	chown :$INHOUSE_ID $I
 }
 make_data_directory
-
-sqlite3 %{DATADIR}/.home.db 'PRAGMA journal_mode = PERSIST;
-	CREATE TABLE IF NOT EXISTS home (
-		id			TEXT,
-		subid		TEXT,
-		ordering	INTEGER
-	);
-'
-chmod 666 %{DATADIR}/.home.db*
-
-sqlite3 %{DATADIR}/.home_tts.db 'PRAGMA journal_mode = PERSIST;
-	CREATE TABLE IF NOT EXISTS home (
-		id			TEXT,
-		subid		TEXT,
-		ordering	INTEGER
-	);
-'
-chmod 666 %{DATADIR}/.home_tts.db*
-
-# apps
-sqlite3 %{DATADIR}/.apps.db 'PRAGMA journal_mode = PERSIST;
-	CREATE TABLE IF NOT EXISTS apps (
-		id			TEXT NOT NULL PRIMARY KEY,
-		ordering	INTEGER
-	);
-'
-chmod 666 %{DATADIR}/.apps.db*
-
-
 
 vconftool set -t int "memory/private/org.tizen.w-home/tutorial" 0 -i -g $INHOUSE_ID -f -s %{name}
 vconftool set -t int "db/private/org.tizen.w-home/enabled_tutorial" 0 -g $INHOUSE_ID -f -s %{name}
