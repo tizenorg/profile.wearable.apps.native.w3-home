@@ -956,15 +956,20 @@ group {
 			scale : 1;
 			repeat_events: 1;
 			description {
-			state: "default" 0.0;
-			rel1 { relative: 0.36 0.63; to: "bg"; }
-			rel2 { relative: 0.65 0.63; to: "bg"; }
-			text {
-				 text: "Add widget";
-				 font: "Sans";
-				 size: 20;
+				state: "default" 0.0;
+				rel1 { relative: 0.36 0.63; to: "bg"; }
+				rel2 { relative: 0.65 0.63; to: "bg"; }
+				text {
+					text: "Add widget";
+					font: "Sans";
+					size: 20;
 				}
-			visible: 1;
+				visible: 1;
+			}
+			description {
+				state: "max" 0.0;
+				inherit: "default" 0.0;
+				visible: 0;
 			}
 
 		}
@@ -1040,6 +1045,7 @@ group {
 			action: STATE_SET "max" 0.0;
 			target: "max_text";
 			target: "plus";
+			target: "plus_text";
 		}
 		program {
 			name: "show_plus";
@@ -1047,6 +1053,7 @@ group {
 			source: "plus_in_edit";
 			action: STATE_SET "default" 0.0;
 			target: "max_text";
+			target: "plus_text";
 			after: "show,edit";
 		}
 		program {
