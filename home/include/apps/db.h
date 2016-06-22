@@ -24,7 +24,7 @@
 
 typedef struct stmt stmt_h;
 
-apps_error_e apps_db_open(const char *db_file);
+apps_error_e apps_db_open();
 stmt_h *apps_db_prepare(const char *query);
 apps_error_e apps_db_bind_bool(stmt_h *handle, int idx, bool value);
 apps_error_e apps_db_bind_int(stmt_h *handle, int idx, int value);
