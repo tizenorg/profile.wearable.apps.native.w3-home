@@ -349,7 +349,7 @@ key_cb_ret_e  _eext_rotary_selector_cb(void *data)
 	Evas_Object *nf =(Evas_Object *)data ;
 	Evas_Object *page =(Evas_Object *)data ;
 	page_info = evas_object_data_get(page, DATA_KEY_PAGE_INFO);
-	//ret_if(!page_info);
+	retv_if(NULL == page_info,KEY_CB_RET_STOP);
 		Evas_Object *temp = scroller_get_focused_page(page_info->scroller);
 		if(temp == main_get_info()->clock_focus)
 		{			
