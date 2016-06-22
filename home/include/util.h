@@ -110,9 +110,6 @@
 
 
 /* Strings */
-#define APPID_W_HOME "org.tizen.w-home"
-#define APPID_APPS "org.tizen.apps-dbox"
-#define FILE_W_HOME_DB DATADIR"/.w_home.db"
 #define STR_SIGNAL_EMIT_SIGNAL_ROTATE "rotate"
 #define STR_SIGNAL_EMIT_SIGNAL_UNROTATE "unrotate"
 
