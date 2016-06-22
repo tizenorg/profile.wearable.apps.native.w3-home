@@ -27,15 +27,13 @@
 #include <dlog.h>
 #include <vconf.h>
 #include <app_preference.h>
+#include <app_common.h>
 #include <widget_viewer_evas.h> // WIDGET_VIEWER_EVAS_DEFAULT_PERIOD
 
 #include "util.h"
 #include "db.h"
 #include "log.h"
 #include "page_info.h"
-#define HOME_DB_FILE DATADIR"/.home.db"
-#define HOME_DB_TTS_FILE DATADIR"/.home_tts.db"
-
 
 #define retv_with_dbmsg_if(expr, val) do { \
 	if (expr) { \
@@ -51,38 +49,74 @@ static struct {
 	char *db_file;
 } db_info = {
 	.db = NULL,
-	.db_file = HOME_DB_FILE,
+	.db_file = NULL,
 };
 
 struct stmt {
 	sqlite3_stmt *stmt;
 };
 
-
+#define CREATE_HOME_TABLE " \
+		PRAGMA journal_mode = PERSIST; \
+		CREATE TABLE IF NOT EXISTS home ( \
+			id			TEXT,\
+			subid		TEXT,\
+			ordering	INTEGER);"
 
 HAPI w_home_error_e db_init(db_file_e db_file)
 {
-	retv_if(!db_file, W_HOME_ERROR_FAIL);
+    int r;
+    char *errmsg = NULL;
+    char *app_data_path = NULL;
+    char db_file_path[PATH_MAX] = { 0, };
 
-	db_close();
+    retv_if(!db_file, W_HOME_ERROR_FAIL);
+    db_close();
+
+    /* Getting app data path */
+    app_data_path = app_get_data_path();
+
+    if (app_data_path == NULL) {
+		_E("fail to get app data path");
+		return W_HOME_ERROR_FAIL;
+    }
 
 	switch (db_file) {
 	case DB_FILE_NORMAL:
-		db_info.db_file = HOME_DB_FILE;
+		snprintf(db_file_path, PATH_MAX, "%s.home.db", app_data_path);
 		break;
 	case DB_FILE_TTS:
-		db_info.db_file = HOME_DB_TTS_FILE;
+		snprintf(db_file_path, PATH_MAX, "%s.home_tts.db", app_data_path);
 		break;
 	default:
 		_E("Invalid db_file");
 	}
 
-	retv_if(W_HOME_ERROR_NONE !=
-			db_open(db_info.db_file), -1);
+	db_info.db_file = strdup(db_file_path);
 
-	return W_HOME_ERROR_NONE;
+	free(app_data_path);
+
+    if (db_info.db_file == NULL) {
+		_E("fail to get db_path");
+        return W_HOME_ERROR_INVALID_PARAMETER;
+    }
+    r = sqlite3_open_v2(db_info.db_file, &db_info.db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, NULL);
+    if (r) {
+        db_util_close(db_info.db);
+		_E("fail to open db %d", r);
+        return W_HOME_ERROR_DB_FAILED;
+    }
+
+    r = sqlite3_exec(db_info.db, CREATE_HOME_TABLE, NULL, NULL, &errmsg);
+
+    if (r != SQLITE_OK) {
+		_E("query error(%d)(%s)", r, errmsg);
+        sqlite3_free(errmsg);
+        db_util_close(db_info.db);
+        return W_HOME_ERROR_DB_FAILED;
+    }
+    return W_HOME_ERROR_NONE;
 }
-
 
 
 HAPI w_home_error_e db_open(const char *db_file)
@@ -349,9 +383,6 @@ HAPI w_home_error_e db_end_transaction(bool success)
 	return W_HOME_ERROR_NONE;
 }
 
-
-
-#define HOME_DB_FILE DATADIR"/.home.db"
 #define HOME_TABLE "home"
 #define QUERY_INSERT_ITEM "INSERT INTO "HOME_TABLE" "\
 		"(id, subid, ordering) "\
@@ -677,6 +708,7 @@ HAPI w_home_error_e db_read_list(Eina_List *page_info_list)
 {
 	const char *logging = NULL;
 	const Eina_List *l, *ln;
+	char *content_info = NULL;
 	Eina_Strbuf *strbuf = NULL;
 	page_info_s *page_info = NULL;
 	int ordering = 0;

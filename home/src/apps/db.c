@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <app_common.h>
 
 #include "log.h"
 #include "util.h"
@@ -50,16 +51,30 @@ struct stmt {
 
 
 
-HAPI apps_error_e apps_db_open(const char *db_file)
+HAPI apps_error_e apps_db_open()
 {
 	int ret;
+	char *app_data_path = NULL;
+	char db_file_path[PATH_MAX] = { 0, };
 
-	retv_if(NULL == db_file, APPS_ERROR_INVALID_PARAMETER);
 	if (db_info.db) {
 		return APPS_ERROR_NONE;
 	}
 
-	ret = db_util_open(db_file, &db_info.db, DB_UTIL_REGISTER_HOOK_METHOD);
+	/* Getting app data path */
+	app_data_path = app_get_data_path();
+
+	if (app_data_path == NULL) {
+		_E("fail to get app data path");
+		return W_HOME_ERROR_FAIL;
+	}
+
+	/* Getting full path of db file */
+	snprintf(db_file_path, PATH_MAX, "%s.apps.db", app_data_path);
+
+	free(app_data_path);
+
+	ret = db_util_open(db_file_path, &db_info.db, DB_UTIL_REGISTER_HOOK_METHOD);
 	if (ret != SQLITE_OK) _APPS_E("%s", sqlite3_errmsg(db_info.db));
 	retv_with_dbmsg_if(ret != SQLITE_OK, APPS_ERROR_FAIL);
 
@@ -306,7 +321,6 @@ HAPI apps_error_e apps_db_end_transaction(bool success)
 
 
 
-#define APPS_DB_FILE DATADIR"/.apps.db"
 #define APPS_TABLE "apps"
 #define QUERY_CREATE_TABLE "CREATE TABLE IF NOT EXISTS "APPS_TABLE" ("\
 	"id TEXT NOT NULL PRIMARY KEY, "\
@@ -323,7 +337,7 @@ HAPI apps_error_e apps_db_init(void)
 	char *query = NULL;
 
 	retv_if(APPS_ERROR_NONE !=
-			apps_db_open(APPS_DB_FILE), -1);
+			apps_db_open(), -1);
 
 	query = sqlite3_mprintf(QUERY_CREATE_TABLE);
 	retv_if(query == NULL, -1);
@@ -345,7 +359,7 @@ HAPI int apps_db_insert_item(const char *id, int ordering)
 	_APPS_D("Insert the item[%s:%d]", id, ordering);
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), -1);
+				apps_db_open(), -1);
 
 	query = sqlite3_mprintf(QUERY_INSERT_ITEM, id, ordering);
 	retv_if(query == NULL, -1);
@@ -374,7 +388,7 @@ HAPI int apps_db_update_item(const char *id, int ordering)
 	_APPS_D("Update the item[%s:%d]", id, ordering);
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), -1);
+				apps_db_open(), -1);
 
 	query = sqlite3_mprintf(QUERY_UPDATE_ITEM, ordering, id);
 	retv_if(query == NULL, -1);
@@ -404,7 +418,7 @@ HAPI int apps_db_remove_item(const char *id)
 	_APPS_D("Remove the item[%s]", id);
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), -1);
+				apps_db_open(), -1);
 
 	query = sqlite3_mprintf(QUERY_REMOVE_ITEM, id);
 	retv_if(query == NULL, -1);
@@ -433,7 +447,7 @@ HAPI int apps_db_count_item(const char *id)
 	retv_if(id == NULL, -1);
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), -1);
+				apps_db_open(), -1);
 
 	st = apps_db_prepare(QUERY_COUNT_ITEM);
 	retv_if(st == NULL, -1);
@@ -492,7 +506,7 @@ HAPI Eina_List *apps_db_write_list(void)
 	Eina_List *list = NULL;
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), NULL);
+				apps_db_open(), NULL);
 
 	st = apps_db_prepare(QUERY_SELECT_ORDERING_ITEM);
 	if (!st) {
@@ -527,7 +541,7 @@ static Eina_List *_db_write_list_direct(void)
 	Eina_List *list = NULL;
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), NULL);
+				apps_db_open(), NULL);
 
 	st = apps_db_prepare(QUERY_SELECT_ORDERING_ITEM);
 	if (!st) {
@@ -582,7 +596,7 @@ HAPI Eina_List *apps_db_write_list_by_name(void)
 	Eina_List *list = NULL;
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), NULL);
+				apps_db_open(), NULL);
 
 	st = apps_db_prepare(QUERY_SELECT_ITEM);
 	if (!st) {
@@ -619,7 +633,7 @@ HAPI Eina_List *_db_write_list_direct_by_name(void)
 	Eina_List *list = NULL;
 
 	retv_if(APPS_ERROR_NONE !=
-				apps_db_open(APPS_DB_FILE), NULL);
+				apps_db_open(), NULL);
 
 	st = apps_db_prepare(QUERY_SELECT_ITEM_ORDER_BY_ASC);
 	if (!st) {
@@ -660,7 +674,7 @@ HAPI int apps_db_count_item_in(void)
 	stmt_h *st = NULL;
 	int count = 0;
 
-	retv_if(APPS_ERROR_NONE != apps_db_open(APPS_DB_FILE), -1);
+	retv_if(APPS_ERROR_NONE != apps_db_open(), -1);
 	st = apps_db_prepare(QUERY_ITEM_COUNT_ITEM);
 	retv_if(!st, -1);
 
@@ -687,7 +701,7 @@ HAPI apps_error_e apps_db_find_empty_position(int *pos)
 		return APPS_ERROR_NONE;
 	}
 
-	retv_if(APPS_ERROR_NONE != apps_db_open(APPS_DB_FILE), APPS_ERROR_FAIL);
+	retv_if(APPS_ERROR_NONE != apps_db_open(), APPS_ERROR_FAIL);
 
 	st = apps_db_prepare(QUERY_ITEM_GET_MAX_POSITION);
 	retv_if(!st, APPS_ERROR_FAIL);
