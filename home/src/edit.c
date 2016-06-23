@@ -758,14 +758,16 @@ static void _edit_button_click_cb(void *data, Evas_Object *obj, const char *emis
 	_D("_edit_button_click_cb" );
 	Evas_Object *layout =data;
 	layout_info_s *layout_info = NULL;
-	Evas_Object* focus_page=NULL;
+	Evas_Object* focus_page = NULL;
 	page_info_s *page_info = NULL;
-	char* widget_id = NULL;
-	if(!layout)
-	{
+	char *widget_id = NULL;
+	char *content_info = NULL;
+
+	if(!layout)	{
 		_E("layout is null " );
 		return;
 	}
+
 	layout_info = evas_object_data_get(layout, DATA_KEY_LAYOUT_INFO);
 	if(!layout_info || !layout_info->scroller) {
 		_E("layout info is null " );
@@ -773,40 +775,40 @@ static void _edit_button_click_cb(void *data, Evas_Object *obj, const char *emis
 	}
 	
 	focus_page = scroller_get_focused_page(layout_info->scroller);
-	if(!focus_page)
-	{
+	if(!focus_page)	{
 		_E("focus page is null " );
 		return;
 	}
+
 	page_info = evas_object_data_get(focus_page , DATA_KEY_PAGE_INFO);
-	if(!page_info )
-	{
+	if(!page_info )	{
 		_E("focus page_info is null " );
 		return;
 	}
-	widget_id = widget_viewer_evas_get_widget_id(page_info->item);
 
-	_D("widget_id:%s",widget_id);
-	if(!widget_id)
-	{
+	widget_id = widget_viewer_evas_get_widget_id(page_info->item);
+	if(!widget_id) {
 		_E("widget id is null " );
 		return;
 	}
 
-	_D("launch normal");
+	content_info = widget_viewer_evas_get_content_info(page_info->item);
+
 	app_control_h service = NULL;
 
 	ret_if(APP_CONTROL_ERROR_NONE != app_control_create(&service));
 	ret_if(NULL == service);
 
 	app_control_set_operation(service, APP_CONTROL_OPERATION_MAIN);
-	app_control_add_extra_data(service, "instance_id",widget_id);
-	app_control_set_app_id(service,SHORTCUT_APP_ID);
-
+	app_control_add_extra_data(service, "instance_id", widget_id);
+	if (content_info) {
+		app_control_add_extra_data(service, "content_info", content_info);
+	}
+	app_control_set_app_id(service, SHORTCUT_APP_ID);
 
 	int ret = app_control_send_launch_request(service, NULL, NULL);
 	if (APP_CONTROL_ERROR_NONE != ret) {
-		LOGE("error");
+		_E("error");
 		app_control_destroy(service);
 		return;
 	}
