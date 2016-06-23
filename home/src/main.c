@@ -485,6 +485,8 @@ static int _dead_cb(int pid, void *data)
 	_D("PID(%d) is dead", pid);
 	/* Who manages the idle clock? home_item_idle_clock_app_dead_cb */
 
+	clock_try_to_launch(pid);
+
 	return 1;
 }
 

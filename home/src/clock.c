@@ -20,6 +20,7 @@
 #include <vconf.h>
 #include <pkgmgr-info.h>
 #include <pkgmgrinfo_type.h>
+#include <Pepper_Efl.h>
 
 #include "conf.h"
 #include "clock_service.h"
@@ -36,9 +37,11 @@
 static struct {
 	Evas_Object *cur_watch;
 	Evas_Object *clock_page;
+	int pid;
 } clock_info_s = {
 	.cur_watch = NULL,
 	.clock_page = NULL,
+	.pid = -1,
 };
 
 
@@ -161,6 +164,55 @@ static void _clock_view_exchange(Evas_Object *item)
 }
 
 
+static int _try_to_launch(const char *clock_pkgname)
+{
+	app_control_h watch_control = NULL;
+	int ret = 0;
+
+	if(!clock_pkgname)
+		clock_pkgname = "org.tizen.idle-clock-digital";
+
+	watch_manager_get_app_control(clock_pkgname, &watch_control);
+	ret = app_control_send_launch_request(watch_control, NULL, NULL);
+	app_control_destroy(watch_control);
+
+	retv_if(ret != APP_CONTROL_ERROR_NONE, -1);
+
+	_D("Succeed to launch : %s", clock_pkgname);
+
+	return ret;
+}
+
+static void _wms_clock_vconf_cb(keynode_t *node, void *data)
+{
+	char *clock_pkgname = NULL;
+	int ret = 0;
+
+	clock_pkgname = vconf_get_str(VCONFKEY_WMS_CLOCKS_SET_IDLE);
+	if(!clock_pkgname)
+		clock_pkgname = "org.tizen.idle-clock-digital";
+
+	_D("clock = (%s), is set", clock_pkgname);
+	ret = _try_to_launch(clock_pkgname);
+
+	if (ret < 0) {
+		_E("Fail to launch the watch");
+		return;
+	}
+}
+
+void clock_try_to_launch(int pid)
+{
+	if (pid != clock_info_s.pid) {
+		_D("Dead process is not faulted clock");
+		return;
+	}
+
+	_D("clock is dead. try to relaunch the clock");
+
+	_wms_clock_vconf_cb(NULL, NULL);
+}
+
 static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 {
 	_D("watch added");
@@ -194,6 +246,7 @@ static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 	}
 
 	clock_info_s.cur_watch = clock;
+	clock_info_s.pid = pepper_efl_object_pid_get(clock);
 }
 
 static void __watch_removed(void *data, Evas_Object *obj, void *event_info)
@@ -204,21 +257,7 @@ static void __watch_removed(void *data, Evas_Object *obj, void *event_info)
 		evas_object_del(clock);
 }
 
-static void _wms_clock_vconf_cb(keynode_t *node, void *data)
-{
-	char *clock_pkgname = NULL;
-	app_control_h watch_control;
 
-	clock_pkgname = vconf_get_str(VCONFKEY_WMS_CLOCKS_SET_IDLE);
-	if(!clock_pkgname)
-		clock_pkgname = "org.tizen.idle-clock-digital";
-
-	_D("clock = (%s), is set", clock_pkgname);
-
-	watch_manager_get_app_control(clock_pkgname, &watch_control);
-	app_control_send_launch_request(watch_control, NULL, NULL);
-	app_control_destroy(watch_control);
-}
 
 void clock_service_init(Evas_Object *win)
 {
@@ -246,23 +285,24 @@ void clock_service_init(Evas_Object *win)
 	watch_manager_init(win);
 	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_ADDED, __watch_added, scroller);
 	evas_object_smart_callback_add(win, WATCH_SMART_SIGNAL_REMOVED, __watch_removed, scroller);
-	watch_manager_get_app_control(pkg_name, &watch_control);
 
-	ret = app_control_send_launch_request(watch_control, NULL, NULL);
-	if (ret != APP_CONTROL_ERROR_NONE) {
-		_E("Failed to launch:%d", ret);
+	ret = _try_to_launch(pkg_name);
+	if (ret < 0) {
+		_E("Failed to launch:%s", pkg_name);
 		goto done;
 	}
-	app_control_destroy(watch_control);
 
 	return;
 
 done:
 	_D("Launching default clock");
 	pkg_name = "org.tizen.idle-clock-digital";
-	watch_manager_get_app_control(pkg_name, &watch_control);
-	app_control_send_launch_request(watch_control, NULL, NULL);
-	app_control_destroy(watch_control);
+
+	ret = _try_to_launch(pkg_name);
+	if (ret < 0) {
+		_E("Failed to launch:%s", pkg_name);
+		goto done;
+	}
 }
 
 

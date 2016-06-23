@@ -120,5 +120,6 @@
 
 extern void clock_service_init(Evas_Object *win);
 extern void clock_service_fini(void);
+extern void clock_try_to_launch(int pid);
 extern key_cb_ret_e _eext_rotary_selector_cb(void *data);
 #endif

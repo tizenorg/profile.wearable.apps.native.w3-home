@@ -45,6 +45,7 @@ BuildRequires: pkgconfig(capi-media-image-util)
 BuildRequires: pkgconfig(notification)
 BuildRequires: pkgconfig(rua)
 BuildRequires: pkgconfig(aul)
+BuildRequires: pkgconfig(libpepper-efl)
 
 %ifarch %{arm}
 %define ARCH arm

@@ -54,6 +54,7 @@ pkg_check_modules(PKGS REQUIRED
 	capi-media-image-util
 	notification
 	capi-message-port
+	libpepper-efl
 )
 
 IF(RUN_ON_DEVICE)
