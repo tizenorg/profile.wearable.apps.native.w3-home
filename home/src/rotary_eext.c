@@ -3,6 +3,9 @@
 #include <pkgmgr-info.h>
 #include <Eina.h>
 #include <app.h>
+#include <vconf.h>
+#include <vconf-keys.h>
+
 #include "conf.h"
 #include "clock_service.h"
 #include "layout.h"
@@ -20,6 +23,15 @@
 #include "key.h"
 #define ROTARY_SELECTOR_PAGE_COUNT 3
 #define ROTARY_SELECTOR_PAGE_ITEM_COUNT 11
+#define DELAY_TIME 0.5f
+
+#ifndef VCONFKEY_SETAPPL_AUTO_OPEN_APPS
+#define VCONFKEY_SETAPPL_AUTO_OPEN_APPS				"db/setting/auto_open_apps"
+#endif
+
+#define ROTARY_DATA_KEY_TIMER "r_timer"
+#define ROTARY_DATA_KEY_RUNNING "r_running"
+
 void apps_item_info_destroy_rotary(item_info_s *item_info)
 {
 	ret_if(!item_info);
@@ -207,14 +219,18 @@ static key_cb_ret_e _back_key_hide_rotary(void *data)
 		return KEY_CB_RET_CONTINUE;
 
 }
-static void
-_item_selected_cb(void *data, Evas_Object *obj, void *event_info)
+
+static Eina_Bool _selected_timer_cb(void *data)
 {
-	_D("selected");
-	Eext_Object_Item *item;
+	Eext_Object_Item *item = NULL;
+	Evas_Object *obj = NULL;
+	int is_auto_open_apps = 0;
 	const char *main_text;
 	const char *sub_text;
-	/* Get current seleted item object */
+
+	retv_if(!data, ECORE_CALLBACK_CANCEL);
+	obj = (Evas_Object *)data;
+
 	item = eext_rotary_selector_selected_item_get(obj);
 
 	/* Get set text for the item */
@@ -222,6 +238,54 @@ _item_selected_cb(void *data, Evas_Object *obj, void *event_info)
 	sub_text = eext_rotary_selector_item_part_text_get(item, "selector,sub_text");
 
 	printf("Item Selected! Currently Selected %s, %s\n", main_text, sub_text);
+
+	if (vconf_get_bool(VCONFKEY_SETAPPL_AUTO_OPEN_APPS, &is_auto_open_apps) < 0)
+		is_auto_open_apps = 0;
+
+	if (is_auto_open_apps) {
+		app_control_h app_control;
+		if (app_control_create(&app_control)== APP_CONTROL_ERROR_NONE)
+		{
+			if (app_control_set_app_id(app_control, sub_text) == APP_CONTROL_ERROR_NONE)
+			{
+				if(app_control_send_launch_request(app_control, NULL, NULL) == APP_CONTROL_ERROR_NONE)
+				{
+					_D("App launch request sent!");
+				}
+			}
+			if (app_control_destroy(app_control) == APP_CONTROL_ERROR_NONE)
+			{
+				_D("App control destroyed.");
+			}
+		}
+	}
+
+	evas_object_data_del(obj, ROTARY_DATA_KEY_TIMER);
+	evas_object_data_set(obj, ROTARY_DATA_KEY_RUNNING, (void *)0);
+	return ECORE_CALLBACK_CANCEL;
+}
+
+static void
+_item_selected_cb(void *data, Evas_Object *obj, void *event_info)
+{
+	_D("selected");
+	Ecore_Timer *timer = NULL;
+
+	timer = evas_object_data_get(obj, ROTARY_DATA_KEY_TIMER);
+
+	if (timer) {
+		int is_running = evas_object_data_get(obj, ROTARY_DATA_KEY_RUNNING);
+
+		if (!is_running) {
+			ecore_timer_del(timer);
+			timer = NULL;
+		}
+	}
+	else {
+		timer = ecore_timer_add(DELAY_TIME, _selected_timer_cb, obj);
+		evas_object_data_set(obj, ROTARY_DATA_KEY_TIMER, timer);
+		evas_object_data_set(obj, ROTARY_DATA_KEY_RUNNING, (void *)1);
+	}
 }
 
 static void

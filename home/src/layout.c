@@ -168,6 +168,7 @@ static Eina_Bool _longpress_timer_cb(void *data)
 	page_info = evas_object_data_get(layout_info->pressed_page, DATA_KEY_PAGE_INFO);
 	retv_if(!page_info, ECORE_CALLBACK_CANCEL);
 
+	widget_viewer_evas_cancel_click_event(layout_info->pressed_item);
 	if (!page_info->layout_longpress) {
 		_D("long-press is not supported on this page");
 		return ECORE_CALLBACK_CANCEL;
@@ -559,9 +560,7 @@ static Evas_Event_Flags _flick_start_cb(void *data, void *event_info)
 	retv_if(!ei, EVAS_EVENT_FLAG_NONE);
 
 	gesture_down_y = (int) evas_object_data_get(layout, PRIVATE_DATA_KEY_LAYOUT_G_DOWN_Y);
-
-	if (ei->momentum.y1 <= THRESHOLD_BEZEL_UP_H
-		&& ei->momentum.my >= THRESHOLD_MOMENTUM_FLICK_Y) {
+	if (ei->momentum.y1 <= THRESHOLD_BEZEL_UP_H) {
 		evas_object_data_set(layout, PRIVATE_DATA_KEY_READY_TO_BEZEL_DOWN, (void *) 1);
 	}
 
