@@ -3,7 +3,7 @@ Summary:	Home for the wearable devices
 Version:	0.1.0
 Release:	1
 Group:	        Applications/System
-License:	Flora
+License: 	Flora-1.1
 Source0:	%{name}-%{version}.tar.gz
 
 %if "%{?tizen_profile_name}"=="mobile"
