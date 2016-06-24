@@ -236,9 +236,6 @@ static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 			evas_object_del(clock);
 			return;
 		}
-		if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb, page)) {
-											_E("Cannot register the key callback");
-										}
 		if (scroller_push_page(scroller, page, SCROLLER_PUSH_TYPE_CENTER) != W_HOME_ERROR_NONE) {
 			_E("Fail to push the page into scroller");
 		}

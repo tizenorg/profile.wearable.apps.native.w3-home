@@ -494,9 +494,6 @@ static int _dead_cb(int pid, void *data)
 static void _resume_cb(void *data)
 {
 	_D("Resumed");
-	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb,main_get_info()->clock_focus)) {
-											_E("Cannot register the key callback");
-										}
 	if (main_info.state == APP_STATE_RESUME) {
 		_E("resumed already");
 		return;
@@ -523,8 +520,6 @@ static void _resume_cb(void *data)
 static void _pause_cb(void *data)
 {
 	_D("Paused");
-	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
-	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
 	if (main_info.state == APP_STATE_PAUSE) {
 		_E("paused already");
 		return;
@@ -1093,8 +1088,16 @@ static void _app_control(app_control_h service, void *data)
 
 		if (!strncmp(service_val, HOME_SERVICE_VALUE_POWERKEY, strlen(HOME_SERVICE_VALUE_POWERKEY))) {
 			//int tutorial_exist = tutorial_is_exist();
-
 			_D("Powerkey operation");
+			Evas_Object *focused_page = scroller_get_focused_page(scroller);
+			if (!apps_main_is_visible()) {
+				if (main_info.clock_focus == focused_page)
+					apps_main_launch(APPS_LAUNCH_SHOW);
+				else
+					scroller_bring_in_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
+			} else {
+				apps_main_launch(APPS_LAUNCH_HIDE);
+			}
 
 			key_cb_execute(KEY_TYPE_HOME);
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_EDIT, strlen(HOME_SERVICE_VALUE_EDIT))) {
@@ -1118,7 +1121,7 @@ static void _app_control(app_control_h service, void *data)
 		}
 		else if (!strncmp(service_val, "launch_apps", strlen("launch_apps"))) {
 			_D("Launch Circular UI");
-			launch_apps_UI(NULL);
+			//launch_apps_UI(NULL);
 		}
 
 

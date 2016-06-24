@@ -51,6 +51,8 @@
 #define DATA_KEY_REAL_PAGE "rp"
 #define DATA_KEY_SCROLLER "sc"
 #define DATA_KEY_SCROLLER_INFO "sc_i"
+#define DATA_KEY_ROTARY "rt"
+#define DATA_KEY_ROTARY_INFO "rt_i"
 #define DATA_KEY_WIN "win"
 
 
