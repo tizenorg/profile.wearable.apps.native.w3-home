@@ -15,11 +15,19 @@
  * limitations under the License.
  */
 
-#ifndef __W_HOME_FACTORY_H__
-#define __W_HOME_FACTORY_H__
+#ifndef __APPS_ROTARY_INFO_H__
+#define __APPS_ROTARY_INFO_H__
 
-extern void factory_init(void);
-extern void factory_fini(void);
-extern int factory_is_factory_binary(void);
+#include <Evas.h>
+#include "apps/apps_main.h"
 
-#endif /* __W_HOME_FACTORY_H__ */
+typedef struct {
+	Evas_Object *win;
+	instance_info_s *instance_info;
+
+	Evas_Object *layout;
+} rotary_info_s;
+
+#endif //__APPS_ROTARY_INFO_H__
+
+// End of a file

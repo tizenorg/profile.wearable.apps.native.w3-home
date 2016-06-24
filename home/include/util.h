@@ -1,6 +1,6 @@
 /*
- * Samsung API
- * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ * w-home
+ * Copyright (c) 2013 - 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@
 #define DATA_KEY_REAL_PAGE "rp"
 #define DATA_KEY_SCROLLER "sc"
 #define DATA_KEY_SCROLLER_INFO "sc_i"
+#define DATA_KEY_ROTARY "rt"
+#define DATA_KEY_ROTARY_INFO "rt_i"
 #define DATA_KEY_WIN "win"
 
 

@@ -15,11 +15,20 @@
  * limitations under the License.
  */
 
-#ifndef __W_HOME_FACTORY_H__
-#define __W_HOME_FACTORY_H__
+#ifndef __APPS_ROTARY_H__
+#define __APPS_ROTARY_H__
 
-extern void factory_init(void);
-extern void factory_fini(void);
-extern int factory_is_factory_binary(void);
+#include <Evas.h>
+#include "apps/apps_main.h"
 
-#endif /* __W_HOME_FACTORY_H__ */
+
+
+HAPI void apps_rotary_append_item(Evas_Object *rotary, item_info_s *item_info);
+HAPI void apps_rotary_destroy(Evas_Object *layout);
+HAPI Evas_Object *apps_rotary_create(Evas_Object *layout);
+
+
+
+#endif //__APPS_ROTARY_H__
+
+// End of a file
