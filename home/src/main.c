@@ -1,6 +1,6 @@
 /*
- * Samsung API
- * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ * w-home
+ * Copyright (c) 2013 - 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,6 @@
 #include "power_mode.h"
 #include "noti_broker.h"
 #include "wms.h"
-//#include "tutorial.h"
 #include "apps/apps_main.h"
 #include "critical_log.h"
 #include "db.h"
@@ -363,7 +362,7 @@ static void _init_theme(void)
 {
 	main_info.theme = elm_theme_new();
 	elm_theme_ref_set(main_info.theme, NULL);
-	//elm_theme_extension_add(main_info.theme, EDJEDIR"/index.edj");
+	/* elm_theme_extension_add(main_info.theme, EDJEDIR"/index.edj"); */
 	elm_theme_extension_add(main_info.theme, EDJEDIR"/style.edj");
 }
 
@@ -371,7 +370,7 @@ static void _init_theme(void)
 
 static void _destroy_theme(void)
 {
-	//elm_theme_extension_del(main_info.theme, EDJEDIR"/index.edj");
+	/* elm_theme_extension_del(main_info.theme, EDJEDIR"/index.edj"); */
 	elm_theme_extension_del(main_info.theme, EDJEDIR"/style.edj");
 	elm_theme_free(main_info.theme);
 	main_info.theme = NULL;
@@ -494,9 +493,6 @@ static int _dead_cb(int pid, void *data)
 static void _resume_cb(void *data)
 {
 	_D("Resumed");
-	if (W_HOME_ERROR_NONE != key_register_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb,main_get_info()->clock_focus)) {
-											_E("Cannot register the key callback");
-										}
 	if (main_info.state == APP_STATE_RESUME) {
 		_E("resumed already");
 		return;
@@ -523,8 +519,6 @@ static void _resume_cb(void *data)
 static void _pause_cb(void *data)
 {
 	_D("Paused");
-	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
-	key_unregister_cb(KEY_TYPE_ROTARY, _eext_rotary_selector_cb);
 	if (main_info.state == APP_STATE_PAUSE) {
 		_E("paused already");
 		return;
@@ -781,7 +775,7 @@ static void _change_apps_order_cb(keynode_t *node, void *data)
 		return;
 	}
 
-	// 0 : init, 1 : backup request, 2 : restore request, 3: write done
+	/* 0 : init, 1 : backup request, 2 : restore request, 3: write done */
 	if (vconf_get_int(VCONF_KEY_WMS_APPS_ORDER,  &value) < 0) {
 		_E("Failed to get VCONFKEY_WMS_APPS_ORDER");
 		return;
@@ -931,7 +925,7 @@ static bool _create_cb(void *data)
 	/* After creating a window */
 	_init_theme();
 
-	//clock_service_event_register();
+	/* clock_service_event_register(); */
 	/**
 	 * This function initialize the noti-broker.
 	 * But we already manage it from this file.
@@ -1092,9 +1086,16 @@ static void _app_control(app_control_h service, void *data)
 		Evas_Object *scroller = _scroller_get();
 
 		if (!strncmp(service_val, HOME_SERVICE_VALUE_POWERKEY, strlen(HOME_SERVICE_VALUE_POWERKEY))) {
-			//int tutorial_exist = tutorial_is_exist();
-
 			_D("Powerkey operation");
+			Evas_Object *focused_page = scroller_get_focused_page(scroller);
+			if (!apps_main_is_visible()) {
+				if (main_info.clock_focus == focused_page)
+					apps_main_launch(APPS_LAUNCH_SHOW);
+				else
+					scroller_bring_in_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
+			} else {
+				apps_main_launch(APPS_LAUNCH_HIDE);
+			}
 
 			key_cb_execute(KEY_TYPE_HOME);
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_EDIT, strlen(HOME_SERVICE_VALUE_EDIT))) {
@@ -1107,8 +1108,7 @@ static void _app_control(app_control_h service, void *data)
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_APPS_EDIT, strlen(HOME_SERVICE_VALUE_APPS_EDIT))) {
 			_D("Apps edit operation");
 			apps_main_launch(APPS_LAUNCH_EDIT);
-		//	is_window_on_top = 1;
-
+			/* is_window_on_top = 1; */
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_SHOW_NOTI, strlen(HOME_SERVICE_VALUE_SHOW_NOTI))) {
 			_D("Show noti operation");
 			ecore_timer_add(0.250f, _show_noti_timer_cb, scroller);
@@ -1118,7 +1118,7 @@ static void _app_control(app_control_h service, void *data)
 		}
 		else if (!strncmp(service_val, "launch_apps", strlen("launch_apps"))) {
 			_D("Launch Circular UI");
-			launch_apps_UI(NULL);
+			/* launch_apps_UI(NULL); */
 		}
 
 
@@ -1183,7 +1183,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Launch the clock */
-	//aul_launch_app(clock):
+	/* aul_launch_app(clock): */
 	ret = ui_app_main(argc, argv, &lifecycle_callback, &main_info);
 	CRITICAL_LOG_FINI();
 	return ret;
@@ -1191,4 +1191,4 @@ int main(int argc, char *argv[])
 
 
 
-// End of a file
+/* End of a file */

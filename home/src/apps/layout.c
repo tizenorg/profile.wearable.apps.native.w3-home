@@ -1,6 +1,6 @@
 /*
- * Samsung API
- * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ * w-home
+ * Copyright (c) 2013 - 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@
 #include "apps/apps_main.h"
 #include "apps/scroller.h"
 #include "apps/scroller_info.h"
+#include "apps/rotary.h"
+
 #include "apps/item.h"
 
 
@@ -75,7 +77,7 @@ static key_cb_ret_e _back_key_cb(void *data)
 
 	Eina_Bool bVisible = evas_object_visible_get(win);
 	_APPS_D("apps status:[%d]", bVisible);
-	if(bVisible) {
+	if (bVisible) {
 		if (APPS_ERROR_FAIL == apps_layout_show(win, EINA_FALSE)) {
 			_APPS_E("Cannot show tray");
 		}
@@ -249,7 +251,7 @@ static void _destroy_checker(Evas_Object *checker)
 
 static Eina_Bool _push_items_cb(void *layout)
 {
-	Evas_Object *scroller = NULL;
+	Evas_Object *rotary = NULL;
 	Eina_List *item_info_list = NULL;
 	instance_info_s *info = NULL;
 	int count = 0;
@@ -259,13 +261,13 @@ static Eina_Bool _push_items_cb(void *layout)
 	info = evas_object_data_get(layout, DATA_KEY_INSTANCE_INFO);
 	retv_if(!info, ECORE_CALLBACK_CANCEL);
 
-	/* scroller */
-	scroller = apps_scroller_create(layout);
-	retv_if(!scroller, ECORE_CALLBACK_CANCEL);
-	evas_object_data_set(layout, DATA_KEY_SCROLLER, scroller);
-	evas_object_show(scroller);
+	/* rotary */
+	rotary = apps_rotary_create(layout);
+	retv_if(!rotary, ECORE_CALLBACK_CANCEL);
+	evas_object_data_set(layout, DATA_KEY_ROTARY, rotary);
+	evas_object_show(rotary);
 
-	elm_object_part_content_set(layout, "scroller", scroller);
+	elm_object_part_content_set(layout, "scroller", rotary);
 
 	if (apps_main_get_info()->first_boot) {
 		item_info_list = apps_item_info_list_create(ITEM_INFO_LIST_TYPE_XML);
@@ -379,7 +381,7 @@ HAPI Evas_Object *apps_layout_create(Evas_Object *win, const char *file, const c
 HAPI void apps_layout_destroy(Evas_Object *layout)
 {
 	Ecore_Idler *idle_timer = NULL;
-	Evas_Object *scroller = NULL;
+	Evas_Object *rotary = NULL;
 	Eina_List *list = NULL;
 	instance_info_s *info = NULL;
 
@@ -390,9 +392,9 @@ HAPI void apps_layout_destroy(Evas_Object *layout)
 		ecore_idler_del(idle_timer);
 	}
 
-	scroller = evas_object_data_del(layout, DATA_KEY_SCROLLER);
-	if (scroller) {
-		apps_scroller_destroy(layout);
+	rotary = evas_object_data_del(layout, DATA_KEY_ROTARY);
+	if (rotary) {
+		apps_rotary_destroy(layout);
 	}
 
 	list = evas_object_data_del(layout, DATA_KEY_LIST);
@@ -437,11 +439,10 @@ static Eina_Bool _show_anim_cb(void *data)
 	Evas_Object *layout = evas_object_data_get(win, DATA_KEY_LAYOUT);
 	retv_if(NULL == layout, ECORE_CALLBACK_CANCEL);
 
+	/*
 	Evas_Object *scroller = evas_object_data_get(layout, DATA_KEY_SCROLLER);
 	retv_if(NULL == scroller, ECORE_CALLBACK_CANCEL);
-
-	scroller_info_s *scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
-	retv_if(NULL == scroller_info, ECORE_CALLBACK_CANCEL);
+	*/
 
 	if (main_get_info()->is_tts
 		&& !layout_info->tutorial) {
@@ -453,7 +454,7 @@ static Eina_Bool _show_anim_cb(void *data)
 		}
 	}
 
-	elm_object_signal_emit(scroller, "show", "");
+	/* elm_object_signal_emit(scroller, "show", ""); */
 
 	return ECORE_CALLBACK_CANCEL;
 }
@@ -490,9 +491,11 @@ HAPI apps_error_e apps_layout_show(Evas_Object *win, Eina_Bool show)
 		evas_object_hide(win);
 		key_unregister_cb(KEY_TYPE_BACK, _back_key_cb);
 
-		Evas_Object *scroller = evas_object_data_get(layout, DATA_KEY_SCROLLER);
+/*
+		Evas_Object *scroller = evas_object_data_get(layout, DATA_KEY_ROTARY);
 		retv_if(NULL == scroller, APPS_ERROR_FAIL);
 		apps_scroller_region_show(scroller, 0, 0);
+*/
 	}
 
 	return APPS_ERROR_NONE;

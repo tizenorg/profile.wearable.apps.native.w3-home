@@ -1,6 +1,6 @@
 /*
- * Samsung API
- * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ * w-home
+ * Copyright (c) 2013 - 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Flora License, Version 1.1 (the License);
  * you may not use this file except in compliance with the License.
@@ -393,14 +393,16 @@ static void _bezel_down_cb(void *data)
 
 	_D("aul_launch_app: %s(%d)", "org.tizen.windicator", pid);
 }
-/*
-static key_cb_ret_e _bezel_up_key_cb(void *data)
+
+
+
+static key_cb_ret_e _power_key_cb(void *data)
 {
 	Evas_Object *layout = data;
 	Evas_Object *scroller = NULL;
 	Evas_Object *focused_page = NULL;
 
-	_D("Bezel up");
+	_D("Power key pressed");
 
 	retv_if(!layout, KEY_CB_RET_CONTINUE);
 
@@ -434,7 +436,7 @@ static key_cb_ret_e _bezel_up_key_cb(void *data)
 
 	return KEY_CB_RET_STOP;
 }
-*/
+
 
 
 HAPI void layout_add_mouse_cb(Evas_Object *layout)
@@ -781,6 +783,7 @@ HAPI Evas_Object *layout_create(Evas_Object *win)
 		_E("Cannot register the key callback");
 	}
 */
+
 	layout_add_mouse_cb(layout);
 
 	checker = _create_checker(layout, MOVE_LEFT);
