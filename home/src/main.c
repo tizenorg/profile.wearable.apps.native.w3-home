@@ -1088,15 +1088,16 @@ static void _app_control(app_control_h service, void *data)
 		if (!strncmp(service_val, HOME_SERVICE_VALUE_POWERKEY, strlen(HOME_SERVICE_VALUE_POWERKEY))) {
 			_D("Powerkey operation");
 			Evas_Object *focused_page = scroller_get_focused_page(scroller);
-			if (!apps_main_is_visible()) {
-				if (main_info.clock_focus == focused_page)
-					apps_main_launch(APPS_LAUNCH_SHOW);
-				else
-					scroller_bring_in_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
-			} else {
-				apps_main_launch(APPS_LAUNCH_HIDE);
-			}
 
+			if (main_info.clock_focus == focused_page) {
+				if (!apps_main_is_visible()) {
+					apps_main_launch(APPS_LAUNCH_SHOW);
+				} else {
+					apps_main_launch(APPS_LAUNCH_HIDE);
+				}
+			}
+			else
+				scroller_bring_in_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
 			key_cb_execute(KEY_TYPE_HOME);
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_EDIT, strlen(HOME_SERVICE_VALUE_EDIT))) {
 			_D("Edit operation");
