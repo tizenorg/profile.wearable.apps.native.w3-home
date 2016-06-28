@@ -957,12 +957,12 @@ group {
 			repeat_events: 1;
 			description {
 				state: "default" 0.0;
-				rel1 { relative: 0.36 0.63; to: "bg"; }
-				rel2 { relative: 0.65 0.63; to: "bg"; }
+				rel1 { relative: 0.25 0.70; to: "bg"; }
+				rel2 { relative: 0.75 0.70; to: "bg"; }
 				text {
 					text: "Add widget";
-					font: "Sans";
-					size: 20;
+					font: "Tizen:style=Regular";
+					size: 18;
 				}
 				visible: 1;
 			}
