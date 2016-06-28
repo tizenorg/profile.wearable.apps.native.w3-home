@@ -3,7 +3,7 @@ Summary:	Home for the wearable devices
 Version:	0.1.0
 Release:	1
 Group:	        Applications/System
-License:	Flora
+License:	Flora-1.1
 Source0:	%{name}-%{version}.tar.gz
 
 %if "%{?tizen_profile_name}"=="mobile"
@@ -23,7 +23,6 @@ BuildRequires: pkgconfig(capi-system-device)
 BuildRequires: pkgconfig(db-util)
 BuildRequires: pkgconfig(deviced)
 BuildRequires: pkgconfig(dlog)
-#BuildRequires: pkgconfig(ecore-x)
 BuildRequires: pkgconfig(efl-assist)
 BuildRequires: pkgconfig(efl-extension)
 BuildRequires: pkgconfig(elementary)
@@ -34,8 +33,6 @@ BuildRequires: pkgconfig(widget_viewer_evas)
 BuildRequires: pkgconfig(watch-control)
 BuildRequires: pkgconfig(pkgmgr)
 BuildRequires: pkgconfig(pkgmgr-info)
-BuildRequires: pkgconfig(syspopup-caller)
-#BuildRequires: pkgconfig(utilX)
 BuildRequires: pkgconfig(syspopup-caller)
 BuildRequires: pkgconfig(appsvc)
 BuildRequires: pkgconfig(capi-base-utils-i18n)
@@ -113,7 +110,6 @@ mkdir -p %{buildroot}/opt/usr/share/w-launcher
 %define tizen_dist_sign 1
 
 %post
-/usr/bin/signing-client/hash-signer-client.sh -a -d -p platform /usr/apps/%{name}
 
 INHOUSE_ID="5000"
 make_data_directory()
@@ -144,14 +140,11 @@ vconftool set -t int "memory/private/org.tizen.w-home/sensitive_move" 1 -i -g $I
 /usr/share/license/%{name}
 /usr/share/packages/%{name}.xml
 /usr/share/icons/default/small/%{name}*.png
-/etc/opt/upgrade/*.sh
 %{PREFIX}/*.xml
 %{PREFIX}/bin/*
 %{PREFIX}/shared/*
 %{PREFIX}/res/*.xml
 %{PREFIX}/res/*.list
-%{PREFIX}/res/*.sh
 %{PREFIX}/res/edje/*
 %{PREFIX}/res/images/*
 %{PREFIX}/res/locale/*/*/*.mo
-/opt/etc/dump.d/module.d/dump_w-home.sh
