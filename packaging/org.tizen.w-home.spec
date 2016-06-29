@@ -144,14 +144,11 @@ vconftool set -t int "memory/private/org.tizen.w-home/sensitive_move" 1 -i -g $I
 /usr/share/license/%{name}
 /usr/share/packages/%{name}.xml
 /usr/share/icons/default/small/%{name}*.png
-/etc/opt/upgrade/*.sh
 %{PREFIX}/*.xml
 %{PREFIX}/bin/*
 %{PREFIX}/shared/*
 %{PREFIX}/res/*.xml
 %{PREFIX}/res/*.list
-%{PREFIX}/res/*.sh
 %{PREFIX}/res/edje/*
 %{PREFIX}/res/images/*
 %{PREFIX}/res/locale/*/*/*.mo
-/opt/etc/dump.d/module.d/dump_w-home.sh
