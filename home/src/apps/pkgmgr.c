@@ -426,26 +426,26 @@ static apps_error_e _error(const char *package, const char *val, void *data)
 
 
 
-static void _install_app(Evas_Object *scroller, const char *appid)
+static void _install_app(Evas_Object *rotary, const char *appid)
 {
 	Evas_Object *item = NULL;
 	item_info_s *item_info = NULL;
 
-	ret_if(!scroller);
+	ret_if(!rotary);
 	ret_if(!appid);
 
 	item_info = apps_item_info_create(appid);
 	ret_if(!item_info);
 
 	_APPS_SD("appid[%s], name[%s]", item_info->appid, item_info->name);
-	item = item_create(scroller, item_info);
+/*	item = item_create(rotary, item_info);
 	if (!item) {
 		_APPS_E("Cannot create an item");
 		apps_item_info_destroy(item_info);
 		return;
 	}
-
-	apps_scroller_append_item(scroller, item);
+*/
+	apps_rotary_append_item(rotary, item_info);
 }
 
 
@@ -495,21 +495,20 @@ static void _uninstall_app(Evas_Object *scroller, const char *appid)
 
 
 
-static void _update_app(Evas_Object *scroller, const char *appid)
+static void _update_app(Evas_Object *rotary, const char *appid)
 {
-	_uninstall_app(scroller, appid);
-	_install_app(scroller, appid);
+	_uninstall_app(rotary, appid);
+	_install_app(rotary, appid);
 }
 
 
 
 static void _manage_package(void (*_func)(Evas_Object *, const char *), const char *appid)
 {
-	Evas_Object *scroller = NULL;
+	Evas_Object *rotary = NULL;
 	Eina_List *list = NULL;
 	const Eina_List *l, *ln;
 	instance_info_s *info = NULL;
-	scroller_info_s *scroller_info = NULL;
 
 	ret_if(!_func);
 	ret_if(!appid);
@@ -521,13 +520,14 @@ static void _manage_package(void (*_func)(Evas_Object *, const char *), const ch
 		continue_if(!info);
 		continue_if(!info->layout);
 
-		scroller = evas_object_data_get(info->layout, DATA_KEY_SCROLLER);
-		continue_if(!scroller);
+		rotary = evas_object_data_get(info->layout, DATA_KEY_ROTARY);
+		continue_if(!rotary);
 
-		_func(scroller, appid);
+		_func(rotary, appid);
 	}
 
-	ret_if(!scroller);
+	ret_if(!rotary);
+	/*
 	apps_scroller_write_list(scroller);
 
 	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
@@ -541,6 +541,7 @@ static void _manage_package(void (*_func)(Evas_Object *, const char *), const ch
 	evas_object_data_set(scroller_info->layout, DATA_KEY_LIST, layout_list);
 
 	apps_db_read_list(scroller_info->list);
+	*/
 }
 
 
