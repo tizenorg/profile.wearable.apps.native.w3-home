@@ -110,8 +110,8 @@ static inline void append_padding(Evas_Object *box, int padding)
 		return;
 	}
 
-	evas_object_resize(pad, 1, padding);
-	evas_object_size_hint_min_set(pad, ELM_SCALE_SIZE(1), ELM_SCALE_SIZE(padding));
+	evas_object_resize(pad, padding, 1);
+	evas_object_size_hint_min_set(pad, ELM_SCALE_SIZE(padding), ELM_SCALE_SIZE(1));
 	evas_object_show(pad);
 	elm_box_pack_end(box, pad);
 }
@@ -266,8 +266,7 @@ cancel:
 	} else {
 		eina_list_free(l);
 		/* TODO: "No content" hide */
-
-		append_padding(container, ADD_VIEWER_PREVIEW_PAD_V);
+		append_padding(container, 46);
 	}
 
 	return ECORE_CALLBACK_CANCEL;
@@ -303,7 +302,7 @@ static int reload_list_cb(struct add_viewer_package *package, void *data)
 		(void)evas_object_data_del(container, "list");
 	}
 
-	append_padding(container, 0);
+	append_padding(container, 46);
 
 	while (normal_loader_cb(widget_data, container) == ECORE_CALLBACK_RENEW);
 	children = elm_box_children_get(container);
@@ -739,6 +738,7 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 	}
 
 	//elm_object_part_text_set(widget_data->bg, "text", _("IDS_HS_OPT_ADD"));
+	evas_object_show(widget_data->bg);
 
 	widget_data->scroller = elm_scroller_add(widget_data->parent);
 	if (!widget_data->scroller) {
@@ -759,27 +759,22 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 
 	elm_box_horizontal_set(box, EINA_TRUE);
 	elm_box_homogeneous_set(box, EINA_FALSE);
+	elm_box_align_set(box, 0.0, 0.0);
 	evas_object_size_hint_fill_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	elm_box_padding_set(box, 80, ADD_VIEWER_PREVIEW_PAD_ITEM_V);
-	elm_box_align_set(box, 0.0, 0.0);
 	evas_object_show(box);
 
-	elm_scroller_page_scroll_limit_set(widget_data->scroller, 1, 1);
+	elm_scroller_bounce_set(widget_data->scroller, EINA_FALSE, EINA_FALSE);
 	elm_scroller_policy_set(widget_data->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+	elm_scroller_page_scroll_limit_set(widget_data->scroller, 1, 1);
 	elm_scroller_content_min_limit(widget_data->scroller, EINA_FALSE, EINA_TRUE);
-	elm_scroller_propagate_events_set(widget_data->scroller, EINA_TRUE);
-	elm_scroller_bounce_set(widget_data->scroller, EINA_FALSE, EINA_TRUE);
-	elm_scroller_bounce_set(widget_data->scroller, EINA_FALSE, EINA_FALSE);;
-	elm_object_style_set(widget_data->scroller, "effect");
-	elm_scroller_page_size_set(widget_data->scroller, 324, ADD_VIEWER_PAGE_HEIGHT);
-
-	elm_object_content_set(widget_data->scroller, box);
-
+	elm_scroller_single_direction_set(widget_data->scroller, ELM_SCROLLER_SINGLE_DIRECTION_HARD);
+	elm_scroller_page_size_set(widget_data->scroller, ELM_SCALE_SIZE(ADD_VIEWER_PAGE_WIDTH), ELM_SCALE_SIZE(ADD_VIEWER_PAGE_HEIGHT));
 	evas_object_smart_callback_add(widget_data->scroller, "scroll", _widget_scroll_cb, widget_data);
 
+	elm_object_style_set(widget_data->scroller, "effect");
 	evas_object_show(widget_data->scroller);
-	evas_object_show(widget_data->bg);
+	elm_object_content_set(widget_data->scroller, box);
 
 	evas_object_smart_member_add(widget_data->bg, widget_data->add_viewer);
 	evas_object_clip_set(widget_data->bg, widget_data->stage);
@@ -1025,7 +1020,7 @@ static void _operator_name_slide_mode_set(Evas_Object *name)
 
 	evas_object_textblock_size_native_get(tb, &tb_w, NULL);
 
-	if((tb_w>0) && (tb_w>ELM_SCALE_SIZE(ADD_VIEWER_TEXT_WIDTH))) {
+	if((tb_w > 0) && (tb_w > ADD_VIEWER_TEXT_WIDTH)) {
 		elm_label_slide_mode_set(name, ELM_LABEL_SLIDE_MODE_AUTO);
 	}
 	elm_label_slide_go(name);
@@ -1215,7 +1210,7 @@ static Evas_Object *winset_preview_add(struct widget_data *widget_data, Evas_Obj
 	}
 	elm_object_text_set(label, buf);
 	elm_object_style_set(label, "slide_short");
-	elm_label_wrap_width_set(label, ELM_SCALE_SIZE(ADD_VIEWER_TEXT_WIDTH));
+	elm_label_wrap_width_set(label, ADD_VIEWER_TEXT_WIDTH);
 	evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
