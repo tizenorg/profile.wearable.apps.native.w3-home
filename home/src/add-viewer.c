@@ -768,7 +768,7 @@ static int widget_data_setup(struct widget_data *widget_data, Evas_Object *paren
 	elm_scroller_page_scroll_limit_set(widget_data->scroller, 1, 1);
 	elm_scroller_content_min_limit(widget_data->scroller, EINA_FALSE, EINA_TRUE);
 	elm_scroller_single_direction_set(widget_data->scroller, ELM_SCROLLER_SINGLE_DIRECTION_HARD);
-	elm_scroller_page_size_set(widget_data->scroller, ELM_SCALE_SIZE(ADD_VIEWER_PAGE_WIDTH), ELM_SCALE_SIZE(ADD_VIEWER_PAGE_HEIGHT));
+	elm_scroller_page_size_set(widget_data->scroller, ADD_VIEWER_PAGE_WIDTH, ADD_VIEWER_PAGE_HEIGHT);
 	evas_object_smart_callback_add(widget_data->scroller, "scroll", _widget_scroll_cb, widget_data);
 
 	elm_object_style_set(widget_data->scroller, "effect");
