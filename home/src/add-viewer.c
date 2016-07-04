@@ -319,13 +319,12 @@ static int reload_list_cb(struct add_viewer_package *package, void *data)
 		}
 	}
 
-/* l = add_viewer_package_list_handle();
+	l = add_viewer_package_list_handle();
 	if (l) {
 		elm_object_part_text_set(widget_data->bg, "empty", "");
-		while (normal_loader_cb(widget_data, container) == ECORE_CALLBACK_RENEW);
 	} else {
 		elm_object_part_text_set(widget_data->bg, "empty", _("IDS_ST_BODY_EMPTY"));
-	} */
+	}
 
 	/* To set the first focus */
 	evas_object_smart_callback_call(widget_data->scroller, "scroll", NULL);
