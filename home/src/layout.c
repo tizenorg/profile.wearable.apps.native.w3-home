@@ -585,15 +585,6 @@ static Evas_Event_Flags _flick_move_cb(void *data, void *event_info)
 	int distance_x = abs( ei->momentum.x1 - ei->momentum.x2);
 	int distance_y = abs(vector_y);
 
-#if 1 //DEBUG
-	_D("gesture_down_y:%d", gesture_down_y);
-	_D("ei->momentum.my:%d", ei->momentum.my);
-	_D("is_flickup_done:%d", is_flickup_done);
-	_D("vector_y:%d", vector_y);
-	_D("distance_x:%d", distance_x);
-	_D("distance_y:%d", distance_y);
-#endif
-
 	if (vector_y < 0 &&
 		(ei->momentum.my <= -THRESHOLD_MOMENTUM_FLICK_Y || distance_y >= THRESHOLD_BEZEL_UP_MOVE_D_H) &&
 		distance_x < distance_y) {

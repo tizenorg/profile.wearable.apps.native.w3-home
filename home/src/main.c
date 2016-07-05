@@ -355,7 +355,7 @@ static void _tts_cb(void *data, Evas_Object *obj, void *event_info)
 	}
 
 	/* UX requirement: activate home window when TTS option is changed */
-	ecore_job_add(_activate_window_job_cb, NULL);
+	/* ecore_job_add(_activate_window_job_cb, NULL); */
 }
 
 static void _init_theme(void)
