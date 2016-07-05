@@ -1145,6 +1145,7 @@ static void _language_changed(app_event_info_h event_info, void *user_data)
 
 int main(int argc, char *argv[])
 {
+	char buf[256];
 	int ret;
 	ui_app_lifecycle_callback_s lifecycle_callback = {0, };
 	app_event_handler_h event_handlers[5] = {NULL, };
@@ -1166,19 +1167,19 @@ int main(int argc, char *argv[])
 	ui_app_add_event_handler(&event_handlers[APP_EVENT_REGION_FORMAT_CHANGED], APP_EVENT_REGION_FORMAT_CHANGED, NULL, NULL);
 
 	if (setenv("ELM_ENGINE", "gl", 1) < 0) {
-		_E("setenv(ELM_ENGINE) is failed: %s", strerror(errno));
+		_E("setenv(ELM_ENGINE) is failed: %s", strerror_r(errno, buf, sizeof(buf)));
 	}
 
 	if (setenv("COREGL_FASTPATH", "1", 1) < 0) {
-		_E("setenv(COREGL_FASTPATH) is failed: %s", strerror(errno));
+		_E("setenv(COREGL_FASTPATH) is failed: %s", strerror_r(errno, buf, sizeof(buf)));
 	}
 
 	if (setenv("BUFMGR_LOCK_TYPE", "always", 0) < 0) {
-		_E("setenv(BUFMGR_LOCK_TYPE) is failed: %s", strerror(errno));
+		_E("setenv(BUFMGR_LOCK_TYPE) is failed: %s", strerror_r(errno, buf, sizeof(buf)));
 	}
 
 	if (setenv("BUFMGR_MAP_CACHE", "true", 0) < 0) {
-		_E("setenv(BUFMGR_MAP_CACHE) is failed: %s", strerror(errno));
+		_E("setenv(BUFMGR_MAP_CACHE) is failed: %s", strerror_r(errno, buf, sizeof(buf)));
 	}
 
 	/* Launch the clock */
