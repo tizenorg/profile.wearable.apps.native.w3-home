@@ -281,39 +281,6 @@ static void _clicked_noti_cb(void *data, Evas_Object *obj, void *event_info)
 }
 
 
-
-static void _clicked_center_cb(void *data, Evas_Object *obj, void *event_info)
-{
-	Evas_Object *proxy_page = data;
-	Evas_Object *effect_page = NULL;
-	Evas_Object *page = NULL;
-	Evas_Object *scroller = NULL;
-	Evas_Object *layout = NULL;
-
-	layout_info_s *layout_info = NULL;
-	page_info_s *page_info = NULL;
-
-	page_info = evas_object_data_get(proxy_page, DATA_KEY_PAGE_INFO);
-	ret_if(!page_info);
-
-	if (evas_object_data_get(page_info->scroller, PRIVATE_DATA_KEY_EDIT_IS_LONGPRESSED)) return;
-
-	layout = page_info->layout;
-	layout_info = evas_object_data_get(layout, DATA_KEY_LAYOUT_INFO);
-	ret_if(!layout_info);
-
-	scroller = layout_info->scroller;
-
-	effect_page = edit_create_enlarge_effect_page(proxy_page);
-	if (effect_page) edit_enlarge_effect_page(effect_page);
-
-	page = evas_object_data_get(proxy_page, DATA_KEY_REAL_PAGE);
-	ret_if(!page);
-	scroller_region_show_center_of(scroller, page, SCROLLER_FREEZE_OFF, NULL, NULL, NULL, NULL);
-}
-
-
-
 static void _clicked_widget_cb(void *data, Evas_Object *obj, void *event_info)
 {
 	Evas_Object *proxy_page = data;
@@ -1141,7 +1108,6 @@ ERROR:
 }
 
 
-
 static Evas_Object *add_widget_in_edit(Evas_Object *layout, const char *id, const char *subid)
 {
 	Evas_Object *proxy_page = NULL;
@@ -1208,7 +1174,7 @@ static Evas_Object *add_widget_in_edit(Evas_Object *layout, const char *id, cons
 
 	elm_object_signal_emit(proxy_page_info->page_inner, "select", "cover_clipper");
 
-	scroller_push_page_before(edit_info->scroller, proxy_page, edit_info->plus_page);
+	scroller_push_page_before_edit(layout_info->scroller, edit_info->scroller, proxy_page, edit_info->plus_page);
 	edit_arrange_plus_page(layout_info->edit);
 
 	evas_object_smart_callback_add(proxy_page_info->focus, "clicked", _clicked_widget_cb, proxy_page);
@@ -2209,90 +2175,14 @@ ERROR:
 }
 
 
-
-static Evas_Object *_create_center_page(Evas_Object *edit, page_direction_e page_direction)
-{
-	Evas_Object *center_page = NULL;
-	layout_info_s *layout_info = NULL;
-	edit_info_s *edit_info = NULL;
-	scroller_info_s *scroller_info = NULL;
-	scroller_info_s *edit_scroller_info = NULL;
-	page_info_s *center_page_info = NULL;
-
-	retv_if(!edit, NULL);
-
-	edit_info = evas_object_data_get(edit, DATA_KEY_EDIT_INFO);
-	retv_if(!edit_info, NULL);
-
-	layout_info = evas_object_data_get(edit_info->layout, DATA_KEY_LAYOUT_INFO);
-	retv_if(!layout_info, NULL);
-
-	scroller_info = evas_object_data_get(layout_info->scroller, DATA_KEY_SCROLLER_INFO);
-	retv_if(!scroller_info, NULL);
-
-	edit_scroller_info = evas_object_data_get(edit_info->scroller, DATA_KEY_SCROLLER_INFO);
-	retv_if(!edit_scroller_info, NULL);
-
-	/* Create the center page */
-	center_page = edit_create_proxy_page(edit_info->scroller, scroller_info->center, PAGE_CHANGEABLE_BG_ON);
-	if (!center_page) {
-		_E("Cannot create a page");
-		return NULL;
-	}
-	evas_object_data_set(center_page, PRIVATE_DATA_KEY_EDIT_UNFOCUSABLE, (void *) 1);
-
-	center_page_info = evas_object_data_get(center_page, DATA_KEY_PAGE_INFO);
-	if (!center_page_info) {
-		_E("Cannot get the page_info");
-		edit_destroy_proxy_page(center_page);
-		return NULL;
-	}
-	elm_access_info_cb_set(center_page_info->focus, ELM_ACCESS_CONTEXT_INFO, _access_tab_to_move_cb, center_page);
-
-	if (page_direction == PAGE_DIRECTION_LEFT) {
-		evas_object_smart_callback_add(center_page_info->focus, "clicked", _clicked_center_cb, center_page);
-	} else {
-		evas_object_smart_callback_add(center_page_info->focus, "clicked", _clicked_noti_cb, center_page);
-	}
-	elm_object_signal_emit(center_page_info->page_inner, "disable", "cover");
-	elm_object_signal_emit(center_page_info->page_inner, "select", "cover_clipper");
-	elm_object_signal_emit(center_page_info->page_inner, "enable", "blocker");
-
-	edit_info->center_page = center_page;
-
-	return center_page;
-}
-
-
-
-static void _destroy_center_page(Evas_Object *edit)
-{
-	edit_info_s *edit_info = NULL;
-
-	ret_if(!edit);
-
-	edit_info = evas_object_data_get(edit, DATA_KEY_EDIT_INFO);
-	ret_if(!edit_info);
-	ret_if(!edit_info->center_page);
-
-	evas_object_data_del(edit_info->center_page, PRIVATE_DATA_KEY_EDIT_UNFOCUSABLE);
-
-	edit_destroy_proxy_page(edit_info->center_page);
-	edit_info->center_page = NULL;
-}
-
-
-
 static w_home_error_e _scroller_push_right_page(Evas_Object *edit, Evas_Object *scroller)
 {
 	Evas_Object *page = NULL;
-	Evas_Object *center_page = NULL;
 	Evas_Object *plus_page = NULL;
 	Eina_List *list = NULL;
 	scroller_info_s *scroller_info = NULL;
 	edit_info_s *edit_info = NULL;
 	page_info_s *page_info = NULL;
-	int count = 0;
 
 	retv_if(!edit, W_HOME_ERROR_INVALID_PARAMETER);
 	retv_if(!scroller, W_HOME_ERROR_INVALID_PARAMETER);
@@ -2305,11 +2195,6 @@ static w_home_error_e _scroller_push_right_page(Evas_Object *edit, Evas_Object *
 
 	list = elm_box_children_get(scroller_info->box);
 	retv_if(!list, W_HOME_ERROR_FAIL);
-
-	center_page = _create_center_page(edit, PAGE_DIRECTION_RIGHT);
-	if (center_page) {
-		scroller_push_page(edit_info->scroller, center_page, SCROLLER_PUSH_TYPE_CENTER);
-	}
 
 	EINA_LIST_FREE(list, page) {
 		Evas_Object *proxy_page = NULL;
@@ -2352,7 +2237,6 @@ static w_home_error_e _scroller_push_right_page(Evas_Object *edit, Evas_Object *
 		evas_object_smart_callback_add(proxy_page_info->remove_focus, "clicked", _del_widget_cb, proxy_page);
 
 		scroller_push_page(edit_info->scroller, proxy_page, SCROLLER_PUSH_TYPE_LAST);
-		count++;
 	}
 
 	/* Plus page */
@@ -2383,9 +2267,6 @@ static void _scroller_pop_right_page(Evas_Object *edit)
 
 	scroller_info = evas_object_data_get(edit_info->scroller, DATA_KEY_SCROLLER_INFO);
 	ret_if(!scroller_info);
-
-	scroller_pop_page(edit_info->scroller, edit_info->center_page);
-	_destroy_center_page(edit);
 
 	if (edit_info->plus_page) {
 		evas_object_data_del(edit_info->plus_page, DATA_KEY_REAL_PAGE);
@@ -2491,7 +2372,6 @@ static void _edit_scroll_cb(void *data, Evas_Object *obj, void *event_info)
 static w_home_error_e _scroller_push_left_page(Evas_Object *edit, Evas_Object *scroller)
 {
 	Evas_Object *page = NULL;
-	Evas_Object *center_page = NULL;
 	Eina_List *list = NULL;
 	scroller_info_s *scroller_info = NULL;
 	edit_info_s *edit_info = NULL;
@@ -2508,11 +2388,6 @@ static w_home_error_e _scroller_push_left_page(Evas_Object *edit, Evas_Object *s
 
 	list = elm_box_children_get(scroller_info->box);
 	retv_if(!list, W_HOME_ERROR_FAIL);
-
-	center_page = _create_center_page(edit, PAGE_DIRECTION_LEFT);
-	if (center_page) {
-		scroller_push_page(edit_info->scroller, center_page, SCROLLER_PUSH_TYPE_CENTER);
-	}
 
 	EINA_LIST_FREE(list, page) {
 		Evas_Object *proxy_page = NULL;
@@ -2567,9 +2442,6 @@ static void _scroller_pop_left_page(Evas_Object *edit)
 
 	edit_info = evas_object_data_get(edit, DATA_KEY_EDIT_INFO);
 	ret_if(!edit_info);
-
-	scroller_pop_page(edit_info->scroller, edit_info->center_page);
-	_destroy_center_page(edit);
 
 	edit_scroller_info = evas_object_data_get(edit_info->scroller, DATA_KEY_SCROLLER_INFO);
 	ret_if(!edit_scroller_info);
@@ -3826,6 +3698,7 @@ HAPI void edit_arrange_plus_page(Evas_Object *edit)
 	ret_if(!page_info);
 
 	count = scroller_count_direction(edit_info->scroller, PAGE_DIRECTION_RIGHT);
+
 	if (count > MAX_WIDGET) {
 		_D("Diable the plus page, count:%d", count);
 

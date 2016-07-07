@@ -850,6 +850,62 @@ HAPI Evas_Object *scroller_create(Evas_Object *layout, Evas_Object *parent, int 
 }
 
 
+HAPI w_home_error_e scroller_push_page_before_edit(Evas_Object *real_scroller, Evas_Object *scroller, Evas_Object *page, Evas_Object *before)
+{
+	Evas_Object *tmp = NULL;
+	Eina_List *list = NULL;
+	const Eina_List *l, *ln;
+	scroller_info_s *scroller_info = NULL;
+	scroller_info_s *real_scroller_info = NULL;
+	page_info_s *page_info = NULL;
+	Evas_Object *real_page = NULL;
+	int center_check = 0;
+
+	real_page = evas_object_data_get(page, DATA_KEY_REAL_PAGE);
+
+	retv_if(!real_scroller, W_HOME_ERROR_FAIL);
+	retv_if(!scroller, W_HOME_ERROR_FAIL);
+	retv_if(!page, W_HOME_ERROR_FAIL);
+	retv_if(!real_page, W_HOME_ERROR_FAIL);
+
+	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
+	retv_if(!scroller_info, W_HOME_ERROR_FAIL);
+
+	real_scroller_info = evas_object_data_get(real_scroller, DATA_KEY_SCROLLER_INFO);
+	retv_if(!real_scroller_info, W_HOME_ERROR_FAIL);
+
+	page_info = evas_object_data_get(page, DATA_KEY_PAGE_INFO);
+	retv_if(!page_info, W_HOME_ERROR_FAIL);
+
+	_elm_box_unpack(scroller, page);
+	if (before) _elm_box_pack_before(scroller, page, before);
+	else _elm_box_pack_end(scroller, page);
+
+	list = elm_box_children_get(real_scroller_info->box);
+
+	EINA_LIST_FOREACH_SAFE(list, l, ln, tmp) {
+		continue_if(!tmp);
+
+		if (real_scroller_info->center == tmp) center_check = 1;
+		if (real_page == tmp) {
+			if (center_check) page_info->direction = PAGE_DIRECTION_RIGHT;
+			else page_info->direction = PAGE_DIRECTION_LEFT;
+			break;
+		}
+	}
+	eina_list_free(list);
+
+	if (scroller_info->index[PAGE_DIRECTION_LEFT]) {
+		index_update(scroller_info->index[PAGE_DIRECTION_LEFT], scroller, INDEX_BRING_IN_NONE);
+	}
+
+	if (scroller_info->index[PAGE_DIRECTION_RIGHT]) {
+		index_update(scroller_info->index[PAGE_DIRECTION_RIGHT], scroller, INDEX_BRING_IN_NONE);
+	}
+
+	return W_HOME_ERROR_NONE;
+}
+
 
 HAPI w_home_error_e scroller_push_page_before(Evas_Object *scroller, Evas_Object *page, Evas_Object *before)
 {
