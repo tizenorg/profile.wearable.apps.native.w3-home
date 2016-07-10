@@ -110,17 +110,7 @@ collections {
 					align: 0.5 0.5;
 				}
 			}
-			part {
-				name: "event";
-				type: RECT;
-				scale: 1;
-				description {
-					state: "default" 0.0;
-					rel1.to: "item";
-					rel2.to: "item";
-					color: 0 0 0 0;
-				}
-			}
+
 			part {
 				name: "hidden_region";
 				type: SPACER;
