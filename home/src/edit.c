@@ -2590,9 +2590,9 @@ HAPI Evas_Object *_create_right_layout(Evas_Object *layout)
 	edit_scroller_info = evas_object_data_get(edit_scroller, DATA_KEY_SCROLLER_INFO);
 	if (!edit_scroller_info) {
 		_E("Cannot create scroller");
-		scroller_destroy(layout);
-		free(layout_info);
-		evas_object_del(layout);
+		scroller_destroy(edit);
+		free(edit_info);
+		evas_object_del(edit);
 		return NULL;
 	}
 	edit_info->scroller = edit_scroller;
@@ -2988,6 +2988,27 @@ static w_home_error_e _lang_changed_cb(void *data)
 
 
 
+static w_home_error_e _resume_result_cb(void *data)
+{
+	Evas_Object *scroller = data;
+	scroller_info_s *scroller_info = NULL;
+
+	retv_if(!scroller, W_HOME_ERROR_INVALID_PARAMETER);
+
+	_D("Activate the rotary events for Home");
+	_D("Activate scroller is %p", scroller);
+
+	scroller_info = evas_object_data_get(scroller, DATA_KEY_SCROLLER_INFO);
+	retv_if(!scroller_info, W_HOME_ERROR_FAIL);
+	retv_if(!scroller_info->box, W_HOME_ERROR_FAIL);
+
+	eext_rotary_object_event_activated_set(scroller, EINA_TRUE);
+
+	return W_HOME_ERROR_NONE;
+}
+
+
+
 HAPI Evas_Object *edit_create_layout(Evas_Object *layout, edit_mode_e edit_mode)
 {
 	Evas_Object *edit = NULL;
@@ -3087,6 +3108,11 @@ HAPI void edit_destroy_layout(void *layout)
 	}
 
 	layout_info->edit = NULL;
+
+	eext_rotary_object_event_activated_set(layout_info->scroller, EINA_TRUE);
+	if (W_HOME_ERROR_NONE != main_register_cb(APP_STATE_RESUME, _resume_result_cb, layout_info->scroller)) {
+		_E("Cannot register the pause callback");
+	}
 
 	scroller_info = evas_object_data_get(layout_info->scroller, DATA_KEY_SCROLLER_INFO);
 	ret_if(!scroller_info);
