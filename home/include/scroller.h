@@ -68,6 +68,7 @@ extern w_home_error_e scroller_push_page_before(Evas_Object *scroller
 extern w_home_error_e scroller_push_page_after(Evas_Object *scroller
 		, Evas_Object *page
 		, Evas_Object *after);
+extern w_home_error_e scroller_push_page_before_edit(Evas_Object *real_scroller, Evas_Object *scroller, Evas_Object *page, Evas_Object *before);
 
 extern int scroller_count(Evas_Object *scroller);
 extern int scroller_count_direction(Evas_Object *scroller, page_direction_e direction);
