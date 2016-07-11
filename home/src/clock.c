@@ -38,10 +38,12 @@ static struct {
 	Evas_Object *cur_watch;
 	Evas_Object *clock_page;
 	int pid;
+	int launched;
 } clock_info_s = {
 	.cur_watch = NULL,
 	.clock_page = NULL,
 	.pid = -1,
+	.launched = 0,
 };
 
 
@@ -167,20 +169,28 @@ static void _clock_view_exchange(Evas_Object *item)
 static int _try_to_launch(const char *clock_pkgname)
 {
 	app_control_h watch_control = NULL;
-	int ret = 0;
 
-	if(!clock_pkgname)
-		clock_pkgname = "org.tizen.idle-clock-digital";
+	int clock_app_pid = 0;
+	bundle *b;
+
+	if(!clock_pkgname) {
+		clock_pkgname = "org.tizen.classic-watch";
+	}
+
+	clock_info_s.launched = 0;
 
 	watch_manager_get_app_control(clock_pkgname, &watch_control);
-	ret = app_control_send_launch_request(watch_control, NULL, NULL);
+	app_control_to_bundle(watch_control, &b);
+	clock_app_pid = appsvc_run_service(b, 0, NULL, NULL); /* Get pid of launched watch-app */
+	_D("appsvc_run_service returns [%d]", clock_app_pid);
+	clock_info_s.pid = clock_app_pid;
 	app_control_destroy(watch_control);
 
-	retv_if(ret != APP_CONTROL_ERROR_NONE, -1);
+	retv_if(clock_app_pid == -4, -1);
 
 	_D("Succeed to launch : %s", clock_pkgname);
 
-	return ret;
+	return 0;
 }
 
 static void _wms_clock_vconf_cb(keynode_t *node, void *data)
@@ -190,7 +200,7 @@ static void _wms_clock_vconf_cb(keynode_t *node, void *data)
 
 	clock_pkgname = vconf_get_str(VCONFKEY_WMS_CLOCKS_SET_IDLE);
 	if(!clock_pkgname)
-		clock_pkgname = "org.tizen.idle-clock-digital";
+		clock_pkgname = "org.tizen.classic-watch";
 
 	_D("clock = (%s), is set", clock_pkgname);
 	ret = _try_to_launch(clock_pkgname);
@@ -203,14 +213,22 @@ static void _wms_clock_vconf_cb(keynode_t *node, void *data)
 
 void clock_try_to_launch(int pid)
 {
+	_D("pid[%d] clock_info_s.pid[%d[", pid, clock_info_s.pid);
 	if (pid != clock_info_s.pid) {
 		_D("Dead process is not faulted clock");
 		return;
 	}
 
-	_D("clock is dead. try to relaunch the clock");
+	clock_info_s.pid = -1;
 
-	_wms_clock_vconf_cb(NULL, NULL);
+	if (clock_info_s.launched == 0) {
+		_D("clock could not be launched. Use default clock");
+		_try_to_launch("org.tizen.classic-watch");
+	} else {
+		clock_info_s.launched = 0;
+		_D("clock is dead. try to relaunch the clock");
+		_wms_clock_vconf_cb(NULL, NULL);
+	}
 }
 
 static void __watch_added(void *data, Evas_Object *obj, void *event_info)
@@ -226,8 +244,7 @@ static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 	}
 
 	if (clock_info_s.cur_watch) {
-			watch_manager_send_terminate(clock_info_s.cur_watch);
-
+		watch_manager_send_terminate(clock_info_s.cur_watch);
 		_clock_view_exchange(clock);
 	} else {
 		page = _clock_view_add(scroller, clock);
@@ -244,6 +261,7 @@ static void __watch_added(void *data, Evas_Object *obj, void *event_info)
 
 	clock_info_s.cur_watch = clock;
 	clock_info_s.pid = pepper_efl_object_pid_get(clock);
+	clock_info_s.launched = 1;
 }
 
 static void __watch_removed(void *data, Evas_Object *obj, void *event_info)
@@ -274,7 +292,7 @@ void clock_service_init(Evas_Object *win)
 	if(!pkg_name)
 	{
 		_D("Failed to get vconf string, launching default clock");
-		pkg_name = "org.tizen.idle-clock-digital";
+		pkg_name = "org.tizen.classic-watch";
 	}
 
 	_D("clock = (%s), is set", pkg_name);
@@ -293,7 +311,7 @@ void clock_service_init(Evas_Object *win)
 
 done:
 	_D("Launching default clock");
-	pkg_name = "org.tizen.idle-clock-digital";
+	pkg_name = "org.tizen.classic-watch";
 
 	ret = _try_to_launch(pkg_name);
 	if (ret < 0) {
