@@ -652,7 +652,6 @@ int util_create_toast_popup(Evas_Object *parent, const char* text)
 
 	elm_object_style_set(popup, POPUP_STYLE_TOAST);
 	elm_popup_orient_set(popup, ELM_POPUP_ORIENT_BOTTOM);
-	elm_popup_align_set(popup, ELM_NOTIFY_ALIGN_FILL, ELM_NOTIFY_ALIGN_FILL);
 	evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
 	elm_object_part_text_set(popup, "elm.text", text);
