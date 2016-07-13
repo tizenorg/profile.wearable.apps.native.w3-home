@@ -240,15 +240,6 @@ static apps_error_e _init_app_win(instance_info_s *info, const char *name, const
 	evas_event_callback_add(info->e, EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, info);
 	evas_event_callback_add(info->e, EVAS_CALLBACK_CANVAS_FOCUS_OUT, _window_focus_out_cb, info);
 
-	/*
-
-	Evas_Object *rect = evas_object_rectangle_add(info->e);
-	evas_object_resize(rect, 200, 200);
-	evas_object_move(rect, 200, 200);
-	evas_object_color_set(rect, 100, 0, 0, 255);
-	evas_object_show(rect);
-	*/
-
 	return APPS_ERROR_NONE;
 }
 
@@ -339,10 +330,6 @@ static void _execute_cbs(instance_info_s *info, int state)
 HAPI void apps_main_init()
 {
 	_APPS_D("APPS INIT");
-	apps_main_info.theme = elm_theme_new();
-	elm_theme_ref_set(apps_main_info.theme, NULL);
-	elm_theme_extension_add(apps_main_info.theme, THEME_EDJE);
-
 
 	/* Data set */
 	instance_info_s *info = NULL;
@@ -350,9 +337,13 @@ HAPI void apps_main_init()
 		info = calloc(1, sizeof(instance_info_s));
 		ret_if(NULL == info);
 	} else {
-		_APPS_E("");
+		_APPS_D("apps already created");
 		return;
 	}
+
+	apps_main_info.theme = elm_theme_new();
+	elm_theme_ref_set(apps_main_info.theme, NULL);
+	elm_theme_extension_add(apps_main_info.theme, THEME_EDJE);
 
 	info->state = APPS_APP_STATE_CREATE;
 
