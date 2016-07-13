@@ -1077,8 +1077,6 @@ static void _app_control(app_control_h service, void *data)
 	/* powerkey bundle */
 	char *service_val = NULL;
 
-	apps_main_init();
-
 	app_control_get_extra_data(service, HOME_SERVICE_KEY, &service_val);
 	_D("Service value : %s", service_val);
 
@@ -1087,6 +1085,8 @@ static void _app_control(app_control_h service, void *data)
 
 		if (!strncmp(service_val, HOME_SERVICE_VALUE_POWERKEY, strlen(HOME_SERVICE_VALUE_POWERKEY))) {
 			_D("Powerkey operation");
+			apps_main_init();
+
 			Evas_Object *focused_page = scroller_get_focused_page(scroller);
 
 			if (main_info.clock_focus == focused_page) {

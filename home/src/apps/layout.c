@@ -426,35 +426,16 @@ HAPI void apps_layout_destroy(Evas_Object *layout)
 
 static Eina_Bool _show_anim_cb(void *data)
 {
-	Evas_Object *win = data;
-
 	retv_if(NULL == data, ECORE_CALLBACK_CANCEL);
 
-	elm_win_activate(win);
-	evas_object_show(win);
-
-	layout_info_s *layout_info = evas_object_data_get(main_get_info()->layout, DATA_KEY_LAYOUT_INFO);
-	retv_if(NULL == layout_info, ECORE_CALLBACK_CANCEL);
-
+	Evas_Object *win = data;
 	Evas_Object *layout = evas_object_data_get(win, DATA_KEY_LAYOUT);
+
 	retv_if(NULL == layout, ECORE_CALLBACK_CANCEL);
 
-	/*
-	Evas_Object *scroller = evas_object_data_get(layout, DATA_KEY_SCROLLER);
-	retv_if(NULL == scroller, ECORE_CALLBACK_CANCEL);
-	*/
-
-	if (main_get_info()->is_tts
-		&& !layout_info->tutorial) {
-
-		//box focus
-		Evas_Object *focus = elm_object_part_content_get(layout, "focus");
-		if(focus) {
-			elm_access_highlight_set(focus);
-		}
-	}
-
-	/* elm_object_signal_emit(scroller, "show", ""); */
+	evas_object_show(layout);
+	evas_object_show(win);
+	elm_win_activate(win);
 
 	return ECORE_CALLBACK_CANCEL;
 }
