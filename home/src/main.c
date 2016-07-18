@@ -699,7 +699,6 @@ static Eina_Bool _visibility_timeout_cb(void *data)
 
 static void _window_visibility_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	
 	if (!main_info.win) {
 		return;
 	}
@@ -880,10 +879,9 @@ static bool _create_cb(void *data)
 		_E("Failed to register the changed_apps_order callback");
 	}
 
-	evas_object_smart_callback_add(main_info.win, "visibility,changed", _window_visibility_cb, NULL);
-
 	main_info.win = win_create("W-Home");
 	retv_if(!main_info.win, false);
+	evas_object_smart_callback_add(main_info.win, "visibility,changed", _window_visibility_cb, NULL);
 	evas_object_smart_callback_add(main_info.win, "access,changed", _tts_cb, NULL);
 
 	evas_event_callback_add(main_info.e, EVAS_CALLBACK_CANVAS_FOCUS_IN, _window_focus_in_cb, NULL);
@@ -1039,6 +1037,7 @@ static void _activate_window_job_cb(void *data)
 	ret_if(!main_info.win);
 
 	_D("Activate the window");
+	evas_object_show(main_info.win);
 	elm_win_activate(main_info.win);
 	home_dbus_home_raise_signal_send();
 
