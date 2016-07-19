@@ -24,6 +24,7 @@
 
 
 HAPI void apps_rotary_append_item(Evas_Object *rotary, item_info_s *item_info);
+HAPI void apps_rotary_delete_item(Evas_Object *rotary, const char *appid);
 HAPI void apps_rotary_destroy(Evas_Object *layout);
 HAPI Evas_Object *apps_rotary_create(Evas_Object *layout);
 
