@@ -146,6 +146,34 @@ static w_home_error_e _pause_rotary_result_cb(void *data)
 
 
 
+HAPI void apps_rotary_delete_item(Evas_Object *rotary, const char *appid)
+{
+	Eext_Object_Item *item = NULL;
+	Eina_List *item_list = NULL;
+	const Eina_List *l, *ln;
+
+	ret_if(!rotary);
+	ret_if(!appid);
+
+	item_list = eext_rotary_selector_items_get(rotary);
+	ret_if(!item_list);
+
+	EINA_LIST_FOREACH_SAFE(item_list, l, ln, item) {
+		char *item_appid = NULL;
+		continue_if(!item);
+
+		item_appid = eext_rotary_selector_item_part_text_get(item, "selector,sub_text");
+		continue_if(!item_appid);
+
+		if (!strcmp(appid, item_appid))
+			break;
+	}
+
+	eext_rotary_selector_item_del(item);
+}
+
+
+
 HAPI void apps_rotary_append_item(Evas_Object *rotary, item_info_s *item_info)
 {
 	Evas_Object *icon = NULL;
@@ -229,6 +257,7 @@ static Eina_Bool _init_timer_cb(void *data)
 
 	item_info->ordering = index;
 	apps_rotary_append_item(rotary, item_info);
+	apps_pkgmgr_item_list_append_item(item_info->pkgid, item_info->appid, NULL);
 
 	index ++;
 	if (index == count) goto OUT;

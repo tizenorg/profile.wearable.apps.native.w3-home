@@ -30,6 +30,7 @@
 #include "apps/scroller_info.h"
 #include "apps/item_badge.h"
 #include "apps/layout.h"
+#include "apps/rotary.h"
 
 
 
@@ -179,7 +180,6 @@ HAPI apps_error_e apps_pkgmgr_item_list_append_item(const char *pkgid, const cha
 
 	retv_if(NULL == pkgid, APPS_ERROR_INVALID_PARAMETER);
 	retv_if(NULL == app_id, APPS_ERROR_INVALID_PARAMETER);
-	retv_if(NULL == item, APPS_ERROR_INVALID_PARAMETER);
 
 	pi = calloc(1, sizeof(pkgmgr_install_s));
 	goto_if(NULL == pi, ERROR);
@@ -256,7 +256,6 @@ HAPI void apps_pkgmgr_item_list_affect_pkgid(const char *pkgid, Eina_Bool (*_aff
 	EINA_LIST_FOREACH_SAFE(pkg_mgr_info.item_list, l, ln, pi) {
 		continue_if(NULL == pi);
 		continue_if(NULL == pi->app_id);
-		continue_if(NULL == pi->item);
 
 		if (strcmp(pkgid, pi->pkgid)) continue;
 		/* It's possible that many items with the same package name are in the install list */
@@ -428,7 +427,6 @@ static apps_error_e _error(const char *package, const char *val, void *data)
 
 static void _install_app(Evas_Object *rotary, const char *appid)
 {
-	Evas_Object *item = NULL;
 	item_info_s *item_info = NULL;
 
 	ret_if(!rotary);
@@ -438,59 +436,19 @@ static void _install_app(Evas_Object *rotary, const char *appid)
 	ret_if(!item_info);
 
 	_APPS_SD("appid[%s], name[%s]", item_info->appid, item_info->name);
-/*	item = item_create(rotary, item_info);
-	if (!item) {
-		_APPS_E("Cannot create an item");
-		apps_item_info_destroy(item_info);
-		return;
-	}
-*/
+
 	apps_rotary_append_item(rotary, item_info);
+	apps_pkgmgr_item_list_append_item(item_info->pkgid, item_info->appid, NULL);
 }
 
 
 
-static void _uninstall_app(Evas_Object *scroller, const char *appid)
+static void _uninstall_app(Evas_Object *rotary, const char *appid)
 {
-	Evas_Object *item = NULL;
-	item_info_s *item_info = NULL;
-
-	int longpressed;
-	int is_edit;
-
-	ret_if(!scroller);
+	ret_if(!rotary);
 	ret_if(!appid);
 
-	item = apps_scroller_get_item_by_appid(scroller, appid);
-	ret_if(!item);
-
-	item_info = evas_object_data_get(item, DATA_KEY_ITEM_INFO);
-	/* We have to try to destroy an item even if there is no item_info */
-
-	if (item_info) {
-		longpressed = item_is_longpressed(item);
-		is_edit = apps_layout_is_edited(item_info->layout);
-		if (is_edit && longpressed) {
-			evas_object_data_set(scroller, DATA_KEY_ITEM_UNINSTALL_RESERVED, (void*)appid);
-		} else {
-			apps_scroller_remove_item(scroller, item);
-			apps_db_remove_item(appid);
-			item_destroy(item);
-
-			_APPS_SD("appid[%s], name[%s]", item_info->appid, item_info->name);
-			item_badge_remove(item_info->appid);
-			item_badge_remove(item_info->pkgid);
-			apps_item_info_destroy(item_info);
-
-			apps_scroller_trim(scroller);
-		}
-	} else {
-		apps_scroller_remove_item(scroller, item);
-		apps_db_remove_item(appid);
-		item_destroy(item);
-
-		apps_scroller_trim(scroller);
-	}
+	apps_rotary_delete_item(rotary, appid);
 }
 
 
