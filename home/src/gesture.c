@@ -82,7 +82,7 @@ static Evas_Object *_scroller_get(void) {
 
 static Eina_Bool _apps_hide_idler_cb(void *data)
 {
-	apps_main_launch(APPS_LAUNCH_HIDE);
+	//apps_main_launch(APPS_LAUNCH_HIDE);
 
 	return ECORE_CALLBACK_CANCEL;
 }
@@ -90,7 +90,7 @@ static Eina_Bool _apps_hide_idler_cb(void *data)
 static void _clock_show(void)
 {
 	int is_clock_displayed = 0;
-	Eina_Bool is_apps_displayed = (apps_main_is_visible() == EINA_TRUE) ? 1 : 0;
+	Eina_Bool is_apps_displayed = 0; //(apps_main_is_visible() == EINA_TRUE) ? 1 : 0;
 
 	Evas_Object *scroller = _scroller_get();
 	ret_if(scroller == NULL);

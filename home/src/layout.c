@@ -431,8 +431,8 @@ static key_cb_ret_e _power_key_cb(void *data)
 		evas_object_data_set(focused_page, DATA_KEY_PAGE_ONHOLD_COUNT, (void*)1);
 	}
 
-	apps_main_show_count_add();
-	apps_main_launch(APPS_LAUNCH_SHOW);
+	//apps_main_show_count_add();
+	//apps_main_launch(APPS_LAUNCH_SHOW);
 
 	return KEY_CB_RET_STOP;
 }

@@ -379,9 +379,9 @@ static int _handler_window_activate(const char *id, int category, void *view, vo
 	retv_if(win == NULL, NOTI_BROKER_ERROR_FAIL);
 	elm_win_activate(win);
 
-	if (apps_main_is_visible() == EINA_TRUE) {
-		apps_main_launch(APPS_LAUNCH_HIDE);
-	}
+	//if (apps_main_is_visible() == EINA_TRUE) {
+		//apps_main_launch(APPS_LAUNCH_HIDE);
+	//}
 
 	return NOTI_BROKER_ERROR_NONE;
 }

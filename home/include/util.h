@@ -283,15 +283,6 @@ extern int util_is_arbic();
 extern int util_host_vender_id_get(void);
 
 //apps
-extern void apps_util_launch(Evas_Object *win, const char *package, const char *name);
-extern void apps_util_launch_main_operation(Evas_Object *win, const char *app_id, const char *name);
-extern void apps_util_launch_with_arg(Evas_Object *win, const char *app_id, const char *arg, const char *name);
-extern void apps_util_launch_with_bundle(Evas_Object *win, const char *app_id, bundle *b, const char *name);
-
-extern void apps_util_post_message_for_launch_fail(const char *name);
-extern void apps_util_notify_to_home(int pid);
-
-
 extern int util_get_app_type(const char *appid);
 extern char *util_get_appid_by_pkgname(const char *pkgname);
 

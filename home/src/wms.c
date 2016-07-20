@@ -34,7 +34,7 @@
 #include "scroller_info.h"
 #include "scroller.h"
 #include "apps/apps_main.h"
-#include "apps/xml.h"
+//#include "apps/xml.h"
 #include "main.h"
 
 
@@ -45,7 +45,7 @@ void wms_change_apps_order(int value)
 	{
 		case W_HOME_WMS_BACKUP:
 			_D("Backup");
-			apps_main_list_backup();
+			//apps_main_list_backup();
 
 			//Have to set the DONE, 3, to notify that backup is completed.
 			vconf_set_int(VCONF_KEY_WMS_APPS_ORDER, W_HOME_WMS_DONE);
@@ -54,7 +54,7 @@ void wms_change_apps_order(int value)
 		case W_HOME_WMS_RESOTRE:
 			_D("Restore");
 			wms_unregister_setup_wizard_vconf();
-			apps_main_list_restore();
+			//apps_main_list_restore();
 			break;
 		case W_HOME_WMS_DONE:
 			_D("done");
@@ -153,7 +153,7 @@ static void _order_reset()
 	vconf_set_int(VCONF_KEY_WMS_FAVORITES_ORDER, W_HOME_WMS_DONE);
 
 	//apps
-	apps_main_list_reset();
+	//apps_main_list_reset();
 	vconf_set_int(VCONF_KEY_WMS_APPS_ORDER, W_HOME_WMS_DONE);
 }
 

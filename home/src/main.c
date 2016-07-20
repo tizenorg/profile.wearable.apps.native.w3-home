@@ -284,7 +284,7 @@ static void _tts_cb(void *data, Evas_Object *obj, void *event_info)
 		const Eina_List *l, *ln;
 
 		main_info.is_tts = val;
-		apps_main_list_tts(val);
+		//apps_main_list_tts(val);
 
 		layout_info = evas_object_data_get(main_info.layout, DATA_KEY_LAYOUT_INFO);
 		ret_if(!layout_info);
@@ -350,9 +350,9 @@ static void _tts_cb(void *data, Evas_Object *obj, void *event_info)
 		scroller_push_pages(scroller, page_info_list, _del_list, page_info_list);
 	}
 
-	if (apps_main_is_visible() == EINA_TRUE) {
-		apps_main_launch(APPS_LAUNCH_HIDE);
-	}
+	//if (apps_main_is_visible() == EINA_TRUE) {
+		//apps_main_launch(APPS_LAUNCH_HIDE);
+	//}
 
 	/* UX requirement: activate home window when TTS option is changed */
 	/* ecore_job_add(_activate_window_job_cb, NULL); */
@@ -498,10 +498,10 @@ static void _resume_cb(void *data)
 		return;
 	}
 
-	if (apps_main_is_visible() && main_info.is_win_visible == 0) {
-		_E("Apps is showing");
-		return;
-	}
+	//if (apps_main_is_visible() && main_info.is_win_visible == 0) {
+		//_E("Apps is showing");
+		//return;
+	//}
 
 	main_info.state = APP_STATE_RESUME;
 	_execute_cbs(APP_STATE_RESUME);
@@ -781,7 +781,7 @@ static void _change_apps_order_cb(keynode_t *node, void *data)
 	}
 
 	_D("Change apps order vconf:[%d]", value);
-	wms_change_apps_order(value);
+	//wms_change_apps_order(value);
 }
 
 
@@ -939,6 +939,7 @@ static bool _create_cb(void *data)
 	if (!main_info.safety_init_timer) {
 		_E("Failed to create a fallback init timer for safety");
 	}
+
 	/**
 	 * Dead callback should be called after initialize all services.
 	 * So we should register this at the last of this function.
@@ -962,7 +963,6 @@ static void _terminate_cb(void *data)
 	home_dbus_fini(NULL);
 
 	apps_main_fini();
-
 
 	home_dbus_unregister_cb(DBUS_EVENT_LCD_ON, _lcd_on_cb);
 	home_dbus_unregister_cb(DBUS_EVENT_LCD_OFF, _lcd_off_cb);
@@ -1012,10 +1012,10 @@ static void _terminate_cb(void *data)
 	/* DYNAMICBOX fini */
 	widget_fini();
 
-	if (main_info.apps_pid) {
-		aul_terminate_pid(main_info.apps_pid);
-		main_info.apps_pid = 0;
-	}
+	//if (main_info.apps_pid) {
+		//aul_terminate_pid(main_info.apps_pid);
+		//main_info.apps_pid = 0;
+	//}
 }
 
 
@@ -1088,11 +1088,19 @@ static void _app_control(app_control_h service, void *data)
 			Evas_Object *focused_page = scroller_get_focused_page(scroller);
 
 			if (main_info.clock_focus == focused_page) {
+#if 0
 				if (!apps_main_is_visible()) {
 					apps_main_launch(APPS_LAUNCH_SHOW);
 				} else {
 					apps_main_launch(APPS_LAUNCH_HIDE);
 				}
+#else
+				if (apps_main_is_visible()) {
+					apps_main_hide();
+				} else {
+					apps_main_show();
+				}
+#endif
 			} else {
 				scroller_bring_in_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
 			}
@@ -1100,14 +1108,18 @@ static void _app_control(app_control_h service, void *data)
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_EDIT, strlen(HOME_SERVICE_VALUE_EDIT))) {
 			_D("Edit operation");
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_SHOW_APPS, strlen(HOME_SERVICE_VALUE_SHOW_APPS))) {
+#if 0
 			if (util_feature_enabled_get(FEATURE_APPS) == 1) {
 				apps_main_launch(APPS_LAUNCH_SHOW);
 				_D("Show apps operation");
 			}
+#endif
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_APPS_EDIT, strlen(HOME_SERVICE_VALUE_APPS_EDIT))) {
 			_D("Apps edit operation");
+#if 0
 			apps_main_launch(APPS_LAUNCH_EDIT);
 			/* is_window_on_top = 1; */
+#endif
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_SHOW_NOTI, strlen(HOME_SERVICE_VALUE_SHOW_NOTI))) {
 			_D("Show noti operation");
 			ecore_timer_add(0.250f, _show_noti_timer_cb, scroller);
