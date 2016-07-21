@@ -28,31 +28,28 @@
 #include "util.h"
 
 typedef struct {
-	/* Multi-window : Every windows are written in the instance_list. */
-	Eina_List *instance_list;
 	Elm_Theme *theme;
 	Eina_List *font_theme;
-	int first_boot;
 	int updated;
 	double scale;
-	int tts;
 	bool longpress_edit_disable;
-} apps_main_s;
 
-typedef struct {
 	int state;
+	int mode;
+
 	int root_w;
 	int root_h;
 	int booting_state;
 	int angle;
 	int is_rotated;
+
 	Eina_List *cbs_list[APPS_APP_STATE_MAX];
 	Evas *e;
 	Ecore_Evas *ee;
 	Evas_Object *win;
 	Evas_Object *layout;
 	char *content;
-} instance_info_s;
+} apps_main_s;
 
 
 enum {
@@ -65,32 +62,30 @@ enum {
 
 HAPI apps_main_s *apps_main_get_info(void);
 
+HAPI void apps_main_mode_set(int mode);
+HAPI int apps_main_mode_get(void);
+
 HAPI apps_error_e apps_main_register_cb(
-	instance_info_s *info,
 	int state,
 	apps_error_e (*result_cb)(void *), void *result_data);
 
 HAPI void apps_main_unregister_cb(
-	instance_info_s *info,
 	int state,
 	apps_error_e (*result_cb)(void *));
 
-HAPI void apps_main_init();
-HAPI void apps_main_fini();
+HAPI apps_error_e apps_main_init(void);
+HAPI void apps_main_fini(void);
 HAPI void apps_main_launch(int launch_type);
-HAPI void apps_main_pause();
-HAPI void apps_main_resume();
-HAPI void apps_main_language_chnage();
-HAPI Eina_Bool apps_main_is_visible();
+HAPI void apps_main_pause(void);
+HAPI void apps_main_resume(void);
+HAPI void apps_main_language_chnage(void);
+HAPI Eina_Bool apps_main_is_visible(void);
 
-HAPI void apps_main_list_backup();
-HAPI void apps_main_list_restore();
-HAPI void apps_main_list_reset();
+HAPI void apps_main_list_backup(void);
+HAPI void apps_main_list_restore(void);
+HAPI void apps_main_list_reset(void);
 
 HAPI void apps_main_list_tts(int is_tts);
-
-HAPI void apps_main_show_count_add(void);
-HAPI int apps_main_show_count_get(void);
 
 #endif //__APPS_MAIN_H__
 

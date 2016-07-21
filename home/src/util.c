@@ -107,9 +107,6 @@ HAPI int util_feature_enabled_get(int feature)
 		if (cooldown_mode_enabled_get() == 1) {
 			return 0;
 		}
-		if (apps_main_show_count_get() > 3) {
-			return 0;
-		}
 	} else if (feature & FEATURE_CLOCK_SELECTOR) {
 #ifndef ENABLE_INDICATOR_BRIEFING_VIEW
 		if (clock_manager_view_state_get(CLOCK_VIEW_TYPE_DRAWER) == 1) {

@@ -6,7 +6,7 @@ Group:	        Applications/System
 License:	Flora-1.1
 Source0:	%{name}-%{version}.tar.gz
 
-%if "%{?tizen_profile_name}"=="mobile"
+%if "%{profile}"=="mobile"
 ExcludeArch: %{arm} %ix86 x86_64
 %endif
 

@@ -207,6 +207,13 @@ typedef enum {
 } apps_error_e;
 
 enum {
+	APPS_MODE_NORMAL = 0,
+	APPS_MODE_EDIT,
+	APPS_MODE_REORDER,
+	APPS_MODE_MAX,
+};
+
+enum {
 	APPS_APP_STATE_CREATE = 0,
 	APPS_APP_STATE_PAUSE,
 	APPS_APP_STATE_RESET,

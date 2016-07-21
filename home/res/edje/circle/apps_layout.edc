@@ -30,10 +30,27 @@ collections {
 					state: "default" 0.0;
 					rel1 { relative: 0.0 0.0; offset: 0 0; }
 					rel2 { relative: 1.0 1.0; offset: 0 0; }
-					color: 0 0 0 0;
+					color: 0 0 0 255 ;
 					visible: 1;
 					perspective {
 						zplane: 0;
+					}
+				}
+			}
+			part {
+				name: "text";
+				type: TEXT;
+				description {
+					state: "default" 0.0;
+					rel1 { relative: 0.0 0.0; }
+					rel2 { relative: 1.0 1.0; }
+					color: 255 255 255 255 ;
+					visible: 1;
+					text {
+						text: "Wearable Apps";
+						font: "Sans";
+						size: 35;
+						align: 0.5 0.5;
 					}
 				}
 			}

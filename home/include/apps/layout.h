@@ -22,12 +22,10 @@
 #include "util.h"
 
 HAPI Evas_Object *apps_layout_create(Evas_Object *win, const char *file, const char *group);
-HAPI void apps_layout_destroy(Evas_Object *layout);
+HAPI void apps_layout_destroy(void);
 
-HAPI apps_error_e apps_layout_show(Evas_Object *win, Eina_Bool show);
-
-HAPI Evas_Object* apps_layout_load_edj(Evas_Object *parent, const char *edjname, const char *grpname);
-HAPI void apps_layout_unload_edj(Evas_Object *layout);
+HAPI apps_error_e apps_layout_show(void);
+HAPI apps_error_e apps_layout_hide(void);
 
 HAPI void apps_layout_rotate(Evas_Object *layout, int is_rotated);
 

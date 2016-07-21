@@ -34,7 +34,7 @@
 #include "scroller_info.h"
 #include "scroller.h"
 #include "apps/apps_main.h"
-#include "apps/xml.h"
+//#include "apps/xml.h"
 #include "main.h"
 
 
