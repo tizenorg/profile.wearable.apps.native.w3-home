@@ -15,12 +15,21 @@
  * limitations under the License.
  */
 
-#ifndef __APPS_BG_H__
-#define __APPS_BG_H__
+#ifndef __APPS_MANAGER_H__
+#define __APPS_MANAGER_H__
 
-#include <Evas.h>
+#include "util.h"
 
-extern Evas_Object *apps_bg_create(Evas_Object *win, int w, int h);
-extern void apps_bg_destroy(Evas_Object *win);
+int apps_manager_get_state(void);
 
-#endif /* __W_HOME_BG_H__ */
+apps_error_e apps_manager_init(void);
+void apps_manager_fini(void);
+void apps_manager_pause(void);
+void apps_manager_resume(void);
+
+apps_error_e apps_manager_show(void);
+void apps_manager_hide(void);
+
+#endif //__APPS_MANAGER_H__
+
+// End of a file

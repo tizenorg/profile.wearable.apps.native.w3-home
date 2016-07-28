@@ -32,7 +32,6 @@
 #include "scroller_info.h"
 #include "scroller.h"
 #include "page.h"
-#include "apps/apps_main.h"
 
 static struct {
 	Evas_Object *cur_watch;
