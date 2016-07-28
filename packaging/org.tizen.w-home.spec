@@ -43,6 +43,8 @@ BuildRequires: pkgconfig(notification)
 BuildRequires: pkgconfig(rua)
 BuildRequires: pkgconfig(aul)
 BuildRequires: pkgconfig(libpepper-efl)
+BuildRequires: pkgconfig(capi-appfw-package-manager)
+BuildRequires: pkgconfig(capi-appfw-app-manager)
 
 %ifarch %{arm}
 %define ARCH arm
