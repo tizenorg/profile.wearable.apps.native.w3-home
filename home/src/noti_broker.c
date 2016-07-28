@@ -32,9 +32,8 @@
 #include "scroller.h"
 #include "page.h"
 #include "key.h"
-//#include "tutorial.h"
 #include "noti_broker.h"
-#include "apps/apps_main.h"
+#include "apps/apps.h"
 #include "critical_log.h"
 
 #define NOTI_BROKER_ERROR_NONE 0
@@ -379,9 +378,7 @@ static int _handler_window_activate(const char *id, int category, void *view, vo
 	retv_if(win == NULL, NOTI_BROKER_ERROR_FAIL);
 	elm_win_activate(win);
 
-	if (apps_main_is_visible() == EINA_TRUE) {
-		apps_main_launch(APPS_LAUNCH_HIDE);
-	}
+	apps_hide();
 
 	return NOTI_BROKER_ERROR_NONE;
 }
