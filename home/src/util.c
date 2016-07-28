@@ -48,8 +48,10 @@
 #include <widget_errno.h>
 #include <Ecore.h>
 
+#if TBD
 #include "apps/layout.h"
 #include "apps/apps_main.h"
+#endif
 //#include "tutorial.h"
 
 
@@ -105,9 +107,6 @@ HAPI int util_feature_enabled_get(int feature)
 			return 0;
 		}
 		if (cooldown_mode_enabled_get() == 1) {
-			return 0;
-		}
-		if (apps_main_show_count_get() > 3) {
 			return 0;
 		}
 	} else if (feature & FEATURE_CLOCK_SELECTOR) {
@@ -276,7 +275,9 @@ void _evas_object_event_hide_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 static Eina_Bool _unblock_cb(void *data)
 {
 	retv_if(NULL == data, EINA_FALSE);
+#if TBD
 	apps_layout_unblock(data);
+#endif
 
 	return EINA_FALSE;
 }
@@ -412,13 +413,17 @@ HAPI void apps_util_launch(Evas_Object *win, const char *package, const char *na
 			free(inform_with_ret);
 		}
 	} else {
+#if TBD
 		apps_util_notify_to_home(ret_aul);
+#endif
 		_D("Launch app's ret : [%d]", ret_aul);
 		_T(package);
 
 		Evas_Object *layout = evas_object_data_get(win, DATA_KEY_LAYOUT);
 		ret_if(NULL == layout);
+#if TBD
 		apps_layout_block(layout);
+#endif
 		ecore_timer_add(LAYOUT_BLOCK_INTERVAL, _unblock_cb, layout);
 	}
 }
@@ -478,7 +483,9 @@ HAPI void apps_util_launch_main_operation(Evas_Object *win, const char *app_id, 
 
 		Evas_Object *layout = evas_object_data_get(win, DATA_KEY_LAYOUT);
 		ret_if(NULL == layout);
+#if TBD
 		apps_layout_block(layout);
+#endif
 		ecore_timer_add(LAYOUT_BLOCK_INTERVAL, _unblock_cb, layout);
 	}
 
@@ -545,7 +552,9 @@ HAPI void apps_util_launch_with_arg(Evas_Object *win, const char *app_id, const 
 
 		Evas_Object *layout = evas_object_data_get(win, DATA_KEY_LAYOUT);
 		ret_if(NULL == layout);
+#if TBD
 		apps_layout_block(layout);
+#endif
 		ecore_timer_add(LAYOUT_BLOCK_INTERVAL, _unblock_cb, layout);
 	}
 }
@@ -597,7 +606,9 @@ HAPI void apps_util_launch_with_bundle(Evas_Object *win, const char *app_id, bun
 
 		Evas_Object *layout = evas_object_data_get(win, DATA_KEY_LAYOUT);
 		ret_if(NULL == layout);
+#if TBD
 		apps_layout_block(layout);
+#endif
 		ecore_timer_add(LAYOUT_BLOCK_INTERVAL, _unblock_cb, layout);
 	}
 }
@@ -929,9 +940,11 @@ HAPI double util_timestamp(void)
 
 HAPI void util_activate_home_window(void)
 {
+#if TBD
 	if (apps_main_is_visible() == EINA_TRUE) {
 		apps_main_launch(APPS_LAUNCH_HIDE);
 	}
+#endif
 }
 
 HAPI void util_raise_home_window(int force_notify)
@@ -1054,13 +1067,17 @@ HAPI void util_mdm_get_service()
 	{
 		_W("mdm_get_service is success");
 		/* MDM Á¤Ã¥ °¡Á®¿À±â */
+#if TBD
 		apps_main_set_mdm_policy(true);
+#endif
 	}
 	else
 	{
 		_W("mdm_get_service is fail");
 		/* ±âÁ¸ APP ±â´É »ç¿ë¿¡ ¹®Á¦°¡ ¾ø¾î¾ßÇÔ. */
+#if TBD
 		apps_main_set_mdm_policy(false);
+#endif
 	}
 }
 
@@ -1078,11 +1095,13 @@ HAPI int util_mdm_is_restricted(const char *appid)
 {
 	retv_if(!appid, 0);
 
+#if TBD
 	if (apps_main_get_mdm_policy() == false)
 	{
 		_W("mdm restrict is false");
 		return 0;
 	}
+#endif
 
 	mdm_status_t status;
 	status = mdm_get_application_uninstallation_disabled(appid);

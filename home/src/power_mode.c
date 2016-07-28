@@ -32,8 +32,9 @@
 #include "layout.h"
 #include "db.h"
 #include "dbus.h"
-//#include "tutorial.h"
+#if TBD
 #include "apps/apps_main.h"
+#endif
 #include "power_mode.h"
 
 #define COOLDOWN_STATUS_RELEASE "Release"
@@ -186,10 +187,12 @@ static void _psmode_apply(int mode)
 
 		//if(_tutorial_get()) tutorial_destroy(_tutorial_get());
 
+#if TBD
 		if (apps_main_is_visible() == EINA_TRUE) {
 			_D("need to hide apps");
 			apps_main_launch(APPS_LAUNCH_HIDE);
 		}
+#endif
 		layout_set_idle(_layout_get());
 
 		scroller_region_show_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_INSTANT);
@@ -256,10 +259,12 @@ static void _cooldown_mode_apply(int mode)
 
 		//if(_tutorial_get()) tutorial_destroy(_tutorial_get());
 
+#if TBD
 		if (apps_main_is_visible() == EINA_TRUE) {
 			_D("need to hide apps");
 			apps_main_launch(APPS_LAUNCH_HIDE);
 		}
+#endif
 		layout_set_idle(_layout_get());
 
 		scroller_region_show_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_INSTANT);

@@ -34,7 +34,9 @@
 #include "key.h"
 //#include "tutorial.h"
 #include "noti_broker.h"
+#if TBD
 #include "apps/apps_main.h"
+#endif
 #include "critical_log.h"
 
 #define NOTI_BROKER_ERROR_NONE 0
@@ -379,9 +381,11 @@ static int _handler_window_activate(const char *id, int category, void *view, vo
 	retv_if(win == NULL, NOTI_BROKER_ERROR_FAIL);
 	elm_win_activate(win);
 
+#if TBD
 	if (apps_main_is_visible() == EINA_TRUE) {
 		apps_main_launch(APPS_LAUNCH_HIDE);
 	}
+#endif
 
 	return NOTI_BROKER_ERROR_NONE;
 }
@@ -640,10 +644,12 @@ HAPI int noti_broker_event_fire_to_plugin(int source, int event, void *data)
 {
 	retv_if(s_info.is_loaded == 0, EVENT_RET_NONE);
 
+#if TBD
 	if (event == EVENT_TYPE_APPS_SHOW ||
 		event == EVENT_TYPE_APPS_HIDE) {
 		_W("source:%d event:%x", source, event);
 	}
+#endif
 
 	return s_info.handle.event(source, event, data);
 }

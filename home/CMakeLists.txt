@@ -171,21 +171,8 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	src/add-viewer_package.c
 	src/add-viewer_index.c
 	src/wms.c
-	src/apps/bg.c
-	src/apps/db.c
-	src/apps/effect.c
-	src/apps/item.c
-	src/apps/item_badge.c
-	src/apps/item_info.c
-	src/apps/lang.c
-	src/apps/layout.c
-	src/apps/list.c
-	src/apps/apps_main.c
-	src/apps/page.c
-	src/apps/pkgmgr.c
-	src/apps/scroller.c
-	src/apps/rotary_eext.c
-	src/apps/xml.c
+	src/apps/apps_manager.c
+	src/apps/apps_view.c
 	src/critical_log.c
 	src/notification/detail.c
 	src/notification/notification.c
