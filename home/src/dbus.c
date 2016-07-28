@@ -34,7 +34,6 @@
 #include "page_info.h"
 #include "scroller_info.h"
 #include "scroller.h"
-#include "apps/apps_main.h"
 
 static struct _info {
 	DBusConnection *connection;

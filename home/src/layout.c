@@ -42,7 +42,7 @@
 #include "util.h"
 #include "xml.h"
 #include "power_mode.h"
-#include "apps/apps_main.h"
+#include "apps/apps_manager.h"
 #include "gesture.h"
 #include "notification/notification.h"
 
@@ -335,50 +335,6 @@ static void _up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 
-/*
-static void _bezel_up_cb(void *data)
-{
-	Evas_Object *layout = data;
-	Evas_Object *scroller = NULL;
-	Evas_Object *focused_page = NULL;
-
-	_D("Bezel up cb");
-
-	ret_if(!layout);
-
-	scroller = evas_object_data_get(layout, DATA_KEY_SCROLLER);
-	ret_if(!scroller);
-
-	if (PAGE_DIRECTION_CENTER != scroller_get_current_page_direction(scroller)) {
-		return;
-	}
-
-	if (util_feature_enabled_get(FEATURE_APPS) == 0) {
-		elm_object_signal_emit(layout, "bottom,show", "layout");
-		return;
-	}
-
-	if (util_feature_enabled_get(FEATURE_APPS_BY_BEZEL_UP) == 0) {
-		return;
-	}
-
-	if (scroller_is_scrolling(scroller)) {
-		return;
-	}
-
-	if (layout_is_edit_mode(layout)) {
-		return;
-	}
-
-	focused_page = scroller_get_focused_page(scroller);
-	if (focused_page != NULL) {
-		evas_object_data_set(focused_page, DATA_KEY_PAGE_ONHOLD_COUNT, (void*)1);
-	}
-
-	apps_main_show_count_add();
-	apps_main_launch(APPS_LAUNCH_SHOW);
-}
-*/
 static void _bezel_down_cb(void *data)
 {
 	Evas_Object *layout = data;
@@ -431,8 +387,7 @@ static key_cb_ret_e _power_key_cb(void *data)
 		evas_object_data_set(focused_page, DATA_KEY_PAGE_ONHOLD_COUNT, (void*)1);
 	}
 
-	apps_main_show_count_add();
-	apps_main_launch(APPS_LAUNCH_SHOW);
+	apps_show();
 
 	return KEY_CB_RET_STOP;
 }

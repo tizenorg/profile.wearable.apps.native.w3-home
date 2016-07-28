@@ -37,9 +37,8 @@
 #include "scroller.h"
 #include "layout.h"
 #include "layout_info.h"
-//#include "tutorial.h"
 #include "dbus.h"
-#include "apps/apps_main.h"
+#include "apps/apps_manager.h"
 
 #define LCD_ON_REASON_GESTURE "gesture"
 #define VCONFKEY_SIMPLE_CLOCK_STATUS "db/setting/simpleclock_mode"
@@ -80,17 +79,9 @@ static Evas_Object *_scroller_get(void) {
 	return scroller;
 }
 
-static Eina_Bool _apps_hide_idler_cb(void *data)
-{
-	apps_main_launch(APPS_LAUNCH_HIDE);
-
-	return ECORE_CALLBACK_CANCEL;
-}
-
 static void _clock_show(void)
 {
 	int is_clock_displayed = 0;
-	Eina_Bool is_apps_displayed = (apps_main_is_visible() == EINA_TRUE) ? 1 : 0;
 
 	Evas_Object *scroller = _scroller_get();
 	ret_if(scroller == NULL);
@@ -120,11 +111,7 @@ static void _clock_show(void)
 	ecore_evas_manual_render(ee);
 	elm_win_raise(main_get_info()->win);
 
-	/* hiding apps */
-	if (is_apps_displayed == 1) {
-		_D("need to hide apps");
-		ecore_idler_add(_apps_hide_idler_cb, NULL);
-	}
+	apps_hide();
 }
 
 #define ALPM_MANAGER_STATUS_SHOW "show"

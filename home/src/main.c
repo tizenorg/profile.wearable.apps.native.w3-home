@@ -58,7 +58,7 @@
 #include "power_mode.h"
 #include "noti_broker.h"
 #include "wms.h"
-#include "apps/apps_main.h"
+#include "apps/apps_manager.h"
 #include "critical_log.h"
 #include "db.h"
 #include "xml.h"
@@ -92,7 +92,6 @@ static main_s main_info = {
 	.clock_focus = NULL,
 	.state = APP_STATE_CREATE,
 	.is_mapbuf = 0,
-	.apps_pid = 0,
 	.is_tts = false,
 	.is_lcd_on = -1,
 	.is_alpm_clock_enabled = 0,
@@ -284,7 +283,6 @@ static void _tts_cb(void *data, Evas_Object *obj, void *event_info)
 		const Eina_List *l, *ln;
 
 		main_info.is_tts = val;
-		apps_main_list_tts(val);
 
 		layout_info = evas_object_data_get(main_info.layout, DATA_KEY_LAYOUT_INFO);
 		ret_if(!layout_info);
@@ -348,10 +346,6 @@ static void _tts_cb(void *data, Evas_Object *obj, void *event_info)
 
 		scroller_pop_pages(scroller, PAGE_DIRECTION_RIGHT);
 		scroller_push_pages(scroller, page_info_list, _del_list, page_info_list);
-	}
-
-	if (apps_main_is_visible() == EINA_TRUE) {
-		apps_main_launch(APPS_LAUNCH_HIDE);
 	}
 
 	/* UX requirement: activate home window when TTS option is changed */
@@ -492,13 +486,16 @@ static int _dead_cb(int pid, void *data)
 
 static void _resume_cb(void *data)
 {
+	int apps_state = 0;
+
 	_D("Resumed");
 	if (main_info.state == APP_STATE_RESUME) {
 		_E("resumed already");
 		return;
 	}
 
-	if (apps_main_is_visible() && main_info.is_win_visible == 0) {
+	apps_state = apps_get_state();
+	if (apps_state == APPS_APP_STATE_RESUME && main_info.is_win_visible == 0) {
 		_E("Apps is showing");
 		return;
 	}
@@ -961,8 +958,7 @@ static void _terminate_cb(void *data)
 
 	home_dbus_fini(NULL);
 
-	apps_main_fini();
-
+	apps_fini();
 
 	home_dbus_unregister_cb(DBUS_EVENT_LCD_ON, _lcd_on_cb);
 	home_dbus_unregister_cb(DBUS_EVENT_LCD_OFF, _lcd_off_cb);
@@ -1011,11 +1007,6 @@ static void _terminate_cb(void *data)
 
 	/* DYNAMICBOX fini */
 	widget_fini();
-
-	if (main_info.apps_pid) {
-		aul_terminate_pid(main_info.apps_pid);
-		main_info.apps_pid = 0;
-	}
 }
 
 
@@ -1088,10 +1079,11 @@ static void _app_control(app_control_h service, void *data)
 			Evas_Object *focused_page = scroller_get_focused_page(scroller);
 
 			if (main_info.clock_focus == focused_page) {
-				if (!apps_main_is_visible()) {
-					apps_main_launch(APPS_LAUNCH_SHOW);
+				int apps_state = apps_get_state();
+				if (apps_state != APPS_APP_STATE_RESUME) {
+					apps_show();
 				} else {
-					apps_main_launch(APPS_LAUNCH_HIDE);
+					apps_hide();
 				}
 			} else {
 				scroller_bring_in_by_push_type(scroller, SCROLLER_PUSH_TYPE_CENTER, SCROLLER_FREEZE_OFF, SCROLLER_BRING_TYPE_ANIMATOR);
@@ -1099,15 +1091,6 @@ static void _app_control(app_control_h service, void *data)
 			key_cb_execute(KEY_TYPE_HOME);
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_EDIT, strlen(HOME_SERVICE_VALUE_EDIT))) {
 			_D("Edit operation");
-		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_SHOW_APPS, strlen(HOME_SERVICE_VALUE_SHOW_APPS))) {
-			if (util_feature_enabled_get(FEATURE_APPS) == 1) {
-				apps_main_launch(APPS_LAUNCH_SHOW);
-				_D("Show apps operation");
-			}
-		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_APPS_EDIT, strlen(HOME_SERVICE_VALUE_APPS_EDIT))) {
-			_D("Apps edit operation");
-			apps_main_launch(APPS_LAUNCH_EDIT);
-			/* is_window_on_top = 1; */
 		} else if (!strncmp(service_val, HOME_SERVICE_VALUE_SHOW_NOTI, strlen(HOME_SERVICE_VALUE_SHOW_NOTI))) {
 			_D("Show noti operation");
 			ecore_timer_add(0.250f, _show_noti_timer_cb, scroller);
@@ -1131,7 +1114,6 @@ static void _app_control(app_control_h service, void *data)
 static void _language_changed(app_event_info_h event_info, void *user_data)
 {
 	_D("");
-	apps_main_language_chnage();
 	evas_object_add_viewer_reload();
 
 	_check_lang();

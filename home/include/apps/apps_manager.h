@@ -15,24 +15,20 @@
  * limitations under the License.
  */
 
-#ifndef __APPS_PAGE_INFO_H__
-#define __APPS_PAGE_INFO_H__
+#ifndef __APPS_MANAGER_H__
+#define __APPS_MANAGER_H__
 
-#include <Evas.h>
-#include "apps/apps_main.h"
+#include "util.h"
 
-typedef struct {
-	Evas_Object *win;
-	instance_info_s *instance_info;
+int apps_get_state(void);
 
-	Evas_Object *scroller;
-	Evas_Object *page_rect;
+void apps_fini(void);
+void apps_pause(void);
+void apps_resume(void);
 
-	Evas_Object *prev_page;
-	Evas_Object *page;
-	Evas_Object *next_page;
-} page_info_s;
+apps_error_e apps_show(void);
+void apps_hide(void);
 
-#endif //__APPS_PAGE_INFO_H__
+#endif //__APPS_MANAGER_H__
 
 // End of a file
