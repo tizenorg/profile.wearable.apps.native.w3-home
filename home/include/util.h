@@ -158,6 +158,10 @@
 /* Packaging */
 #define DEFAULT_ICON IMAGEDIR"/unknown.png"
 
+#define IMAGE_DIR "image"
+#define EDJE_DIR "edje"
+
+#define MAX_FILE_PATH_LEN 1024
 
 /* Enum */
 typedef enum {
@@ -181,7 +185,7 @@ typedef enum {
 	APP_STATE_POWER_OFF,
 	APP_STATE_WIN_ACTIVATED,
 	APP_STATE_MAX,
-} app_state_e;
+} w_app_state_e;
 
 
 
@@ -205,6 +209,8 @@ typedef enum {
 	APPS_ERROR_INVALID_PARAMETER = -4,
 	APPS_ERROR_NO_DATA = -5,
 } apps_error_e;
+
+
 
 enum {
 	APPS_APP_STATE_CREATE = 0,
@@ -236,6 +242,18 @@ enum {
 	TUTORIAL_LANGUAGE_NORMAL = 0,
 	TUTORIAL_LANGUAGE_MALI,
 	TUTORIAL_LANGUAGE_GEORGIA,
+};
+
+enum app_subdir {
+	APP_DIR_DATA,
+	APP_DIR_CACHE,
+	APP_DIR_RESOURCE,
+	APP_DIR_SHARED_DATA,
+	APP_DIR_SHARED_RESOURCE,
+	APP_DIR_SHARED_TRUSTED,
+	APP_DIR_EXTERNAL_DATA,
+	APP_DIR_EXTERNAL_CACHE,
+	APP_DIR_EXTERNAL_SHARED_DATA,
 };
 
 typedef enum {
@@ -272,6 +290,17 @@ extern void util_notify_to_home(int pid);
 
 extern int util_launch_app(const char *appid, const char *key, const char *value);
 extern int util_feature_enabled_get(int feature);
+extern const char *util_get_file_path(enum app_subdir dir, const char *relative);
+
+#define util_get_data_file_path(x) util_get_file_path(APP_DIR_DATA, (x))
+#define util_get_cache_file_path(x) util_get_file_path(APP_DIR_CACHE, (x))
+#define util_get_res_file_path(x) util_get_file_path(APP_DIR_RESOURCE, (x))
+#define util_get_shared_data_file_path(x) util_get_file_path(APP_DIR_SHARED_DATA, (x))
+#define util_get_shared_res_file_path(x) util_get_file_path(APP_DIR_SHARED_RESOURCE, (x))
+#define util_get_trusted_file_path(x) util_get_file_path(APP_DIR_SHARED_TRUSTED, (x))
+#define util_get_external_data_file_path(x) util_get_file_path(APP_DIR_EXTERNAL_DATA, (x))
+#define util_get_external_cache_file_path(x) util_get_file_path(APP_DIR_EXTERNAL_CACHE, (x))
+#define util_get_external_shared_data_file_path(x) util_get_file_path(APP_DIR_EXTERNAL_SHARED_DATA, (x))
 
 extern int util_find_top_visible_window(char **command);
 extern int util_get_app_type(const char *appid);

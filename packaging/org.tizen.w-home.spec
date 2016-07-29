@@ -6,7 +6,7 @@ Group:	        Applications/System
 License:	Flora-1.1
 Source0:	%{name}-%{version}.tar.gz
 
-%if "%{?tizen_profile_name}"=="mobile"
+%if "%{profile}" == "mobile"
 ExcludeArch: %{arm} %ix86 x86_64
 %endif
 
@@ -43,6 +43,8 @@ BuildRequires: pkgconfig(notification)
 BuildRequires: pkgconfig(rua)
 BuildRequires: pkgconfig(aul)
 BuildRequires: pkgconfig(libpepper-efl)
+BuildRequires: pkgconfig(capi-appfw-package-manager)
+BuildRequires: pkgconfig(capi-appfw-app-manager)
 
 %ifarch %{arm}
 %define ARCH arm
