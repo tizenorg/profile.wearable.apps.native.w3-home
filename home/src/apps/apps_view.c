@@ -54,6 +54,15 @@ static struct _apps_view_s {
 	.mode = APPS_MODE_NORMAL,
 };
 
+static Evas_Object *_create_window(const char *name, const char *title);
+static void _destroy_window(void);
+static Evas_Object *_create_layout(Evas_Object *parent);
+static void _destroy_layout(void);
+static Eina_Bool _push_items(void *layout);
+static key_cb_ret_e _back_key_cb(void *data);
+static Eina_Bool _show_idler_cb(void *data);
+
+
 static Evas_Object *_create_window(const char *name, const char *title)
 {
 	Evas_Object *win = NULL;

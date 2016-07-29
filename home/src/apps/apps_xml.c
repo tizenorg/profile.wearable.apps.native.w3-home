@@ -38,7 +38,6 @@ Eina_List *apps_xml_get_list(void)
 
 	int ret = -1;
 	const char *name, *value;
-	char *element = NULL;
 
 	apps_data_s *item = NULL;
 	APPS_XML_TYPE input_type = _APPS_XML_INVALID;
@@ -52,8 +51,6 @@ Eina_List *apps_xml_get_list(void)
 	while ((ret = xmlTextReaderRead(reader)) == 1) {
 		int dep = 0;
 		int node_type = 0;
-		static int cell = 0;
-		static int page_no = 0;
 
 		dep = xmlTextReaderDepth(reader);
 		node_type = xmlTextReaderNodeType(reader);

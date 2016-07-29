@@ -34,12 +34,14 @@ static void _apps_data_free(apps_data_s *item);
 static void _apps_data_delete_index(int delete_index);
 static void _apps_data_insert_index(int insert_index);
 static void _apps_data_print();
+static int _apps_data_sort_by_position(const void *a , const void *b);
+static apps_data_s *_apps_data_find_item(Eina_List *list, const char* app_id);
+
 
 void apps_data_init(void)
 {
 	Eina_List *db_list = NULL;
 	Eina_List *pkg_list = NULL;
-	Eina_List *order_list = NULL;
 	_APPS_D("");
 	if (apps_data_info.data_list != NULL) {
 		_APPS_D("exist");
@@ -49,9 +51,6 @@ void apps_data_init(void)
 
 	apps_package_manager_init();
 	apps_package_manager_get_list(&pkg_list);
-
-	//order_list = apps_xml_read_list();
-	order_list = apps_xml_get_list();
 
 	if(!apps_db_create()){
 		_APPS_D("DB EXIT");
@@ -64,34 +63,68 @@ void apps_data_init(void)
 		bool b_find = false;
 
 		EINA_LIST_FOREACH(db_list, find_db_list, db_item) {
-			b_find = false;
-			find_pkg_list = pkg_item = NULL;
-
-			EINA_LIST_FOREACH(pkg_list, find_pkg_list, pkg_item) {
-				if (strcmp(db_item->app_id, pkg_item->app_id) == 0) {
-					b_find = true;
-					break;
-				}
-			}
-			if (b_find) {
+			pkg_item = _apps_data_find_item(pkg_list, db_item->app_id);
+			if (pkg_item != NULL) {
 				apps_data_info.data_list = eina_list_append(apps_data_info.data_list, db_item);
-				if (pkg_item) {
-					pkg_list = eina_list_remove(pkg_list, pkg_item);
-					_apps_data_free(pkg_item);
-				}
+				pkg_list = eina_list_remove(pkg_list, pkg_item);
+				_apps_data_free(pkg_item);
 			} else {
 				_apps_data_free(db_item);
 			}
 		}
+		find_pkg_list = NULL;
+		pkg_item = NULL;
+		EINA_LIST_FOREACH(pkg_list, find_pkg_list, pkg_item) {
+			apps_data_insert(pkg_item);
+		}
 		db_list = eina_list_free(db_list);
 
+	} else {
+		Eina_List *xml_list = NULL;
+		Eina_List *order_list = NULL;
+		Eina_List *find_list = NULL;
+		apps_data_s *find_item = NULL;
+		apps_data_s *item = NULL;
+		apps_data_s *first_item = NULL;
+		int index = 0;
+
+		xml_list = apps_xml_get_list();
+		xml_list = eina_list_sort(xml_list, eina_list_count(xml_list), _apps_data_sort_by_position);
+
+		EINA_LIST_FOREACH(xml_list, find_list, find_item) {
+			item = _apps_data_find_item(pkg_list, find_item->app_id);
+			if (item != NULL) {
+				order_list = eina_list_append(order_list, item);
+				item->position = find_item->position;
+				pkg_list = eina_list_remove(pkg_list, item);
+			} else {
+				_APPS_D("Not exit(xml_order) : %s", find_item->app_id);
+			}
+			_apps_data_free(find_item);
+		}
+		eina_list_free(xml_list);
+
+		find_list = NULL;
+		find_item = NULL;
+		EINA_LIST_FOREACH(order_list, find_list, find_item) {
+			while (index < find_item->position) {
+				first_item = eina_list_nth(pkg_list, 0);
+				if (first_item) {
+					apps_data_insert(first_item);
+					pkg_list = eina_list_remove(pkg_list, first_item);
+				}
+				index ++;
+			}
+			apps_data_insert(find_item);
+		}
+		order_list = eina_list_free(order_list);
+		find_list = NULL;
+		find_item = NULL;
+		EINA_LIST_FOREACH(pkg_list, find_list, find_item) {
+			apps_data_insert(find_item);
+		}
 	}
 
-	Eina_List *find_list = NULL;
-	apps_data_s *item = NULL;
-	EINA_LIST_FOREACH(pkg_list, find_list, item) {
-		apps_data_insert(item);
-	}
 	pkg_list = eina_list_free(pkg_list);
 
 	_apps_data_print();
@@ -260,4 +293,23 @@ static void _apps_data_print()
 		_APPS_D("[%d] %s , position : %d", i++, item->label, item->position);
 	}
 	_APPS_D("================================= ");
+}
+
+static int _apps_data_sort_by_position(const void *a , const void *b)
+{
+	apps_data_s *item1 = (apps_data_s *)a;
+	apps_data_s *item2 = (apps_data_s *)b;
+
+	return item1->position < item2->position ? -1 : 1;
+}
+
+static apps_data_s *_apps_data_find_item(Eina_List *list, const char* app_id)
+{
+	Eina_List *find_list = NULL;
+	apps_data_s *item = NULL;
+	EINA_LIST_FOREACH(list, find_list, item) {
+		if(strcmp(app_id, item->app_id) == 0)
+			return item;
+	}
+	return NULL;
 }

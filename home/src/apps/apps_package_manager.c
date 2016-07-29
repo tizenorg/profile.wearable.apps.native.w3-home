@@ -28,13 +28,13 @@
 
 static package_manager_h pkg_mgr = NULL;
 
-static void __apps_package_manager_event_cb(const char *type, const char *package,
+static void _apps_package_manager_event_cb(const char *type, const char *package,
 		package_manager_event_type_e event_type, package_manager_event_state_e event_state, int progress,
 		package_manager_error_e error, void *user_data);
-static bool __apps_package_manager_get_item(app_info_h app_handle, void *data);
-static bool __apps_package_get_apps_info(app_info_h app_handle, apps_data_s **item);
-static void __apps_package_manager_install(const char* package);
-static void __apps_package_manager_uninstall(const char* package);
+static bool _apps_package_manager_get_item(app_info_h app_handle, void *data);
+static bool _apps_package_get_apps_info(app_info_h app_handle, apps_data_s **item);
+static void _apps_package_manager_install(const char* package);
+static void _apps_package_manager_uninstall(const char* package);
 
 void apps_package_manager_init(void)
 {
@@ -52,7 +52,7 @@ void apps_package_manager_init(void)
 		_APPS_E("package_manager_set_event_status : failed[%d]", ret);
 	}
 
-	ret = package_manager_set_event_cb(pkg_mgr, __apps_package_manager_event_cb, NULL);
+	ret = package_manager_set_event_cb(pkg_mgr, _apps_package_manager_event_cb, NULL);
 	if (ret != PACKAGE_MANAGER_ERROR_NONE) {
 		_APPS_E("package_manager_set_event_cb : failed[%d]", ret);
 	}
@@ -80,7 +80,7 @@ bool apps_package_manager_get_list(Eina_List **list)
 		return EINA_FALSE;
 	}
 	app_info_filter_add_bool(handle, PACKAGE_INFO_PROP_APP_NODISPLAY , false);
-	app_info_filter_foreach_appinfo(handle, __apps_package_manager_get_item, list);
+	app_info_filter_foreach_appinfo(handle, _apps_package_manager_get_item, list);
 
 	_APPS_D("end");
 	return EINA_TRUE;
@@ -104,7 +104,7 @@ void apps_package_manager_update_label(Eina_List *list)
 	}
 }
 
-static void __apps_package_manager_event_cb(const char *type, const char *package,
+static void _apps_package_manager_event_cb(const char *type, const char *package,
 		package_manager_event_type_e event_type, package_manager_event_state_e event_state, int progress,
 		package_manager_error_e error, void *user_data)
 {
@@ -115,9 +115,9 @@ static void __apps_package_manager_event_cb(const char *type, const char *packag
 	} else if (event_state == PACKAGE_MANAGER_EVENT_STATE_COMPLETED) {
 		_APPS_D("pkg:%s type:%d PACKAGE_MANAGER_EVENT_STATE_COMPLETED", package, event_type);
 		if (event_type == PACKAGE_MANAGER_EVENT_TYPE_INSTALL) {
-			__apps_package_manager_install(package);
+			_apps_package_manager_install(package);
 		} else if (event_type == PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL) {
-			__apps_package_manager_uninstall(package);
+			_apps_package_manager_uninstall(package);
 		} else { //PACKAGE_MANAGER_EVENT_TYPE_UPDATE
 			_APPS_D("UPDATE - %s", package);
 		}
@@ -126,17 +126,17 @@ static void __apps_package_manager_event_cb(const char *type, const char *packag
 	}
 }
 
-static bool __apps_package_manager_get_item(app_info_h app_handle, void *data)
+static bool _apps_package_manager_get_item(app_info_h app_handle, void *data)
 {
 	Eina_List **list = (Eina_List **)data;
 	apps_data_s *item = NULL;
-	if (__apps_package_get_apps_info(app_handle, &item)) {
+	if (_apps_package_get_apps_info(app_handle, &item)) {
 		*list = eina_list_append(*list, item);
 	}
 	return true;
 }
 
-static bool __apps_package_get_apps_info(app_info_h app_handle, apps_data_s **item)
+static bool _apps_package_get_apps_info(app_info_h app_handle, apps_data_s **item)
 {
 	bool nodisplay = false;
 	int ret;
@@ -215,19 +215,19 @@ ERROR:
 	return false;
 }
 
-static void __apps_package_manager_install(const char* package)
+static void _apps_package_manager_install(const char* package)
 {
 	app_info_h app_info = NULL;
 	apps_data_s *item = NULL;
 
 	app_manager_get_app_info(package, &app_info);
-	if (__apps_package_get_apps_info(app_info, &item)) {
+	if (_apps_package_get_apps_info(app_info, &item)) {
 		apps_data_insert(item);
 	}
 	app_info_destroy(app_info);
 }
 
-static void __apps_package_manager_uninstall(const char* package)
+static void _apps_package_manager_uninstall(const char* package)
 {
 	_APPS_D("");
 	apps_data_delete_by_pkg_id(package);

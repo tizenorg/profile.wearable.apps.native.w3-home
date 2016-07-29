@@ -56,7 +56,7 @@ enum {
 
 #define SELECT_ITEM "SELECT * FROM apps;"
 
-static bool __apps_db_open(void);
+static bool _apps_db_open(void);
 
 bool apps_db_create(void)
 {
@@ -93,7 +93,7 @@ bool apps_db_create(void)
 	return true;
 }
 
-bool apps_db_close_temp(void)
+bool apps_db_close(void)
 {
 	if (apps_db) {
 		sqlite3_exec(apps_db, "COMMIT TRANSACTION", NULL, NULL, NULL);
@@ -107,7 +107,7 @@ bool apps_db_update(apps_data_s *item)
 {
 	char query[QUERY_MAXLEN];
 	sqlite3_stmt *stmt;
-	if (!__apps_db_open())
+	if (!_apps_db_open())
 		return false;
 
 	snprintf(query, QUERY_MAXLEN, UPDATE_APPS_DB_TABLE,
@@ -124,7 +124,7 @@ bool apps_db_update(apps_data_s *item)
 	}
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
-	apps_db_close_temp();
+	apps_db_close();
 	return true;
 
 }
@@ -133,7 +133,7 @@ bool apps_db_insert(apps_data_s *item)
 {
 	char query[QUERY_MAXLEN];
 	sqlite3_stmt *stmt;
-	if (!__apps_db_open())
+	if (!_apps_db_open())
 		return false;
 
 	snprintf(query, QUERY_MAXLEN, INSERT_APPS_DB_TABLE,
@@ -152,7 +152,7 @@ bool apps_db_insert(apps_data_s *item)
 	sqlite3_finalize(stmt);
 	item->db_id = (int)sqlite3_last_insert_rowid(apps_db);
 
-	apps_db_close_temp();
+	apps_db_close();
 	return true;
 }
 
@@ -160,7 +160,7 @@ bool apps_db_delete(apps_data_s *item)
 {
 	char query[QUERY_MAXLEN];
 	sqlite3_stmt *stmt;
-	if (!__apps_db_open())
+	if (!_apps_db_open())
 		return false;
 
 	snprintf(query, QUERY_MAXLEN, "DELETE FROM apps WHERE id=%d", item->db_id);
@@ -172,7 +172,7 @@ bool apps_db_delete(apps_data_s *item)
 	sqlite3_step(stmt);
 	sqlite3_finalize(stmt);
 
-	apps_db_close_temp();
+	apps_db_close();
 	return true;
 }
 
@@ -181,7 +181,7 @@ bool apps_db_get_list(Eina_List **apps_db_list)
 	sqlite3_stmt *stmt;
 	const char *str = NULL;
 
-	if (!__apps_db_open())
+	if (!_apps_db_open())
 		return false;
 
 	int ret = sqlite3_prepare_v2(apps_db, SELECT_ITEM, strlen(SELECT_ITEM), &stmt, NULL);
@@ -212,12 +212,12 @@ bool apps_db_get_list(Eina_List **apps_db_list)
 		*apps_db_list = eina_list_append(*apps_db_list, item);
 	}
 	sqlite3_finalize(stmt);
-	apps_db_close_temp();
+	apps_db_close();
 
 	return true;
 }
 
-static bool __apps_db_open(void)
+static bool _apps_db_open(void)
 {
 	if (!apps_db) {
 		int ret;

@@ -173,14 +173,14 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	src/add-viewer_package.c
 	src/add-viewer_index.c
 	src/wms.c
-	src/apps/apps_manager.c
-	src/apps/apps_view.c
 	src/critical_log.c
 	src/notification/detail.c
 	src/notification/notification.c
 	src/notification/simple.c
 	src/notification/summary.c
 	src/notification/time.c
+	src/apps/apps_manager.c
+	src/apps/apps_view.c
 	src/apps/apps_data.c
 	src/apps/apps_package_manager.c
 	src/apps/apps_db.c

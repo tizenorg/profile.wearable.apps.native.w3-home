@@ -22,7 +22,7 @@
 #include "apps/apps_data_type.h"
 
 bool apps_db_create(void);
-bool apps_db_close_temp(void);
+bool apps_db_close(void);
 
 bool apps_db_update(apps_data_s *item);
 bool apps_db_insert(apps_data_s *item);

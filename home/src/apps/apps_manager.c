@@ -22,6 +22,7 @@
 #include "log.h"
 #include "apps/apps.h"
 #include "apps/apps_view.h"
+#include "apps/apps_data.h"
 
 static struct _apps_s {
 	int state;
@@ -41,6 +42,8 @@ apps_error_e apps_init(void)
 	_APPS_D("%s", __func__);
 
 	apps_info.state = APPS_APP_STATE_CREATE;
+
+	apps_data_init();
 
 	ret = apps_view_create();
 	if (APPS_ERROR_NONE != ret) {
