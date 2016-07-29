@@ -55,6 +55,8 @@ pkg_check_modules(PKGS REQUIRED
 	notification
 	capi-message-port
 	libpepper-efl
+	capi-appfw-package-manager
+	capi-appfw-app-manager
 )
 
 IF(RUN_ON_DEVICE)
@@ -179,6 +181,10 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	src/notification/simple.c
 	src/notification/summary.c
 	src/notification/time.c
+	src/apps/apps_data.c
+	src/apps/apps_package_manager.c
+	src/apps/apps_db.c
+	src/apps/apps_xml.c
 )
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PKGS_LDFLAGS} ${EXTRA_LDFLAGS} -lm  -Wl,--hash-style=both -Wl,--as-needed -pie )

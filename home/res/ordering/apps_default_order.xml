@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<apps>
+		<app_id>org.tizen.recent</app_id>
+		<position>0</position>
+	</apps>
+	<apps>
+		<app_id>org.example.calculator</app_id>
+		<position>1</position>
+	</apps>
+</data>
