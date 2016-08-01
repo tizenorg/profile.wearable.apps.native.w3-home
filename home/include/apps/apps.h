@@ -22,9 +22,8 @@
 
 int apps_get_state(void);
 
+apps_error_e apps_init(void);
 void apps_fini(void);
-void apps_pause(void);
-void apps_resume(void);
 
 apps_error_e apps_show(void);
 void apps_hide(void);

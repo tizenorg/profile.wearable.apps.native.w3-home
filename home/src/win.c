@@ -93,7 +93,8 @@ HAPI Evas_Object *win_create(const char *name)
 	win = (Evas_Object *) app_get_preinitialized_window(name);
 	if (!win) win = elm_win_add(NULL, name, ELM_WIN_BASIC);
 #else
-	win = elm_win_add(NULL, name, ELM_WIN_BASIC);
+	//win = elm_win_add(NULL, name, ELM_WIN_BASIC);
+	win = elm_win_util_standard_add(name, name);
 #endif
 	retv_if(!win, NULL);
 

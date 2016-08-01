@@ -495,7 +495,7 @@ static void _resume_cb(void *data)
 	}
 
 	apps_state = apps_get_state();
-	if (apps_state == APPS_APP_STATE_RESUME && main_info.is_win_visible == 0) {
+	if (apps_state == APPS_STATE_SHOW && main_info.is_win_visible == 0) {
 		_E("Apps is showing");
 		return;
 	}
@@ -1080,7 +1080,7 @@ static void _app_control(app_control_h service, void *data)
 
 			if (main_info.clock_focus == focused_page) {
 				int apps_state = apps_get_state();
-				if (apps_state != APPS_APP_STATE_RESUME) {
+				if (apps_state != APPS_STATE_SHOW) {
 					apps_show();
 				} else {
 					apps_hide();

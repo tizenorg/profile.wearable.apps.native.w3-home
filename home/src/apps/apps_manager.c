@@ -26,7 +26,7 @@
 static struct _apps_s {
 	int state;
 } apps_info = {
-	.state = APPS_APP_STATE_POWER_OFF,
+	.state = APPS_STATE_NONE,
 };
 
 int apps_get_state(void)
@@ -40,7 +40,7 @@ apps_error_e apps_init(void)
 
 	_APPS_D("%s", __func__);
 
-	apps_info.state = APPS_APP_STATE_CREATE;
+	apps_info.state = APPS_STATE_NONE;
 
 	ret = apps_view_create();
 	if (APPS_ERROR_NONE != ret) {
@@ -55,33 +55,18 @@ void apps_fini(void)
 {
 	_APPS_D("%s", __func__);
 
-	apps_info.state = APPS_APP_STATE_TERMINATE;
+	apps_info.state = APPS_STATE_NONE;
 
 	apps_view_destroy();
 }
 
-void apps_pause(void)
-{
-	_APPS_D("%s", __func__);
-
-	apps_info.state = APPS_APP_STATE_PAUSE;
-}
-
-void apps_resume(void)
-{
-	_APPS_D("%s", __func__);
-
-	apps_info.state = APPS_APP_STATE_RESUME;
-}
-
 apps_error_e apps_show(void)
 {
-	Evas_Object *win = NULL;
 	int ret = 0;
 
 	_APPS_D("Show APPS");
 
-	if (apps_info.state == APPS_APP_STATE_POWER_OFF) {
+	if (apps_info.state == APPS_STATE_NONE) {
 		ret = apps_init();
 		if (APPS_ERROR_NONE != ret) {
 			_APPS_E("Failed to initialize apps");
@@ -89,7 +74,7 @@ apps_error_e apps_show(void)
 		}
 	}
 
-	apps_resume();
+	apps_info.state = APPS_STATE_SHOW;
 
 	ret = apps_view_show();
 	if (APPS_ERROR_NONE != ret) {
@@ -106,5 +91,5 @@ void apps_hide(void)
 
 	apps_view_hide();
 
-	apps_pause();
+	apps_info.state = APPS_STATE_HIDE;
 }

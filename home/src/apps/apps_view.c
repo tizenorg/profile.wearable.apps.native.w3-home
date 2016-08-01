@@ -29,6 +29,9 @@
 #define APPS_VIEW_LAYOUT_GROUP_NAME "layout"
 #define APPS_VIEW_ROTATION_TYPE_NUM 1
 
+#define APPS_VIEW_LONG_PRESS_TIME 0.75
+#define APPS_VIEW_MOUSE_MOVE_MIN_DISTANCE 100
+
 enum {
 	APPS_MODE_NORMAL = 0,
 	APPS_MODE_EDIT,
@@ -54,6 +57,46 @@ static struct _apps_view_s {
 	.mode = APPS_MODE_NORMAL,
 };
 
+static struct _mouse_info_s {
+	Eina_Bool pressed;
+	Eina_Bool long_pressed;
+	Evas_Coord down_x;
+	Evas_Coord down_y;
+	Evas_Coord move_x;
+	Evas_Coord move_y;
+	Evas_Coord up_x;
+	Evas_Coord up_y;
+	int offset_x;
+	int offset_y;
+	Ecore_Timer *long_press_timer;
+	Evas_Object *pressed_obj;
+} mouse_info = {
+	.pressed = EINA_FALSE,
+	.long_pressed = EINA_FALSE,
+	.down_x = 0,
+	.down_y = 0,
+	.move_x = 0,
+	.move_y = 0,
+	.up_x = 0,
+	.up_y = 0,
+	.offset_x = 0,
+	.offset_y = 0,
+	.long_press_timer = NULL,
+	.pressed_obj = NULL,
+};
+
+
+int apps_view_get_mode(void)
+{
+	return view_info.mode;
+}
+
+void apps_view_set_mode(int mode)
+{
+	_APPS_D("Set mode : %d -> %d", view_info.mode, mode);
+	view_info.mode = mode;
+}
+
 static Evas_Object *_create_window(const char *name, const char *title)
 {
 	Evas_Object *win = NULL;
@@ -61,7 +104,7 @@ static Evas_Object *_create_window(const char *name, const char *title)
 	/* Open GL backend */
 	elm_config_accel_preference_set("opengl");
 
-	win = elm_win_add(NULL, name, ELM_WIN_BASIC);
+	win = elm_win_util_standard_add(name, name);
 	if (win == NULL) {
 		_APPS_E("Failed to add apps window");
 		return NULL;
@@ -69,20 +112,13 @@ static Evas_Object *_create_window(const char *name, const char *title)
 
 	elm_win_screen_size_get(win, NULL, NULL, &view_info.root_w, &view_info.root_h);
 
-	elm_win_alpha_set(win, EINA_FALSE); // This order is important
-	elm_win_role_set(win, "no-effect");
+	evas_object_resize(win, view_info.root_w, view_info.root_h);
+	evas_object_show(win);
 
 	if (elm_win_wm_rotation_supported_get(win)) {
 		const int rots[APPS_VIEW_ROTATION_TYPE_NUM] = { 0 };
 		elm_win_wm_rotation_available_rotations_set(win, rots, APPS_VIEW_ROTATION_TYPE_NUM);
 	}
-
-	evas_object_color_set(win, 0, 0, 0, 0);
-	evas_object_resize(win, view_info.root_w, view_info.root_h);
-	evas_object_hide(win);
-
-	elm_win_title_set(win, title);
-	elm_win_borderless_set(win, EINA_TRUE);
 
 	return win;
 }
@@ -122,8 +158,9 @@ static Evas_Object *_create_layout(Evas_Object *parent)
 	}
 
 	evas_object_size_hint_weight_set(layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_size_hint_align_set(layout, EVAS_HINT_FILL, EVAS_HINT_FILL);
-	evas_object_resize(layout, view_info.root_w, view_info.root_h);
+	evas_object_size_hint_min_set(layout, view_info.root_w, view_info.root_h);
+	evas_object_size_hint_max_set(layout, view_info.root_w, view_info.root_h);
+	elm_win_resize_object_add(parent, layout);
 	evas_object_show(layout);
 
 	return layout;
@@ -151,6 +188,13 @@ static Eina_Bool _push_items(void *layout)
 }
 
 static key_cb_ret_e _back_key_cb(void *data)
+{
+	_APPS_D("%s", __func__);
+
+	return KEY_CB_RET_STOP;
+}
+
+static key_cb_ret_e _home_key_cb(void *data)
 {
 	_APPS_D("%s", __func__);
 
@@ -202,6 +246,13 @@ apps_error_e apps_view_show(void)
 		_APPS_E("Failed to register back key event");
 	}
 
+	ret = key_register_cb(KEY_TYPE_HOME, _home_key_cb, NULL);
+	if (W_HOME_ERROR_NONE != ret) {
+		_APPS_E("Failed to register home key event");
+	}
+
+	view_info.mode = APPS_MODE_NORMAL;
+
 	return APPS_ERROR_NONE;
 }
 
@@ -215,14 +266,106 @@ void apps_view_hide(void)
 	}
 
 	evas_object_hide(view_info.win);
+	evas_object_hide(view_info.layout);
 	key_unregister_cb(KEY_TYPE_BACK, _back_key_cb);
+	key_unregister_cb(KEY_TYPE_HOME, _home_key_cb);
+}
+
+static Eina_Bool _apps_view_long_press_time_cb(void *data)
+{
+	if (mouse_info.pressed != EINA_TRUE || mouse_info.pressed_obj != data) {
+		return ECORE_CALLBACK_CANCEL;
+	}
+
+	mouse_info.long_pressed = EINA_TRUE;
+	apps_view_set_mode(APPS_MODE_EDIT);
+
+	mouse_info.long_press_timer = NULL;
+
+	return ECORE_CALLBACK_CANCEL;
+}
+
+static void _apps_view_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Evas_Event_Mouse_Down *ev = event_info;
+
+	if (view_info.mode != APPS_MODE_NORMAL) {
+		_APPS_E("Apps mode is not normal(%d)", view_info.mode);
+		return;
+	}
+
+	_APPS_D("Mouse Down(%d, %d)", ev->output.x, ev->output.y);
+
+	mouse_info.pressed = EINA_TRUE;
+	mouse_info.pressed_obj = obj;
+
+	mouse_info.down_x = mouse_info.move_x = ev->output.x;
+	mouse_info.down_y = mouse_info.move_y = ev->output.y;
+
+	if (mouse_info.long_press_timer) {
+		ecore_timer_del(mouse_info.long_press_timer);
+		mouse_info.long_press_timer = NULL;
+	}
+
+	mouse_info.long_press_timer = ecore_timer_add(APPS_VIEW_LONG_PRESS_TIME, _apps_view_long_press_time_cb, obj);
+	if (mouse_info.long_press_timer == NULL) {
+		_APPS_E("Failed to add long press timer");
+	}
+}
+
+static void _apps_view_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Evas_Event_Mouse_Move *ev = event_info;
+
+	if (mouse_info.pressed != EINA_TRUE || mouse_info.pressed_obj != obj) {
+		return;
+	}
+
+	mouse_info.move_x = ev->cur.output.x;
+	mouse_info.move_y = ev->cur.output.y;
+
+	if (mouse_info.long_pressed != EINA_TRUE) {
+		int distance = (mouse_info.move_x - mouse_info.down_x) * (mouse_info.move_x -mouse_info.down_x);
+		distance += (mouse_info.move_y - mouse_info.down_y) * (mouse_info.move_y - mouse_info.down_y);
+
+		if (distance > APPS_VIEW_MOUSE_MOVE_MIN_DISTANCE) {
+			if (mouse_info.long_press_timer) {
+				ecore_timer_del(mouse_info.long_press_timer);
+				mouse_info.long_press_timer = NULL;
+			}
+			return;
+		}
+	}
+}
+
+static void _apps_view_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Evas_Event_Mouse_Up *ev = event_info;
+
+	if (mouse_info.pressed != EINA_TRUE || mouse_info.pressed_obj != obj) {
+		return;
+	}
+
+	_APPS_D("Mouse Up(%d, %d)", ev->output.x, ev->output.y);
+
+	mouse_info.pressed = EINA_FALSE;
+
+	if (mouse_info.long_press_timer) {
+		ecore_timer_del(mouse_info.long_press_timer);
+		mouse_info.long_press_timer = NULL;
+	}
+
+	mouse_info.up_x = ev->output.x;
+	mouse_info.up_y = ev->output.y;
+
+	mouse_info.long_pressed = EINA_FALSE;
 }
 
 apps_error_e apps_view_create(void)
 {
 	_APPS_D("%s", __func__);
 
-	view_info.win =  _create_window(APPS_VIEW_WIN_NAME, APPS_VIEW_WIN_TITLE);
+	view_info.win = _create_window(APPS_VIEW_WIN_NAME, APPS_VIEW_WIN_TITLE);
 	if (view_info.win == NULL) {
 		_APPS_E("Failed to create apps window");
 		return APPS_ERROR_FAIL;
@@ -240,12 +383,20 @@ apps_error_e apps_view_create(void)
 		_APPS_E("Failed to push app items");
 	}
 
+	evas_object_event_callback_add(view_info.layout, EVAS_CALLBACK_MOUSE_DOWN, _apps_view_down_cb, NULL);
+	evas_object_event_callback_add(view_info.layout, EVAS_CALLBACK_MOUSE_MOVE, _apps_view_move_cb, NULL);
+	evas_object_event_callback_add(view_info.layout, EVAS_CALLBACK_MOUSE_UP, _apps_view_up_cb, NULL);
+
 	return APPS_ERROR_NONE;
 }
 
 void apps_view_destroy(void)
 {
 	_APPS_D("%s", __func__);
+
+	evas_object_event_callback_del(view_info.layout, EVAS_CALLBACK_MOUSE_DOWN, _apps_view_down_cb);
+	evas_object_event_callback_del(view_info.layout, EVAS_CALLBACK_MOUSE_MOVE, _apps_view_move_cb);
+	evas_object_event_callback_del(view_info.layout, EVAS_CALLBACK_MOUSE_UP, _apps_view_up_cb);
 
 	if (view_info.apps_item_idler) {
 		ecore_idler_del(view_info.apps_item_idler);
