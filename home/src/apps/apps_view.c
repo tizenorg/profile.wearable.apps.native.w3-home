@@ -61,28 +61,41 @@ static Evas_Object *_create_window(const char *name, const char *title)
 	/* Open GL backend */
 	elm_config_accel_preference_set("opengl");
 
-	win = elm_win_add(NULL, name, ELM_WIN_BASIC);
+	//win = elm_win_add(NULL, name, ELM_WIN_BASIC);
+	win = elm_win_util_standard_add(name, name);
 	if (win == NULL) {
 		_APPS_E("Failed to add apps window");
 		return NULL;
 	}
 
+	elm_win_title_set(win, title);
+	elm_win_borderless_set(win, EINA_TRUE);
+
 	elm_win_screen_size_get(win, NULL, NULL, &view_info.root_w, &view_info.root_h);
 
-	elm_win_alpha_set(win, EINA_FALSE); // This order is important
+	//elm_win_alpha_set(win, EINA_FALSE); // This order is important
 	elm_win_role_set(win, "no-effect");
 
+
+	evas_object_show(win);
+
+#if 0
 	if (elm_win_wm_rotation_supported_get(win)) {
 		const int rots[APPS_VIEW_ROTATION_TYPE_NUM] = { 0 };
 		elm_win_wm_rotation_available_rotations_set(win, rots, APPS_VIEW_ROTATION_TYPE_NUM);
 	}
+#endif
 
-	evas_object_color_set(win, 0, 0, 0, 0);
+	evas_object_color_set(win, 255, 0, 0, 255);
 	evas_object_resize(win, view_info.root_w, view_info.root_h);
-	evas_object_hide(win);
+	//evas_object_hide(win);
 
-	elm_win_title_set(win, title);
-	elm_win_borderless_set(win, EINA_TRUE);
+	////////////////////////////////////////////////
+	int x, y, w, h;
+	evas_object_geometry_get(win, &x, &y, &w, &h);
+	_APPS_D(" =========== win : %d, %d(%dx%d)", x, y, w, h);
+	////////////////////////////////////////////////
+
 
 	return win;
 }
@@ -122,9 +135,17 @@ static Evas_Object *_create_layout(Evas_Object *parent)
 	}
 
 	evas_object_size_hint_weight_set(layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_size_hint_align_set(layout, EVAS_HINT_FILL, EVAS_HINT_FILL);
+	evas_object_size_hint_min_set(layout, view_info.root_w, view_info.root_h);
+	evas_object_size_hint_max_set(layout, view_info.root_w, view_info.root_h);
 	evas_object_resize(layout, view_info.root_w, view_info.root_h);
+	elm_win_resize_object_add(parent, layout);
 	evas_object_show(layout);
+
+	////////////////////////////////////////////////
+	int x, y, w, h;
+	evas_object_geometry_get(layout, &x, &y, &w, &h);
+	_APPS_D(" =========== root : (%dx%d) layout : %d, %d(%dx%d)", view_info.root_w, view_info.root_h, x, y, w, h);
+	////////////////////////////////////////////////
 
 	return layout;
 }
@@ -140,6 +161,7 @@ static void _destroy_layout(void)
 	view_info.layout = NULL;
 }
 
+#if 0
 static Eina_Bool _push_items(void *layout)
 {
 	if (layout == NULL) {
@@ -149,6 +171,7 @@ static Eina_Bool _push_items(void *layout)
 
 	return ECORE_CALLBACK_CANCEL;
 }
+#endif
 
 static key_cb_ret_e _back_key_cb(void *data)
 {
@@ -215,6 +238,7 @@ void apps_view_hide(void)
 	}
 
 	evas_object_hide(view_info.win);
+	evas_object_hide(view_info.layout);
 	key_unregister_cb(KEY_TYPE_BACK, _back_key_cb);
 }
 
@@ -222,7 +246,7 @@ apps_error_e apps_view_create(void)
 {
 	_APPS_D("%s", __func__);
 
-	view_info.win =  _create_window(APPS_VIEW_WIN_NAME, APPS_VIEW_WIN_TITLE);
+	view_info.win = _create_window(APPS_VIEW_WIN_NAME, APPS_VIEW_WIN_TITLE);
 	if (view_info.win == NULL) {
 		_APPS_E("Failed to create apps window");
 		return APPS_ERROR_FAIL;
@@ -235,10 +259,12 @@ apps_error_e apps_view_create(void)
 		return APPS_ERROR_FAIL;
 	}
 
+#if 0
 	view_info.apps_item_idler = ecore_idler_add(_push_items, view_info.layout);
 	if (view_info.apps_item_idler == NULL) {
 		_APPS_E("Failed to push app items");
 	}
+#endif
 
 	return APPS_ERROR_NONE;
 }
