@@ -396,49 +396,6 @@ static void _bezel_down_cb(void *data)
 
 
 
-static key_cb_ret_e _power_key_cb(void *data)
-{
-	Evas_Object *layout = data;
-	Evas_Object *scroller = NULL;
-	Evas_Object *focused_page = NULL;
-
-	_D("Power key pressed");
-
-	retv_if(!layout, KEY_CB_RET_CONTINUE);
-
-	scroller = evas_object_data_get(layout, DATA_KEY_SCROLLER);
-	retv_if(!scroller, KEY_CB_RET_CONTINUE);
-
-	if (PAGE_DIRECTION_CENTER != scroller_get_current_page_direction(scroller)) {
-		return KEY_CB_RET_CONTINUE;
-	}
-
-	if (util_feature_enabled_get(FEATURE_APPS) == 0) {
-		util_create_toast_popup(scroller, _("IDS_ST_TPOP_ACTION_NOT_AVAILABLE_WHILE_POWER_SAVING_PLUS_ENABLED"));
-		return KEY_CB_RET_CONTINUE;
-	}
-
-	if (util_feature_enabled_get(FEATURE_APPS_BY_BEZEL_UP) == 0) {
-		return KEY_CB_RET_CONTINUE;
-	}
-
-	if (scroller_is_scrolling(scroller)) {
-		return KEY_CB_RET_CONTINUE;
-	}
-
-	focused_page = scroller_get_focused_page(scroller);
-	if (focused_page != NULL) {
-		evas_object_data_set(focused_page, DATA_KEY_PAGE_ONHOLD_COUNT, (void*)1);
-	}
-
-	apps_main_show_count_add();
-	apps_main_launch(APPS_LAUNCH_SHOW);
-
-	return KEY_CB_RET_STOP;
-}
-
-
-
 HAPI void layout_add_mouse_cb(Evas_Object *layout)
 {
 	evas_object_event_callback_add(layout, EVAS_CALLBACK_MOUSE_DOWN, _down_cb, NULL);
@@ -555,13 +512,11 @@ static void _upper_end_cb(void *data, Evas_Object *obj, void *event_info)
 
 static Evas_Event_Flags _flick_start_cb(void *data, void *event_info)
 {
-	int gesture_down_y = 0;
 	Evas_Object *layout = data;
 	Elm_Gesture_Line_Info *ei = (Elm_Gesture_Line_Info *)event_info;
 	retv_if(!layout, EVAS_EVENT_FLAG_NONE);
 	retv_if(!ei, EVAS_EVENT_FLAG_NONE);
 
-	gesture_down_y = (int) evas_object_data_get(layout, PRIVATE_DATA_KEY_LAYOUT_G_DOWN_Y);
 	if (ei->momentum.y1 <= THRESHOLD_BEZEL_UP_H) {
 		evas_object_data_set(layout, PRIVATE_DATA_KEY_READY_TO_BEZEL_DOWN, (void *) 1);
 	}

@@ -179,7 +179,7 @@ HAPI Evas_Object *summary_create_item(Evas_Object *page, const char *pkgname, co
     }
     else {
 		goto_if(0 > pkgmgrinfo_appinfo_get_appinfo(pkgname, &appinfo_h), ERROR);
-		goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_icon(appinfo_h, &icon_path), ERROR);
+		goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_icon(appinfo_h, (char**)&icon_path), ERROR);
 
 		if (icon_path == NULL || strlen(icon_path) == 0) {
 			_D("actual icon_path [%s]", RESDIR"/images/unknown.png");

@@ -18,6 +18,7 @@
 #include <Elementary.h>
 #include <notification.h>
 #include <notification_internal.h>
+#include <notification_text_domain.h>
 
 #include "util.h"
 #include "log.h"

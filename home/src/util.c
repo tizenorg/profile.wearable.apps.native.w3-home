@@ -31,6 +31,7 @@
 #include <efl_extension.h>
 #include <pkgmgr-info.h>
 #include <widget_service.h>
+#include <bundle_internal.h>
 
 #include <unicode/unum.h>
 #include <unicode/ustring.h>
@@ -1046,53 +1047,5 @@ HAPI int util_host_vender_id_get(void)
 
 	//return ret;
 }
-
-#ifdef __MDM_ENABLED__
-HAPI void util_mdm_get_service()
-{
-	if (mdm_get_service() == MDM_RESULT_SUCCESS)
-	{
-		_W("mdm_get_service is success");
-		/* MDM Á¤Ã¥ °¡Á®¿À±â */
-		apps_main_set_mdm_policy(true);
-	}
-	else
-	{
-		_W("mdm_get_service is fail");
-		/* ±âÁ¸ APP ±â´É »ç¿ë¿¡ ¹®Á¦°¡ ¾ø¾î¾ßÇÔ. */
-		apps_main_set_mdm_policy(false);
-	}
-}
-
-
-HAPI void util_mdm_release_service()
-{
-//	if (apps_main_get_mdm_policy() == true)
-	{
-		_W("mdm release service");
-		mdm_release_service();
-	}
-}
-
-HAPI int util_mdm_is_restricted(const char *appid)
-{
-	retv_if(!appid, 0);
-
-	if (apps_main_get_mdm_policy() == false)
-	{
-		_W("mdm restrict is false");
-		return 0;
-	}
-
-	mdm_status_t status;
-	status = mdm_get_application_uninstallation_disabled(appid);
-	if (status == MDM_DISABLED) {
-		_SD("#MDM app[%s] is diabled", appid);
-		return 1;
-
-	}
-	return 0;
-}
-#endif
 
 // End of a file

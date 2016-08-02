@@ -40,6 +40,7 @@ extern void *add_viewer_package_list_prev(void *handle);
 extern void add_viewer_package_list_del(struct add_viewer_package *package);
 
 extern const char *add_viewer_package_list_name(struct add_viewer_package *package);
+extern const char *add_viewer_package_list_appname(struct add_viewer_package *package);
 extern const char *add_viewer_package_list_pkgname(struct add_viewer_package *package);
 extern const char *add_viewer_package_list_icon(struct add_viewer_package *package);
 extern int add_viewer_package_list_type(struct add_viewer_package *package);
@@ -63,6 +64,8 @@ extern int add_viewer_package_is_skipped(struct add_viewer_package *package);
 
 extern void add_viewer_package_set_data(struct add_viewer_package *package, void *data);
 extern void *add_viewer_package_data(struct add_viewer_package *package);
+extern int add_viewer_package_get_max_instance_count(struct add_viewer_package *package);
+extern int add_viewer_package_get_widget_count_in_package(struct add_viewer_package *package);
 
 extern int add_viewer_package_list_add_event_callback(struct add_viewer_package *package, int event, int (*cb)(struct add_viewer_package *package, void *data), void *data);
 extern int add_viewer_package_list_del_event_callback(struct add_viewer_package *package, int event, int (*cb)(struct add_viewer_package *package, void *data), void *data);

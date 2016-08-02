@@ -125,7 +125,7 @@ HAPI void lang_refresh_ids(void)
 
 	EINA_LIST_FOREACH_SAFE(lang_list, l, n, le) {
 		if (le->domain) {
-			temp = D_(le->id);
+			temp = dgettext("sys_string", le->id);
 		} else {
 			temp = _(le->id);
 		}

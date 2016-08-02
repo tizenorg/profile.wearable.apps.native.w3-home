@@ -21,6 +21,8 @@
 #include <pkgmgr-info.h>
 #include <pkgmgrinfo_type.h>
 #include <Pepper_Efl.h>
+#include <appsvc.h>
+#include <app_control_internal.h>
 
 #include "conf.h"
 #include "clock_service.h"
@@ -277,7 +279,6 @@ static void __watch_removed(void *data, Evas_Object *obj, void *event_info)
 void clock_service_init(Evas_Object *win)
 {
 	Evas_Object *scroller = _scroller_get();
-	app_control_h watch_control;
 	char *pkg_name = NULL;
 	int ret = 0;
 
