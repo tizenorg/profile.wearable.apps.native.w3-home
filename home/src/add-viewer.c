@@ -116,60 +116,6 @@ static inline void append_padding(Evas_Object *box, int padding)
 	elm_box_pack_end(box, pad);
 }
 
-static void show_progress(struct widget_data *widget_data)
-{
-	Evas_Object *scroller = widget_data->scroller;
-	Evas_Object *box = elm_object_content_get(scroller);
-
-	Evas_Object *widget = NULL;
-	Eina_List *list = NULL;
-	int h_page = 0;
-	Evas_Coord x;
-
-	if (!scroller) {
-		ErrPrint("Failed to load the widget scroller\n");
-		return;
-	}
-
-	if (!box) {
-		return;
-	}
-
-	list = elm_box_children_get(box);
-	if (!list) {
-		return;
-	}
-
-	widget_data->progress = elm_progressbar_add(widget_data->bg);
-	elm_object_style_set(widget_data->progress, "process");
-	evas_object_size_hint_align_set(widget_data->progress, EVAS_HINT_FILL, 0.5);
-	evas_object_size_hint_weight_set(widget_data->progress, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	elm_progressbar_pulse(widget_data->progress, EINA_TRUE);
-	evas_object_show(widget_data->progress);
-	evas_object_smart_member_add(widget_data->progress, widget_data->add_viewer);
-	evas_object_clip_set(widget_data->progress, widget_data->stage);
-	elm_object_part_content_set(widget_data->bg, "progress", widget_data->progress);
-	elm_progressbar_pulse(widget_data->progress, EINA_TRUE);
-
-	evas_object_geometry_get(box, &x, NULL, NULL, NULL);
-	x -= (ADD_VIEWER_PAGE_WIDTH >> 1);
-	h_page = -(x / ADD_VIEWER_PAGE_WIDTH);
-
-	widget = eina_list_nth(list, h_page);
-	if (widget) {
-		evas_object_hide(widget);
-	}
-	widget = eina_list_nth(list, h_page + 2);
-	if (widget) {
-		evas_object_hide(widget);
-	}
-
-	elm_object_signal_emit(widget_data->bg, "hide", "index");
-
-	elm_scroller_movement_block_set(widget_data->scroller, ELM_SCROLLER_MOVEMENT_BLOCK_HORIZONTAL);
-}
-
-
 static Eina_Bool normal_loader_cb(struct widget_data *widget_data, void *container)
 {
 	struct add_viewer_package *package;
@@ -199,7 +145,7 @@ static Eina_Bool normal_loader_cb(struct widget_data *widget_data, void *contain
 		goto out;
 	}
 
-	char *widget_id = add_viewer_package_list_pkgname(package);
+	const char *widget_id = add_viewer_package_list_pkgname(package);
 	if (widget_id) {
 		if (!strcmp(widget_id, CALENDAR_NEXT_EVENT_WIDGET_ID)) {
 			if (util_host_vender_id_get() == W_HOME_VENDOR_ID_LO) {
@@ -238,7 +184,7 @@ static Eina_Bool normal_loader_cb(struct widget_data *widget_data, void *contain
 		free(appname);
 	} else {
 		name = elm_entry_utf8_to_markup(add_viewer_package_list_name(package));
-		appname = elm_entry_utf8_to_markup(add_viewer_package_list_appname(package));
+		appname = elm_entry_utf8_to_markup((char*)add_viewer_package_list_appname(package));
 
 		thumb_item = winset_preview_add(widget_data, container, package, name, appname, widget_count, WIDGET_SIZE_TYPE_2x2, 0);
 		WarnPrint("Added: %p %s %s\n", thumb_item, name, appname);
@@ -714,7 +660,7 @@ static void _widget_scroll_cb(void *data, Evas_Object *obj, void *event_info)
 		return;
 	}
 
-	_change_focus(widget_data, focus_widget);
+	_change_focus(widget_data->scroller, focus_widget);
 
 	add_viewer_index_bringin(widget_data->index, focus_widget);
 }
@@ -1040,7 +986,7 @@ static Evas_Object *winset_preview_add(struct widget_data *widget_data, Evas_Obj
 	Evas_Object *bg;
 	char buf[512] = {0, };
 
-	char *widget_id = add_viewer_package_list_pkgname(package);
+	const char *widget_id = add_viewer_package_list_pkgname(package);
 	if (widget_id) {
 		if (!strcmp(widget_id, APPSHORTCUT_WIDGET_ID)) {
 			if (util_host_vender_id_get() == W_HOME_VENDOR_ID_LO) {

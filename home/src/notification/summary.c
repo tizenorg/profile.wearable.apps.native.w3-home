@@ -148,6 +148,7 @@ HAPI Evas_Object *summary_create_item(Evas_Object *page, const char *pkgname, co
 
 	char *text_time = NULL;
 	char buf[BUFSZE] = {0, };
+	char *temp_icon_path = NULL;
 
 	Eina_Bool ret = EINA_FALSE;
 
@@ -179,14 +180,15 @@ HAPI Evas_Object *summary_create_item(Evas_Object *page, const char *pkgname, co
     }
     else {
 		goto_if(0 > pkgmgrinfo_appinfo_get_appinfo(pkgname, &appinfo_h), ERROR);
-		goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_icon(appinfo_h, &icon_path), ERROR);
+		goto_if(PMINFO_R_OK != pkgmgrinfo_appinfo_get_icon(appinfo_h, &temp_icon_path), ERROR);
 
-		if (icon_path == NULL || strlen(icon_path) == 0) {
+		if (temp_icon_path == NULL || strlen(temp_icon_path) == 0) {
 			_D("actual icon_path [%s]", RESDIR"/images/unknown.png");
 			goto_if(elm_image_file_set(icon, RESDIR"/images/unknown.png", NULL) == EINA_FALSE, ERROR);
 		}
 		else {
-			goto_if(elm_image_file_set(icon, icon_path, NULL) == EINA_FALSE, ERROR);
+			goto_if(elm_image_file_set(icon, temp_icon_path, NULL) == EINA_FALSE, ERROR);
+			free(temp_icon_path);
 		}
 
 		if (appinfo_h) {
@@ -253,6 +255,8 @@ ERROR:
 	if (item) evas_object_del(item);
 	if (appinfo_h)
 		pkgmgrinfo_appinfo_destroy_appinfo(appinfo_h);
+	if (temp_icon_path)
+		free(temp_icon_path);
 	return NULL;
 }
 

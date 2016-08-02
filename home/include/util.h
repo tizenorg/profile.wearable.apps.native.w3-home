@@ -122,9 +122,6 @@
 #define _(str) gettext(str)
 #endif
 #define gettext_noop(str) (str)
-#define N_(str) gettext_noop(str)
-#define D_(str) dgettext("sys_string", str)
-
 
 
 /* Accessibility */

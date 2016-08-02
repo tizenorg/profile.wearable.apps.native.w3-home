@@ -26,6 +26,7 @@
 #include <vconf.h>
 #include <widget_viewer_evas.h>
 #include <app_control.h>
+#include <circle/efl_extension_rotary.h>
 
 #include "util.h"
 #include "add-viewer.h"
@@ -727,8 +728,8 @@ static void _edit_button_click_cb(void *data, Evas_Object *obj, const char *emis
 	layout_info_s *layout_info = NULL;
 	Evas_Object* focus_page = NULL;
 	page_info_s *page_info = NULL;
-	char *widget_id = NULL;
-	char *content_info = NULL;
+	const char *widget_id = NULL;
+	const char *content_info = NULL;
 
 	if(!layout)	{
 		_E("layout is null " );

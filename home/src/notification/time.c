@@ -145,7 +145,7 @@ static i18n_udate_format_h _get_time_formatter(void)
 
 	char a_best_pattern[BUF_FORMATTER] = {0, };
 	char *a_best_pattern_fixed = NULL;
-	char *saveptr1, *saveptr2;
+	char *saveptr1 = NULL, *saveptr2 = NULL;
 
 	int32_t u_best_pattern_capacity;
 	int32_t best_pattern_len;
@@ -220,7 +220,7 @@ static i18n_udate_format_h _get_time_formatter_24(void)
 
 	char a_best_pattern[BUF_FORMATTER] = {0.};
 	char *a_best_pattern_fixed = NULL;
-	char *saveptr1, *saveptr2;
+	char *saveptr1 = NULL, *saveptr2 = NULL;
 
 	int32_t u_best_pattern_capacity;
 	int32_t best_pattern_len;
