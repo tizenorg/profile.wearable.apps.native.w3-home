@@ -70,7 +70,6 @@ Home for wearable devices
 %setup -q
 
 %define PREFIX /usr/apps/%{name}
-%define DATADIR /opt%{PREFIX}/data
 
 %build
 
@@ -112,16 +111,6 @@ mkdir -p %{buildroot}/opt/usr/share/w-launcher
 %post
 
 INHOUSE_ID="5000"
-make_data_directory()
-{
-	I="%{DATADIR}"
-	if [ ! -d $I ]; then
-		mkdir -p $I
-	fi
-	chmod 775 $I
-	chown :$INHOUSE_ID $I
-}
-make_data_directory
 
 vconftool set -t int "memory/private/org.tizen.w-home/tutorial" 0 -i -g $INHOUSE_ID -f -s %{name}
 vconftool set -t int "db/private/org.tizen.w-home/enabled_tutorial" 0 -g $INHOUSE_ID -f -s %{name}
