@@ -95,7 +95,7 @@ export FFLAGS="$FFLAGS -DTIZEN_DEBUG_ENABLE"
 %endif
 RPM_OPT=`echo $CFLAGS|sed 's/-Wp,-D_FORTIFY_SOURCE=2//'`
 export CFLAGS=$RPM_OPT
-cmake  -DCMAKE_INSTALL_PREFIX="%{PREFIX}" -DARCH=%{ARCH} -DCIRCLE="%{CIRCLE}"
+cmake  -DCMAKE_INSTALL_PREFIX="%{PREFIX}" -DARCH=%{ARCH} -DCIRCLE="circle"
 make %{?jobs:-j%jobs}
 
 

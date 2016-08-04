@@ -54,7 +54,6 @@ static struct _apps_view_s {
 	.apps_show_idler = NULL,
 	.root_w = 0,
 	.root_h = 0,
-	.mode = APPS_MODE_NORMAL,
 };
 
 static struct _mouse_info_s {
@@ -267,6 +266,7 @@ void apps_view_hide(void)
 
 	evas_object_hide(view_info.win);
 	evas_object_hide(view_info.layout);
+
 	key_unregister_cb(KEY_TYPE_BACK, _back_key_cb);
 	key_unregister_cb(KEY_TYPE_HOME, _home_key_cb);
 }
@@ -383,6 +383,9 @@ apps_error_e apps_view_create(void)
 		_APPS_E("Failed to push app items");
 	}
 
+	/*
+	 * Register mouse evnet callback
+	 */
 	evas_object_event_callback_add(view_info.layout, EVAS_CALLBACK_MOUSE_DOWN, _apps_view_down_cb, NULL);
 	evas_object_event_callback_add(view_info.layout, EVAS_CALLBACK_MOUSE_MOVE, _apps_view_move_cb, NULL);
 	evas_object_event_callback_add(view_info.layout, EVAS_CALLBACK_MOUSE_UP, _apps_view_up_cb, NULL);
@@ -394,6 +397,9 @@ void apps_view_destroy(void)
 {
 	_APPS_D("%s", __func__);
 
+	/*
+	 * Unregister mouse event callback
+	 */
 	evas_object_event_callback_del(view_info.layout, EVAS_CALLBACK_MOUSE_DOWN, _apps_view_down_cb);
 	evas_object_event_callback_del(view_info.layout, EVAS_CALLBACK_MOUSE_MOVE, _apps_view_move_cb);
 	evas_object_event_callback_del(view_info.layout, EVAS_CALLBACK_MOUSE_UP, _apps_view_up_cb);
