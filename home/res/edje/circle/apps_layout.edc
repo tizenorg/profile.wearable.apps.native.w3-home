@@ -18,6 +18,56 @@
 #include "apps_conf.edc"
 #include "../color_classes.edc"
 
+#define TOUCH_AREA_PART(index) \
+	part { \
+		name: "touch_area_"index; \
+		type: IMAGE; \
+		scale: 1; \
+		mouse_events: 1; \
+		description { \
+			state: "default" 0.0; \
+			rel1 { relative: 0.0 0.0; to: "bg"; } \
+			rel2 { relative: 1.0 1.0; to: "bg"; } \
+			image { normal: "touch_area/b_home_screen_apps_toucharea_"index".png"; } \
+			visible: 1; \
+			color: 0 13*index 50 100; \
+		} \
+	}
+
+#define ICON_POSITION(index, x, y) \
+	part { \
+		name: "icon_position_"index; \
+		type: RECT; \
+		scale: 1; \
+		mouse_events: 1; \
+		description { \
+			state: "default" 0.0; \
+			rel1 { relative: x/360 y/360; to: "bg"; } \
+			rel2 { relative: x/360 y/360; to: "bg"; } \
+			min: 62 62; \
+			max: 62 62; \
+			visible: 1; \
+			color: 255 0 0 150; \
+		} \
+	}
+
+images {
+	image: "touch_area/b_home_screen_apps_toucharea_1.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_2.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_3.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_4.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_5.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_6.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_7.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_8.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_9.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_10.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_11.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_12.png" COMP;
+	image: "touch_area/b_home_screen_apps_toucharea_13.png" COMP;
+	image: "b_home_rotary_selector_center_pointer.png" COMP;
+}
+
 collections {
 	group {
 		name: "layout";
@@ -28,8 +78,8 @@ collections {
 				mouse_events: 1;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; offset: 0 0; }
-					rel2 { relative: 1.0 1.0; offset: 0 0; }
+					rel1 { relative: 0.0 0.0; }
+					rel2 { relative: 1.0 1.0; }
 					color: 0 0 0 255;
 					visible: 1;
 					perspective {
@@ -43,8 +93,8 @@ collections {
 				scale: 1;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
+					rel1 { relative: 104/360 138/360; to: "bg"; }
+					rel2 { relative: (104+152)/360 (138+84)/360; to: "bg"; }
 					color: 255 255 255 255;
 					visible: 1;
 					text {
@@ -55,124 +105,67 @@ collections {
 					}
 				}
 			}
-			part {
-				name: "focus";
-				type: SWALLOW;
-				scale: 1;
-				mouse_events: 1;
-				repeat_events: 1;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
-					color: 0 0 0 0;
-					visible: 1;
-				}
-			}
-			part {
-				name: "container";
-				type: SWALLOW;
-				mouse_events: 0;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
-					visible: 1;
-				}
-			}
-			part {
-				name: "zoom";
-				type: RECT;
-				description {
-					state: "default" 0.0;
-					color: 0 0 0 0;
-					perspective {
-						zplane: -140;
-					}
-				}
-			}
-			part {
-				name: "scroller";
-				type: SWALLOW;
-				mouse_events: 1;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to, "bg"; }
-					align: 0.5 0.0;
-					visible: 1;
-					map {
-						on: 0;
-					}
-				}
-				description {
-					state: "on" 0.0;
-					inherit: "default" 0.0;
-					map {
-						on: 1;
-						perspective: "bg";
-					}
-				}
-				description {
-					state: "zoom" 0.0;
-					inherit: "on";
-					map {
-						perspective: "zoom";
-					}
-				}
-			}
-			part {
-				name: "top_checker";
-				type: SWALLOW;
-				mouse_events: 1;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 1.0 0.2; to: "bg"; }
-					visible: 0;
-				}
-				description {
-					state: "show" 0.0;
-					inherit: "default" 0.0;
-					visible: 1;
-				}
-			}
-			part {
-				name: "bottom_checker";
-				type: SWALLOW;
-				mouse_events: 1;
-				description {
-					state: "default" 0.0;
-					rel1 { relative: 0.0 0.8; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
-					visible: 0;
-				}
-				description {
-					state: "show" 0.0;
-					inherit: "default" 0.0;
-					visible: 1;
-				}
-			}
+
+			ICON_POSITION(0, 253, 62)
+			ICON_POSITION(1, 305, 122)
+			ICON_POSITION(2, 317, 200)
+			ICON_POSITION(3, 286, 270)
+			ICON_POSITION(4, 220, 313)
+			ICON_POSITION(5, 141, 313)
+			ICON_POSITION(6, 75, 270)
+			ICON_POSITION(7, 42, 200)
+			ICON_POSITION(8, 53, 122)
+			ICON_POSITION(9, 104, 62)
+
+			TOUCH_AREA_PART(1)
+			TOUCH_AREA_PART(2)
+			TOUCH_AREA_PART(3)
+			TOUCH_AREA_PART(4)
+			TOUCH_AREA_PART(5)
+			TOUCH_AREA_PART(6)
+			TOUCH_AREA_PART(7)
+			TOUCH_AREA_PART(8)
+			TOUCH_AREA_PART(9)
+			TOUCH_AREA_PART(10)
+			TOUCH_AREA_PART(11)
+			TOUCH_AREA_PART(12)
+			TOUCH_AREA_PART(13)
 
 			part {
-				name: "blocker";
-				type: RECT;
+				name: "img.rotary.pointer";
+				type: IMAGE;
+				scale: 1;
 				mouse_events: 1;
 				description {
 					state: "default" 0.0;
-					rel1 { relative: 0.0 0.0; to: "bg"; }
-					rel2 { relative: 1.0 1.0; to: "bg"; }
-					color: 0 0 0 0;
-					visible: 0;
-				}
-				description {
-					state: "enable" 0.0;
-					inherit: "default" 0.0;
+					rel1 { relative: 75/360 75/360; to: "bg"; }
+					rel2 { relative: (75+210)/360 (75+210)/360; to: "bg"; }
+					image { normal: "b_home_rotary_selector_center_pointer.png"; }
 					visible: 1;
+					color: 255 255 255 255;
+					map {
+						on: 1;
+						rotation {
+							x: 0.0;
+							y: 0.0;
+							z: 32.7;
+						}
+					}
 				}
 			}
 		}
 		programs {
+			script {
+				public message(Msg_Type:type, id, ...) {
+					if ((type == MSG_FLOAT) && (id == 0)) {
+						/* rotary pointer */
+						new Float:angle = getfarg(2);
+						custom_state(PART:"img.rotary.pointer", "default", 0.0);
+						set_state_val(PART:"img.rotary.pointer", STATE_MAP_ROT_Z, angle);
+						set_state(PART:"img.rotary.pointer", "custom", 0.0);
+					}
+				}
+			}
 			program {
 				name: "bg,down";
 				signal: "mouse,down,1";
@@ -184,58 +177,6 @@ collections {
 				signal: "mouse,up,1";
 				source: "bg";
 				action: SIGNAL_EMIT "bg,up" "bg";
-			}
-			program {
-				signal: "show";
-				source: "checker";
-				action: STATE_SET "show" 0.0;
-				target: "top_checker";
-				target: "bottom_checker";
-			}
-			program {
-				signal: "hide";
-				source: "checker";
-				action: STATE_SET "default" 0.0;
-				target: "top_checker";
-				target: "bottom_checker";
-			}
-			program {
-				signal: "block";
-				source: "layout";
-				action: STATE_SET "enable" 0.0;
-				target: "blocker";
-			}
-			program {
-				signal: "unblock";
-				source: "layout";
-				action: STATE_SET "default" 0.0;
-				target: "blocker";
-			}
-			program {
-				signal: "show,zoom";
-				source: "scroller";
-				action: STATE_SET "on" 0.0;
-				target: "scroller";
-				after: "show,zoom,after";
-			}
-			program {
-				name: "show,zoom,after";
-				action: STATE_SET "zoom" 0.0;
-				transition: SIN_FAC 0.2 0.90;
-				target: "scroller";
-			}
-			program {
-				signal: "reset,zoom";
-				source: "scroller";
-				action: STATE_SET "on" 0.0;
-				transition: SIN_FAC 0.2 0.90;
-				target: "scroller";
-				after: "reset,zoom,after";
-			}
-			program {
-				name: "reset,zoom,after";
-				action: STATE_SET "default" 0.0;
-				target: "scroller";
 			}
 		}
 	} // layout group
